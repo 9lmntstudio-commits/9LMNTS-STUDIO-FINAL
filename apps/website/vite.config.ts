@@ -8,6 +8,7 @@ export default defineConfig({
     extensions: ['.js', '.jsx', '.ts', '.tsx', '.json'],
     alias: {
       '@': path.resolve(__dirname, './src'),
+      '@assets': path.resolve(__dirname, '../../packages/assets'),
     },
   },
   build: {
@@ -18,4 +19,5 @@ export default defineConfig({
     port: 3000,
     open: true,
   },
+  assetsInclude: ['**/*.png', '**/*.jpg', '**/*.jpeg', '**/*.gif', '**/*.svg', '**/*.webp'],
 });

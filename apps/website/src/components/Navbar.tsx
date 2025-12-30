@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Menu, X } from 'lucide-react';
-import logoImage from 'figma:asset/66355c9cd4c14b7fec10c18b34ee5fc85c12f93e.png';
+import logoImage from '@assets/images/66355c9cd4c14b7fec10c18b34ee5fc85c12f93e.png';
 
 interface NavbarProps {
   currentPage: string;
