@@ -150,6 +150,7 @@ export function LOAAssistantPage() {
                       Most Popular
                     </span>
                   </div>
+                )}
                 
                 <div className="mb-6">
                   <h3 className="text-white text-2xl mb-2">{tier.name}</h3>
