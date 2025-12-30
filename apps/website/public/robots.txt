@@ -1,0 +1,18 @@
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://9lmnts.studio/sitemap.xml
+
+# Block common bot paths
+Disallow: /api/
+Disallow: /admin/
+Disallow: /_next/
+Disallow: /static/
+
+# Allow specific paths
+Allow: /assets/
+Allow: /images/
+
+# Crawl delay (optional)
+Crawl-delay: 1
