@@ -16,14 +16,6 @@
       "dest": "/apps/website"
     },
     {
-      "src": "/loa-assistant",
-      "dest": "/apps/website"
-    },
-    {
-      "src": "/loa-game",
-      "dest": "/apps/website"
-    },
-    {
       "src": "/(.*)",
       "dest": "/apps/website/$1"
     }

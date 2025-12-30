@@ -7,15 +7,13 @@ import { ServicesPage } from './components/ServicesPage';
 import { PricingPage } from './components/PricingPage';
 import { AboutPage } from './components/AboutPage';
 import { EventOSPage } from './components/EventOSPage';
-import { LOAAssistantPage } from './components/LOAAssistantPage';
-import { LOAGamePage } from './components/LOAGamePage';
 import { SEO } from './components/SEO';
-import { Analytics } from './components/Analytics';
 
 export default function App() {
   return (
     <Router>
       <div className="min-h-screen bg-[#1A1A1A]">
+        <SEO />
         <CommandCenter currentPage={window.location.pathname} />
         <main>
           <Routes>
@@ -25,8 +23,6 @@ export default function App() {
             <Route path="/pricing" element={<PricingPage />} />
             <Route path="/about" element={<AboutPage />} />
             <Route path="/event-os" element={<EventOSPage />} />
-            <Route path="/loa-assistant" element={<LOAAssistantPage />} />
-            <Route path="/loa-game" element={<LOAGamePage />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </main>

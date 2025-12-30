@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, Zap, Gamepad2, Brain } from 'lucide-react';
+import { Menu, X, Zap } from 'lucide-react';
 
 interface CommandCenterProps {
   currentPage: string;
@@ -22,18 +22,6 @@ export function CommandCenter({ currentPage }: CommandCenterProps) {
       id: '/event-os',
       icon: Menu,
       description: 'QR-based Event Management System'
-    },
-    {
-      name: 'LOA Assistant',
-      id: '/loa-assistant',
-      icon: Brain,
-      description: 'B2B Workflow Optimization AI'
-    },
-    {
-      name: 'LOA Game',
-      id: '/loa-game',
-      icon: Gamepad2,
-      description: 'Legend of Arcadom - Cyber Action Game'
     }
   ];
 
