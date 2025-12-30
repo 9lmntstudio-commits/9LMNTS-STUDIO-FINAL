@@ -45,16 +45,16 @@ export function Footer() {
           <div>
             <h4 className="text-white mb-4">Connect</h4>
             <div className="flex space-x-4 mb-4">
-              <a href="#" className="text-gray-400 hover:text-[#FF7A00] transition-colors">
+              <a href="https://instagram.com/9lmntsstudio" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#FF7A00] transition-colors">
                 <Instagram size={20} />
               </a>
-              <a href="#" className="text-gray-400 hover:text-[#FF7A00] transition-colors">
+              <a href="https://twitter.com/9lmntsstudio" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#FF7A00] transition-colors">
                 <Twitter size={20} />
               </a>
-              <a href="#" className="text-gray-400 hover:text-[#FF7A00] transition-colors">
+              <a href="https://linkedin.com/company/9lmntsstudio" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#FF7A00] transition-colors">
                 <Linkedin size={20} />
               </a>
-              <a href="#" className="text-gray-400 hover:text-[#FF7A00] transition-colors">
+              <a href="mailto:contact@9lmnts.studio" className="text-gray-400 hover:text-[#FF7A00] transition-colors">
                 <Mail size={20} />
               </a>
             </div>

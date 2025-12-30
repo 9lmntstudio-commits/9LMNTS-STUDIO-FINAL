@@ -1,5 +1,6 @@
 import { Check, HelpCircle } from 'lucide-react';
 import { useState } from 'react';
+import { PaymentButton } from './PaymentButton';
 
 export function PricingPage() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
@@ -173,7 +174,9 @@ export function PricingPage() {
                   ))}
                 </ul>
 
-                <button
+                <PaymentButton
+                  priceId={`price_${tier.name.toLowerCase().replace(' ', '_')}`}
+                  buttonText={tier.cta}
                   className={`w-full py-4 rounded-lg transition-all ${
                     tier.popular
                       ? 'bg-[#FF7A00] text-[#1A1A1A] hover:bg-[#FF7A00]/90'
@@ -181,9 +184,7 @@ export function PricingPage() {
                       ? 'bg-transparent border-2 border-[#FF7A00] text-[#FF7A00] hover:bg-[#FF7A00]/10'
                       : 'bg-transparent border border-[#FF7A00] text-[#FF7A00] hover:bg-[#FF7A00]/10'
                   }`}
-                >
-                  {tier.cta}
-                </button>
+                />
               </div>
             ))}
           </div>

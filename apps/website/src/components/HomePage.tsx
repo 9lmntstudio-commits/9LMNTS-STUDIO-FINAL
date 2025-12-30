@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { ArrowRight, Sparkles, Zap, Layers } from 'lucide-react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
+import { EmailCapture } from './EmailCapture';
 
 export function HomePage() {
   const featuredWorks = [
@@ -84,6 +85,23 @@ export function HomePage() {
               Explore Services
             </Link>
           </div>
+        </div>
+      </section>
+
+      {/* Email Capture */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-4xl mx-auto text-center">
+          <h2 className="text-3xl sm:text-4xl text-white mb-4">
+            Ready to <span className="font-graffiti text-[#FF7A00]">Transform</span> Your Digital Presence?
+          </h2>
+          <p className="text-gray-400 text-lg mb-8">
+            Get exclusive design tips and be the first to know about our latest projects
+          </p>
+          <EmailCapture 
+            className="max-w-md mx-auto"
+            placeholder="Enter your email address"
+            buttonText="Get Started"
+          />
         </div>
       </section>
 
