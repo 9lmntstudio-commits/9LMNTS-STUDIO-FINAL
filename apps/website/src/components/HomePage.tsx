@@ -1,11 +1,8 @@
+import { Link } from 'react-router-dom';
 import { ArrowRight, Sparkles, Zap, Layers } from 'lucide-react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 
-interface HomePageProps {
-  onNavigate: (page: string) => void;
-}
-
-export function HomePage({ onNavigate }: HomePageProps) {
+export function HomePage() {
   const featuredWorks = [
     {
       title: 'Rockin\' Smiles',
@@ -73,19 +70,19 @@ export function HomePage({ onNavigate }: HomePageProps) {
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button
-              onClick={() => onNavigate('pricing')}
+            <Link
+              to="/pricing"
               className="px-8 py-4 bg-[#FF7A00] text-[#1A1A1A] rounded-lg hover:bg-[#FF7A00]/90 transition-all transform hover:scale-105 flex items-center justify-center gap-2 group"
             >
               Start Your Project
               <ArrowRight className="group-hover:translate-x-1 transition-transform" size={20} />
-            </button>
-            <button
-              onClick={() => onNavigate('services')}
+            </Link>
+            <Link
+              to="/services"
               className="px-8 py-4 bg-transparent border-2 border-[#FF7A00] text-[#FF7A00] rounded-lg hover:bg-[#FF7A00]/10 transition-all"
             >
               Explore Services
-            </button>
+            </Link>
           </div>
         </div>
       </section>
@@ -235,13 +232,13 @@ export function HomePage({ onNavigate }: HomePageProps) {
           </div>
 
           <div className="text-center">
-            <button
-              onClick={() => onNavigate('pricing')}
+            <Link
+              to="/pricing"
               className="px-8 py-4 bg-transparent border-2 border-[#FF7A00] text-[#FF7A00] rounded-lg hover:bg-[#FF7A00]/10 transition-all inline-flex items-center gap-2"
             >
               View All Plans
               <ArrowRight size={20} />
-            </button>
+            </Link>
           </div>
         </div>
       </section>

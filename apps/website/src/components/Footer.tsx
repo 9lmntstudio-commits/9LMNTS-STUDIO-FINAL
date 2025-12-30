@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { Instagram, Twitter, Linkedin, Mail } from 'lucide-react';
 import logoImage from '@assets/images/66355c9cd4c14b7fec10c18b34ee5fc85c12f93e.png';
 
@@ -22,10 +23,10 @@ export function Footer() {
           <div>
             <h4 className="text-white mb-4">Quick Links</h4>
             <ul className="space-y-2 text-gray-400 text-sm">
-              <li><a href="#" className="hover:text-[#FF7A00] transition-colors">Home</a></li>
-              <li><a href="#" className="hover:text-[#FF7A00] transition-colors">Services</a></li>
-              <li><a href="#" className="hover:text-[#FF7A00] transition-colors">Pricing</a></li>
-              <li><a href="#" className="hover:text-[#FF7A00] transition-colors">About</a></li>
+              <li><Link to="/" className="hover:text-[#FF7A00] transition-colors">Home</Link></li>
+              <li><Link to="/services" className="hover:text-[#FF7A00] transition-colors">Services</Link></li>
+              <li><Link to="/pricing" className="hover:text-[#FF7A00] transition-colors">Pricing</Link></li>
+              <li><Link to="/about" className="hover:text-[#FF7A00] transition-colors">About</Link></li>
             </ul>
           </div>
 
