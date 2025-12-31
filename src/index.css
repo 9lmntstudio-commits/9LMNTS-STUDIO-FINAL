@@ -1,0 +1,15 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Permanent+Marker&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.font-futuristic {
+  letter-spacing: 0.05em;
+  font-family: Orbitron, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+}
+
+.font-graffiti {
+  letter-spacing: 0.02em;
+  font-family: 'Permanent Marker', cursive;
+}
