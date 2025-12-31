@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>9LMNTS | The Ecosystem</title>
+    <style>
+        /* --- MASTER CYBER CSS --- */
+        :root { --bg: #050505; --card: #111; --orange: #FF5E00; --red: #D32F2F; --white: #fff; --gray: #888; --green: #00e676; }
+        body { background: var(--bg); color: var(--white); font-family: 'Helvetica Neue', sans-serif; margin: 0; padding-bottom: 80px; overflow-x: hidden; }
+        a { text-decoration: none; color: inherit; }
+        
+        /* CONTAINER */
+        .app-container { max-width: 480px; margin: 0 auto; min-height: 100vh; border-left: 1px solid #222; border-right: 1px solid #222; position: relative; }
+        
+        /* HEADER */
+        header { display: flex; justify-content: space-between; padding: 20px; border-bottom: 1px solid #222; background: rgba(5,5,5,0.95); position: sticky; top: 0; z-index: 90; backdrop-filter: blur(10px); }
+        .logo { font-weight: 900; letter-spacing: 1px; }
+        .live-tag { border: 1px solid var(--red); color: var(--red); font-size: 0.7rem; font-weight: bold; padding: 4px 8px; display: flex; align-items: center; gap: 5px; }
+        .pulse { width: 6px; height: 6px; background: var(--red); border-radius: 50%; animation: pulse 1s infinite; }
+        
+        /* HERO SECTION */
+        .hero { text-align: center; padding: 40px 20px; background: radial-gradient(circle at center, #1a0a0a 0%, #000000 70%); border-bottom: 1px solid #222; }
+        .hero h1 { font-size: 3rem; margin: 10px 0; font-style: italic; line-height: 0.9; text-transform: uppercase; text-shadow: 0 0 20px rgba(255, 94, 0, 0.4); }
+        .sub-hero { font-size: 0.9rem; color: #ccc; letter-spacing: 1px; margin-bottom: 20px; }
+        
+        /* TABS */
+        .category-nav { display: flex; gap: 10px; padding: 20px 15px; overflow-x: auto; scrollbar-width: none; border-bottom: 1px solid #222; }
+        .cat-tab { white-space: nowrap; padding: 8px 15px; border: 1px solid #333; color: #666; font-size: 0.7rem; font-weight: bold; cursor: pointer; border-radius: 20px; transition: 0.3s; text-transform: uppercase; }
+        .cat-tab.active { background: var(--white); color: black; border-color: white; }
+
+        /* BATTLE GRID */
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 20px 15px; display: none; }
+        .grid.active-view { display: grid; animation: fadeIn 0.5s ease; }
+        
+        .card { background: var(--card); border-top: 4px solid #333; padding: 15px; text-align: center; position: relative; }
+        .card-red { border-color: var(--red); }
+        .card-org { border-color: var(--orange); }
+        
+        .avatar { width: 80px; height: 80px; background-size: cover; background-position: center; margin: 0 auto 10px; border-radius: 4px; filter: grayscale(100%); transition: 0.3s; }
+        .card:hover .avatar { filter: grayscale(0%); }
+
+        .btn-preview { width: 100%; background: #222; border: 1px solid #333; color: #ccc; padding: 8px; font-size: 0.7rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; margin: 10px 0; }
+        .profile-link { font-size: 0.7rem; color: var(--gray); display: block; margin-bottom: 15px; text-decoration: underline; cursor: pointer; }
+        
+        .btn-vote { width: 100%; padding: 12px; font-weight: bold; border: none; cursor: pointer; text-transform: uppercase; color: white; }
+        .bg-red { background: var(--red); }
+        .bg-org { background: var(--orange); }
+
+        /* VOTING STATS */
+        .vote-bar-container { padding: 0 15px 20px 15px; display: none; }
+        .vote-bar-container.active-view { display: block; }
+
+        /* BUILD A STAR SECTION */
+        .star-section { padding: 30px 15px; border-top: 1px solid #222; background: #080808; }
+        .section-label { text-align: center; color: var(--gray); font-size: 0.8rem; letter-spacing: 2px; margin-bottom: 20px; font-style: italic; }
+        
+        .star-card { padding: 25px; margin-bottom: 15px; position: relative; }
+        .sc-red { background: linear-gradient(90deg, rgba(211,47,47,0.1) 0%, #000 100%); border-left: 4px solid var(--red); border: 1px solid #222; border-left-width: 4px; }
+        .sc-org { background: linear-gradient(90deg, rgba(255,94,0,0.1) 0%, #000 100%); border-left: 4px solid var(--orange); border: 1px solid #222; border-left-width: 4px; }
+        
+        .star-card h3 { margin: 0 0 10px 0; font-size: 1.2rem; text-transform: uppercase; }
+        .promo-tag { display: inline-block; background: #222; color: white; font-size: 0.6rem; font-weight: bold; padding: 4px 8px; margin-bottom: 15px; font-family: monospace; }
+        .star-btn { background: #fff; color: #000; border: none; padding: 12px 20px; font-weight: bold; text-transform: uppercase; cursor: pointer; font-size: 0.8rem; width: 100%; }
+
+        /* GAME FUNDING BANNER */
+        .game-banner { margin: 30px 15px; background: linear-gradient(45deg, #1a0505, #000); border: 1px solid var(--orange); padding: 30px 20px; text-align: center; }
+        .game-btn { background: var(--white); color: black; border: none; padding: 15px 30px; font-weight: bold; margin-top: 15px; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; }
+
+        /* FOOTER */
+        footer { text-align: center; padding: 30px; color: #444; font-size: 0.8rem; }
+
+        /* --- MODALS --- */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
+        .modal-box { width: 85%; max-width: 400px; background: #151515; padding: 30px; position: relative; box-shadow: 0 0 50px rgba(0,0,0,0.8); }
+        .close { position: absolute; top: 15px; right: 20px; font-size: 24px; cursor: pointer; color: #666; }
+        
+        .tab-group { display: flex; margin-bottom: 20px; border-bottom: 1px solid #333; }
+        .tab { flex: 1; padding: 10px; text-align: center; cursor: pointer; color: #666; font-size: 0.8rem; font-weight: bold; }
+        .tab.active { color: white; border-bottom: 2px solid white; }
+
+        input, select { width: 100%; padding: 15px; background: #000; border: 1px solid #333; color: white; margin-bottom: 15px; box-sizing: border-box; }
+        .submit { width: 100%; padding: 15px; background: white; color: black; border: none; font-weight: bold; cursor: pointer; text-transform: uppercase; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <header>
+        <div class="logo">THE ETHER <span style="color:#666">x</span> <span style="color:var(--orange)">9LMNTS</span></div>
+        <div class="live-tag"><div class="pulse"></div> LIVE</div>
+    </header>
+
+    <section class="hero">
+        <div style="color: var(--red); font-weight:bold; letter-spacing:3px; margin-bottom:10px;">FEB 28 @ 70 BONGARD</div>
+        <h1>CULTURE<br>CLASH</h1>
+        <p class="sub-hero">THE 9 ELEMENTS TOURNAMENT.</p>
+        <button class="game-btn" onclick="openModal('gameModal')">GET TICKETS / PLEDGE</button>
+    </section>
+
+    <div class="category-nav">
+        <div class="cat-tab active" onclick="changeCategory('lyrical', this)">🎤 Lyrical Warfare</div>
+        <div class="cat-tab" onclick="changeCategory('kinetic', this)">💃 Kinetic Energy</div>
+        <div class="cat-tab" onclick="changeCategory('fusion', this)">⚡ Fusion Teams</div>
+    </div>
+
+    <div id="lyrical" class="grid active-view">
+        <div class="card card-red">
+            <div class="avatar" style="background-image: url('https://images.unsplash.com/photo-1598520106830-8c45c2035460?auto=format&fit=crop&w=300&q=80');"></div>
+            <h3 style="margin:0; text-transform:uppercase;">Kinetic</h3>
+            <div style="font-size:0.7rem; color:var(--gray); margin-bottom:10px;">WEST END</div>
+            <button class="btn-preview" onclick="playMockAudio(this)">▶ PREVIEW</button>
+            <button class="btn-vote bg-red" onclick="openVote('KINETIC', 'var(--red)')">VOTE RED</button>
+        </div>
+        <div class="card card-org">
+            <a href="profile.html"><div class="avatar" style="background-image: url('https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?auto=format&fit=crop&w=300&q=80'); border: 2px solid var(--orange);"></div></a>
+            <h3 style="margin:0; text-transform:uppercase;">Das Jones</h3>
+            <div style="font-size:0.7rem; color:var(--gray); margin-bottom:10px;">OTTAWA // MTL</div>
+            <button class="btn-preview" onclick="playMockAudio(this)">▶ PREVIEW</button>
+            <a href="profile.html" class="profile-link">View Full Profile →</a>
+            <button class="btn-vote bg-org" onclick="openVote('DAS JONES', 'var(--orange)')">VOTE ORANGE</button>
+        </div>
+    </div>
+
+    <div id="kinetic" class="grid">
+        <div class="card card-red">
+            <div class="avatar" style="background-image: url('https://images.unsplash.com/photo-1535525266644-dc2878e7e653?auto=format&fit=crop&w=300&q=80');"></div>
+            <h3 style="margin:0; text-transform:uppercase;">Phantom</h3>
+            <div style="font-size:0.7rem; color:var(--gray); margin-bottom:10px;">BREAKING</div>
+            <button class="btn-preview" onclick="playMockAudio(this)">▶ WATCH MOVE</button>
+            <button class="btn-vote bg-red" onclick="openVote('PHANTOM', 'var(--red)')">VOTE RED</button>
+        </div>
+        <div class="card card-org">
+            <div class="avatar" style="background-image: url('https://images.unsplash.com/photo-1508700929628-666bc8bd84ea?auto=format&fit=crop&w=300&q=80');"></div>
+            <h3 style="margin:0; text-transform:uppercase;">B-Boy 613</h3>
+            <div style="font-size:0.7rem; color:var(--gray); margin-bottom:10px;">POPPING</div>
+            <button class="btn-preview" onclick="playMockAudio(this)">▶ WATCH MOVE</button>
+            <button class="btn-vote bg-org" onclick="openVote('B-BOY 613', 'var(--orange)')">VOTE ORANGE</button>
+        </div>
+    </div>
+
+    <div id="fusion" class="grid">
+        <div class="card card-red">
+            <div class="avatar" style="background-image: url('https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=300&q=80');"></div>
+            <h3 style="margin:0; text-transform:uppercase;">Team Alpha</h3>
+            <div style="font-size:0.7rem; color:var(--gray); margin-bottom:10px;">DJ + RAP + DANCE</div>
+            <button class="btn-preview" onclick="playMockAudio(this)">▶ WATCH SET</button>
+            <button class="btn-vote bg-red" onclick="openVote('TEAM ALPHA', 'var(--red)')">VOTE RED</button>
+        </div>
+        <div class="card card-org">
+            <div class="avatar" style="background-image: url('https://images.unsplash.com/photo-1493225255756-d9584f8606e9?auto=format&fit=crop&w=300&q=80');"></div>
+            <h3 style="margin:0; text-transform:uppercase;">Team Omega</h3>
+            <div style="font-size:0.7rem; color:var(--gray); margin-bottom:10px;">DJ + RAP + DANCE</div>
+            <button class="btn-preview" onclick="playMockAudio(this)">▶ WATCH SET</button>
+            <button class="btn-vote bg-org" onclick="openVote('TEAM OMEGA', 'var(--orange)')">VOTE ORANGE</button>
+        </div>
+    </div>
+
+    <div id="stats-lyrical" class="vote-bar-container active-view">
+        <div style="background:#222; height:8px; display:flex;"><div style="width:48%; background:var(--red)"></div><div style="width:52%; background:var(--orange)"></div></div>
+        <div style="display:flex; justify-content:space-between; font-size:0.7rem; margin-top:5px; color:var(--gray);"><span>48%</span><span>TOTAL: 1,245</span><span>52%</span></div>
+    </div>
+    <div id="stats-kinetic" class="vote-bar-container">
+        <div style="background:#222; height:8px; display:flex;"><div style="width:60%; background:var(--red)"></div><div style="width:40%; background:var(--orange)"></div></div>
+        <div style="display:flex; justify-content:space-between; font-size:0.7rem; margin-top:5px; color:var(--gray);"><span>60%</span><span>TOTAL: 890</span><span>40%</span></div>
+    </div>
+    <div id="stats-fusion" class="vote-bar-container">
+        <div style="background:#222; height:8px; display:flex;"><div style="width:30%; background:var(--red)"></div><div style="width:70%; background:var(--orange)"></div></div>
+        <div style="display:flex; justify-content:space-between; font-size:0.7rem; margin-top:5px; color:var(--gray);"><span>30%</span><span>TOTAL: 2,100</span><span>70%</span></div>
+    </div>
+
+    <div class="star-section">
+        <div class="section-label">—— BUILD A STAR ——</div>
+        
+        <div class="star-card sc-red">
+            <h3 style="color:var(--red)">THE SOUND</h3>
+            <p class="star-desc">Recorded at The Ether Studio.<br>Create now. Pay later.</p>
+            <div class="promo-tag">0% INTEREST FINANCING</div>
+            <button class="star-btn" onclick="openModal('studioModal')">BOOK STUDIO SESSION</button>
+        </div>
+
+        <div class="star-card sc-org">
+            <h3 style="color:var(--orange)">THE IMAGE</h3>
+            <p class="star-desc">Branding by 9LMNTS Studio.<br>Websites, Logos, & Identity.</p>
+            <div class="promo-tag">WINNER GETS FULL PACKAGE</div>
+            <button class="star-btn" onclick="openModal('agencyModal')">LAUNCH MY BRAND</button>
+        </div>
+    </div>
+
+    <div class="game-banner">
+        <div style="font-size:0.7rem; color:var(--orange); font-weight:bold; letter-spacing:1px; margin-bottom:5px;">FUND THE REVOLUTION</div>
+        <h3>BECOME AN NPC IN "LOA"</h3>
+        <p style="font-size:0.8rem; color:#ccc; margin-bottom:15px;">Support the event & get your face scanned into Ottawa's first Open World RPG.</p>
+        <button class="game-btn" onclick="openModal('gameModal')">PLEDGE $250</button>
+    </div>
+
+    <footer>© 2025 9LMNTS.ENT</footer>
+</div>
+
+<div id="voteModal" class="modal">
+    <div class="modal-box" id="voteBox" style="border-top: 5px solid white;">
+        <span class="close" onclick="closeModal('voteModal')">&times;</span>
+        <h3 style="margin-top:0;">CAST VOTE</h3>
+        <p style="font-size:0.8rem; color:#888; margin-bottom:20px;">Voting for: <strong id="voteTarget" style="color:white;">ARTIST</strong></p>
+        <div class="tab-group">
+            <div class="tab active" onclick="switchTab('free')">FREE VOTE</div>
+            <div class="tab" onclick="switchTab('power')">POWER VOTE (+$)</div>
+        </div>
+        <div id="freeForm">
+            <input type="email" placeholder="Enter Email to Verify">
+            <button class="submit" onclick="process('voteModal', 'VOTE CAST!')">SUBMIT VOTE</button>
+        </div>
+        <div id="powerForm" style="display:none;">
+            <div style="display:flex; gap:10px; margin-bottom:15px;">
+                <button style="flex:1; padding:10px; background:#222; border:1px solid #333; color:white;">10 Votes<br><span style="color:var(--orange)">$2</span></button>
+                <button style="flex:1; padding:10px; background:#222; border:1px solid #333; color:white;">50 Votes<br><span style="color:var(--orange)">$10</span></button>
+            </div>
+            <button class="submit" style="background:var(--orange); color:white;" onclick="process('voteModal', 'POWER BOOST APPLIED!')">PAY & BOOST</button>
+        </div>
+    </div>
+</div>
+
+<div id="gameModal" class="modal">
+    <div class="modal-box" style="border-top: 5px solid var(--orange);">
+        <span class="close" onclick="closeModal('gameModal')">&times;</span>
+        <h3 style="margin-top:0; color:var(--orange);">ENLIST</h3>
+        <p style="font-size:0.8rem; color:#888; margin-bottom:20px;">Support the Event + Fund the Game.</p>
+        
+        <select id="tierSelect">
+            <option value="25">THE RECRUIT ($25) - Ticket Only</option>
+            <option value="50">THE BETA TESTER ($50) - Ticket + Game</option>
+            <option value="250">THE IMMORTAL ($250) - VIP + NPC Face Scan</option>
+        </select>
+
+        <input type="email" placeholder="Email Address">
+        <button class="submit" style="background:var(--orange); color:white;" onclick="process('gameModal', 'PLEDGE SUCCESSFUL!')">SECURE SPOT</button>
+    </div>
+</div>
+
+<div id="studioModal" class="modal">
+    <div class="modal-box" style="border-top: 5px solid var(--red);">
+        <span class="close" onclick="closeModal('studioModal')">&times;</span>
+        <h3 style="margin-top:0; color:var(--red);">BOOK STUDIO</h3>
+        <select>
+            <option>Recording Session ($65/hr)</option>
+            <option>Mixing & Mastering</option>
+            <option>Studio Takeover (10 Hrs)</option>
+        </select>
+        <div style="background:rgba(211,47,47,0.1); padding:10px; border:1px solid var(--red); display:flex; align-items:center; gap:10px; margin-bottom:15px;">
+            <input type="checkbox" checked style="width:20px; margin:0;">
+            <span style="font-size:0.7rem; font-weight:bold; color:var(--red);">ACTIVATE 0% FINANCING</span>
+        </div>
+        <input type="email" placeholder="Your Email">
+        <button class="submit" style="background:var(--red); color:white;" onclick="process('studioModal', 'BOOKING REQUEST SENT')">CONFIRM</button>
+    </div>
+</div>
+
+<div id="agencyModal" class="modal">
+    <div class="modal-box" style="border-top: 5px solid var(--orange);">
+        <span class="close" onclick="closeModal('agencyModal')">&times;</span>
+        <h3 style="margin-top:0; color:var(--orange);">LAUNCH BRAND</h3>
+        <select>
+            <option>Logo & Identity Design</option>
+            <option>Artist Website</option>
+            <option>Social Media Kit</option>
+        </select>
+        <input type="email" placeholder="Your Email">
+        <button class="submit" style="background:var(--orange); color:white;" onclick="process('agencyModal', 'INQUIRY SENT')">START PROJECT</button>
+    </div>
+</div>
+
+<script>
+    // NAVIGATION
+    function changeCategory(cat, tabElement) {
+        document.querySelectorAll('.cat-tab').forEach(t => t.classList.remove('active'));
+        tabElement.classList.add('active');
+        document.querySelectorAll('.grid').forEach(g => g.classList.remove('active-view'));
+        document.querySelectorAll('.vote-bar-container').forEach(s => s.classList.remove('active-view'));
+        document.getElementById(cat).classList.add('active-view');
+        document.getElementById('stats-' + cat).classList.add('active-view');
+    }
+
+    // MODAL OPENERS
+    function openVote(artist, color) {
+        document.getElementById('voteTarget').innerText = artist;
+        document.getElementById('voteTarget').style.color = color;
+        document.getElementById('voteBox').style.borderTopColor = color;
+        document.getElementById('voteModal').style.display = 'flex';
+    }
+    function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+    // TAB LOGIC
+    function switchTab(type) {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        event.target.classList.add('active');
+        if(type === 'free') {
+            document.getElementById('freeForm').style.display = 'block';
+            document.getElementById('powerForm').style.display = 'none';
+        } else {
+            document.getElementById('freeForm').style.display = 'none';
+            document.getElementById('powerForm').style.display = 'block';
+        }
+    }
+
+    // PROCESS MOCK
+    function process(modalId, msg) { 
+        let btn = document.querySelector(`#${modalId} .submit`);
+        let oldText = btn.innerText;
+        btn.innerText = "PROCESSING...";
+        setTimeout(() => {
+            alert(msg);
+            closeModal(modalId);
+            btn.innerText = oldText;
+        }, 1000);
+    }
+
+    function playMockAudio(btn) {
+        if(btn.innerHTML.includes('PREVIEW') || btn.innerHTML.includes('WATCH')) {
+            let original = btn.innerHTML;
+            btn.innerHTML = "❚❚ PLAYING...";
+            btn.style.color = "var(--orange)";
+            setTimeout(() => { btn.innerHTML = original; btn.style.color = "#ccc"; }, 4000);
+        }
+    }
+</script>
+</body>
+</html>

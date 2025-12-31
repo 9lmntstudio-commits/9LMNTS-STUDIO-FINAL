@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>9LMNTS COMMAND CENTER | ADMIN</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Teko:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --bg-dark: #050505;
+            --panel-bg: #111111;
+            --text-main: #ffffff;
+            --text-sub: #737373;
+            --primary: #f97316; /* 9LMNTS ORANGE */
+            --success: #10b981;
+            --border: #262626;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 20px;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            background: var(--panel-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+        .brand {
+            font-family: 'Teko', sans-serif;
+            font-size: 2rem;
+            margin-bottom: 40px;
+            color: white;
+            letter-spacing: 2px;
+        }
+        .brand span { color: var(--primary); }
+        
+        .nav-item {
+            padding: 15px;
+            margin-bottom: 5px;
+            border-radius: 8px;
+            cursor: pointer;
+            color: var(--text-sub);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: 0.2s;
+        }
+        .nav-item.active, .nav-item:hover {
+            background: rgba(249, 115, 22, 0.1);
+            color: var(--primary);
+        }
+
+        /* MAIN DASHBOARD */
+        .main-content {
+            display: grid;
+            grid-template-rows: auto 1fr;
+            gap: 20px;
+            overflow-y: auto;
+        }
+
+        /* TOP STATS ROW */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+        }
+        .stat-card {
+            background: var(--panel-bg);
+            border: 1px solid var(--border);
+            padding: 20px;
+            border-radius: 12px;
+            position: relative;
+        }
+        .stat-card::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 2px;
+            background: linear-gradient(90deg, var(--primary), transparent);
+            opacity: 0.5;
+        }
+        .stat-label { font-size: 0.75rem; color: var(--text-sub); text-transform: uppercase; font-weight: 700; }
+        .stat-val { font-size: 2.2rem; font-weight: 800; margin: 5px 0; font-family: 'Teko', sans-serif; }
+        .stat-change { font-size: 0.8rem; color: var(--success); display: flex; align-items: center; gap: 5px; }
+
+        /* CHARTS & FEEDS */
+        .dashboard-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+            height: 100%;
+        }
+        .panel {
+            background: var(--panel-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 15px;
+        }
+        .p-title { font-weight: 700; color: white; }
+        
+        /* LIVE FEED LIST */
+        .live-feed {
+            flex: 1;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 0.85rem;
+        }
+        .feed-item {
+            padding: 10px 0;
+            border-bottom: 1px solid #222;
+            display: flex;
+            justify-content: space-between;
+            animation: fadeIn 0.3s ease;
+        }
+        .feed-time { color: var(--text-sub); margin-right: 10px; }
+        .feed-action { color: white; }
+        .feed-money { color: var(--success); font-weight: bold; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
+
+        /* SIMULATOR CONTROLS (Hidden Trigger) */
+        .sim-trigger {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            opacity: 0.1;
+            cursor: pointer;
+        }
+        .sim-trigger:hover { opacity: 1; }
+
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <div class="brand">9LMNTS <span>OS</span></div>
+        <div class="nav-item active"><i class="fas fa-chart-line"></i> Dashboard</div>
+        <div class="nav-item"><i class="fas fa-users"></i> Users</div>
+        <div class="nav-item"><i class="fas fa-wallet"></i> Revenue</div>
+        <div class="nav-item"><i class="fas fa-sliders-h"></i> Configuration</div>
+        <div style="flex:1"></div>
+        <div class="nav-item" style="color:var(--text-sub); font-size:0.8rem;">
+            <i class="fas fa-circle" style="color:var(--success); font-size:0.5rem;"></i> System Online
+        </div>
+    </div>
+
+    <div class="main-content">
+        
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">Total Revenue (Live)</div>
+                <div class="stat-val" id="totalRev">$12,450</div>
+                <div class="stat-change"><i class="fas fa-arrow-up"></i> +$850 (Last Hour)</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Active Users</div>
+                <div class="stat-val" id="activeUsers">142</div>
+                <div class="stat-change"><i class="fas fa-user-plus"></i> +12 joined</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Vote Packs Sold</div>
+                <div class="stat-val" id="packsSold">89</div>
+                <div class="stat-change" style="color:var(--primary);">24% Conversion</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">ARPU (Avg Revenue)</div>
+                <div class="stat-val">$87.60</div>
+                <div class="stat-change">Per User</div>
+            </div>
+        </div>
+
+        <div class="dashboard-row">
+            <div class="panel">
+                <div class="panel-header">
+                    <div class="p-title">Real-Time Revenue Velocity</div>
+                    <div style="font-size:0.8rem; color:var(--text-sub);">Last 30 Minutes</div>
+                </div>
+                <div style="flex:1; position: relative;">
+                    <canvas id="revenueChart"></canvas>
+                </div>
+            </div>
+
+            <div class="panel">
+                <div class="panel-header">
+                    <div class="p-title">Live Transaction Feed</div>
+                    <div style="background:var(--success); color:black; font-size:0.6rem; font-weight:bold; padding:2px 6px; border-radius:4px;">LIVE</div>
+                </div>
+                <div class="live-feed" id="liveFeed">
+                    </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="sim-trigger">
+        <button onclick="simulateSale(5)">+$5</button>
+        <button onclick="simulateSale(50)">+$50</button>
+        <button onclick="simulateSale(500)">VIP</button>
+    </div>
+
+    <script>
+        // --- CHART SETUP ---
+        const ctx = document.getElementById('revenueChart').getContext('2d');
+        const revenueChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['10:00', '10:05', '10:10', '10:15', '10:20', '10:25'],
+                datasets: [{
+                    label: 'Revenue ($)',
+                    data: [500, 1200, 1800, 2400, 3200, 4100],
+                    borderColor: '#f97316',
+                    backgroundColor: 'rgba(249, 115, 22, 0.1)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { grid: { color: '#222' }, ticks: { color: '#666' } },
+                    x: { grid: { display: false }, ticks: { color: '#666' } }
+                }
+            }
+        });
+
+        // --- SIMULATOR LOGIC ---
+        let currentRev = 12450;
+        let packs = 89;
+
+        function updateStats() {
+            document.getElementById('totalRev').innerText = '$' + currentRev.toLocaleString();
+            document.getElementById('packsSold').innerText = packs;
+        }
+
+        function addFeedItem(item, amount) {
+            const feed = document.getElementById('liveFeed');
+            const div = document.createElement('div');
+            div.className = 'feed-item';
+            const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            
+            div.innerHTML = `
+                <div><span class="feed-time">[${time}]</span> <span class="feed-action">${item}</span></div>
+                <div class="feed-money">+$${amount}</div>
+            `;
+            
+            feed.prepend(div);
+            if (feed.children.length > 20) feed.lastChild.remove();
+        }
+
+        // TRIGGER THIS WHEN YOU WANT TO SHOW REVENUE
+        function simulateSale(amount) {
+            currentRev += amount;
+            packs += 1;
+            
+            let itemName = "Vote Pack (Standard)";
+            if (amount > 40) itemName = "Mega Vote Pack";
+            if (amount > 100) itemName = "VIP Table Upgrade";
+
+            updateStats();
+            addFeedItem(itemName, amount);
+            
+            // Update Chart
+            const newData = revenueChart.data.datasets[0].data;
+            const lastVal = newData[newData.length - 1];
+            newData.push(lastVal + amount);
+            newData.shift(); // keep graph moving
+            revenueChart.update();
+        }
+
+        // AUTO SIMULATOR (Small passive sales)
+        setInterval(() => {
+            if(Math.random() > 0.7) {
+                simulateSale(5);
+            }
+        }, 3000);
+
+    </script>
+</body>
+</html>

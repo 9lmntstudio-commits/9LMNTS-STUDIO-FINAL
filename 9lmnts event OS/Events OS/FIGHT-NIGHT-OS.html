@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>WAGER OS | Fight Night Bracket</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Teko:wght@300;500;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --neon-red: #ff003c;
+            --neon-blue: #00f0ff;
+            --dark-bg: #050505;
+            --panel: #111;
+            --border: rgba(255,255,255,0.1);
+            --font-head: 'Teko', sans-serif;
+            --font-body: 'Inter', sans-serif;
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { 
+            margin: 0; padding: 0; background: var(--dark-bg); color: white; 
+            font-family: var(--font-body); overflow-x: hidden; padding-bottom: 80px;
+        }
+
+        /* --- HEADER --- */
+        header {
+            background: rgba(0,0,0,0.9); border-bottom: 1px solid var(--border);
+            padding: 15px 20px; display: flex; justify-content: space-between; align-items: center;
+            position: sticky; top: 0; z-index: 100; backdrop-filter: blur(10px);
+        }
+        .brand { font-family: var(--font-head); font-size: 1.8rem; font-weight: 700; color: var(--neon-red); letter-spacing: 1px; }
+        .status { font-size: 0.8rem; background: var(--border); padding: 4px 10px; border-radius: 4px; }
+
+        /* --- BRACKET VISUALIZER --- */
+        .bracket-container {
+            padding: 20px; overflow-x: auto; white-space: nowrap;
+            background: radial-gradient(circle at center, #1a1a1a 0%, #000 100%);
+        }
+        
+        .round-title { 
+            font-family: var(--font-head); color: #666; font-size: 1.2rem; margin-bottom: 15px; 
+            text-transform: uppercase; letter-spacing: 1px;
+        }
+
+        .bracket-column { display: inline-block; width: 160px; vertical-align: top; margin-right: 20px; }
+        
+        .matchup-box {
+            background: var(--panel); border: 1px solid var(--border); border-radius: 8px;
+            margin-bottom: 30px; position: relative; overflow: hidden;
+            transition: 0.2s;
+        }
+        
+        /* Connecting Lines */
+        .bracket-column:not(:last-child) .matchup-box::after {
+            content: ''; position: absolute; right: -20px; top: 50%; width: 20px; height: 1px; background: #333;
+        }
+
+        .fighter {
+            padding: 10px; display: flex; justify-content: space-between; align-items: center;
+            cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .fighter:last-child { border-bottom: none; }
+        .fighter:hover { background: rgba(255,255,255,0.05); }
+        
+        .fighter.selected { background: var(--neon-red); color: black; font-weight: 700; }
+        .fighter.winner { border-left: 4px solid var(--neon-blue); }
+
+        .name { font-size: 0.9rem; }
+        .record { font-size: 0.7rem; opacity: 0.6; }
+
+        /* --- LEADERBOARD SECTION --- */
+        .section-header {
+            padding: 20px; font-family: var(--font-head); font-size: 1.5rem; 
+            border-bottom: 1px solid var(--border); display: flex; justify-content: space-between;
+        }
+
+        .leaderboard-row {
+            display: flex; align-items: center; padding: 15px 20px;
+            border-bottom: 1px solid var(--border); animation: fadeIn 0.5s ease;
+        }
+        .rank { font-family: var(--font-head); font-size: 1.5rem; width: 40px; color: #666; }
+        .user-info { flex: 1; }
+        .user-name { font-weight: 600; font-size: 1rem; }
+        .user-loc { font-size: 0.8rem; color: #888; }
+        .pts { font-family: var(--font-head); font-size: 1.5rem; color: var(--neon-blue); }
+
+        /* --- ACTION BAR --- */
+        .action-bar {
+            position: fixed; bottom: 0; left: 0; width: 100%;
+            padding: 15px; background: #000; border-top: 1px solid var(--border);
+            display: flex; gap: 10px; z-index: 200;
+        }
+        .btn {
+            flex: 1; padding: 15px; border: none; border-radius: 4px;
+            font-family: var(--font-head); font-size: 1.2rem; cursor: pointer;
+            text-transform: uppercase; letter-spacing: 1px;
+        }
+        .btn-primary { background: var(--neon-red); color: black; font-weight: 700; }
+        .btn-secondary { background: #333; color: white; }
+
+        /* --- ADMIN MODAL --- */
+        .modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9); z-index: 1000; align-items: center; justify-content: center;
+        }
+        .modal-content {
+            background: #111; padding: 25px; border-radius: 10px; width: 90%; max-width: 400px;
+            border: 1px solid var(--neon-red);
+        }
+        input {
+            width: 100%; padding: 12px; background: #222; border: 1px solid #333;
+            color: white; margin-bottom: 15px; font-family: var(--font-body);
+        }
+
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="brand" onclick="triggerAdmin()"><i class="fas fa-fist-raised"></i> FIGHT NIGHT OS</div>
+    <div class="status">LIVE • MAIN CARD</div>
+</header>
+
+<div class="bracket-container">
+    
+    <div class="bracket-column">
+        <div class="round-title">Quarter Finals</div>
+        
+        <div class="matchup-box" id="m1">
+            <div class="fighter" onclick="pickFighter('m1', 'Mike Tyson')">
+                <div>
+                    <div class="name">Mike Tyson</div>
+                    <div class="record">50-6 (44 KO)</div>
+                </div>
+            </div>
+            <div class="fighter" onclick="pickFighter('m1', 'Jake Paul')">
+                <div>
+                    <div class="name">Jake Paul</div>
+                    <div class="record">9-1 (6 KO)</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="matchup-box" id="m2">
+            <div class="fighter" onclick="pickFighter('m2', 'McGregor')">
+                <div class="name">McGregor</div>
+            </div>
+            <div class="fighter" onclick="pickFighter('m2', 'Chandler')">
+                <div class="name">Chandler</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="bracket-column" style="margin-top: 50px;">
+        <div class="round-title">Semi Finals</div>
+        <div class="matchup-box" id="s1">
+            <div class="fighter" style="height: 40px; color:#444;">Winner M1</div>
+            <div class="fighter" style="height: 40px; color:#444;">Winner M2</div>
+        </div>
+    </div>
+
+</div>
+
+<div class="section-header">
+    <span>LIVE STANDINGS</span>
+    <span style="font-size: 1rem; color: var(--neon-red);">PRIZE: VIP BOTTLE</span>
+</div>
+
+<div id="leaderboard">
+    <div class="leaderboard-row">
+        <div class="rank">1</div>
+        <div class="user-info">
+            <div class="user-name">Table 4 (The Boys)</div>
+            <div class="user-loc">4/4 Correct</div>
+        </div>
+        <div class="pts">400</div>
+    </div>
+    <div class="leaderboard-row">
+        <div class="rank">2</div>
+        <div class="user-info">
+            <div class="user-name">Sarah @ Bar</div>
+            <div class="user-loc">3/4 Correct</div>
+        </div>
+        <div class="pts">300</div>
+    </div>
+</div>
+
+<div class="action-bar">
+    <button class="btn btn-secondary" onclick="alert('Tie Breaker: Guess the exact minute of the main event KO.')">TIE BREAKER</button>
+    <button class="btn btn-primary" onclick="openEntry()">SUBMIT BRACKET</button>
+</div>
+
+<div class="modal" id="entryModal">
+    <div class="modal-content">
+        <h2 style="font-family: var(--font-head); margin-top:0;">ENTER TOURNAMENT</h2>
+        <p style="font-size:0.9rem; color:#888;">Complete your bracket to enter the pool.</p>
+        
+        <label>Your Name / Group Name</label>
+        <input type="text" id="pName" placeholder="e.g. The Knockout Kings">
+        
+        <label>Table Number</label>
+        <input type="text" id="pTable" placeholder="e.g. Table 12">
+        
+        <button class="btn btn-primary" style="width:100%;" onclick="submitBracket()">LOCK IN PREDICTIONS</button>
+        <button class="btn btn-secondary" style="width:100%; margin-top:10px;" onclick="document.getElementById('entryModal').style.display='none'">CANCEL</button>
+    </div>
+</div>
+
+<div class="modal" id="adminModal">
+    <div class="modal-content" style="border-color: #00f0ff;">
+        <h2 style="font-family: var(--font-head); margin-top:0; color:#00f0ff;">VENUE ADMIN</h2>
+        <p>Advance winners to update the big screen.</p>
+        
+        <button class="btn btn-secondary" onclick="adminAdvance('m1', 'Mike Tyson')">Tyson Wins M1</button>
+        <div style="height:10px;"></div>
+        <button class="btn btn-secondary" onclick="adminAdvance('m1', 'Jake Paul')">Paul Wins M1</button>
+        
+        <div style="height:20px; border-bottom:1px solid #333; margin-bottom:20px;"></div>
+        
+        <button class="btn btn-primary" onclick="resetTourney()">RESET TOURNAMENT</button>
+    </div>
+</div>
+
+<script>
+    // --- STATE ---
+    let myPicks = {};
+    let adminClicks = 0;
+
+    // --- USER ACTIONS ---
+    function pickFighter(matchId, fighterName) {
+        // Visual Selection
+        const matchBox = document.getElementById(matchId);
+        const fighters = matchBox.getElementsByClassName('fighter');
+        
+        // Clear previous selection in this box
+        for(let f of fighters) {
+            f.classList.remove('selected');
+        }
+
+        // Highlight clicked
+        event.currentTarget.classList.add('selected');
+        
+        // Save Pick
+        myPicks[matchId] = fighterName;
+        
+        // Auto-advance visuals for user (Preview)
+        if(matchId === 'm1' || matchId === 'm2') {
+            updateSemiPreview();
+        }
+    }
+
+    function updateSemiPreview() {
+        const s1 = document.getElementById('s1');
+        const f1 = myPicks['m1'] || "Winner M1";
+        const f2 = myPicks['m2'] || "Winner M2";
+        
+        s1.innerHTML = `
+            <div class="fighter" onclick="pickFighter('s1', '${f1}')"><div class="name">${f1}</div></div>
+            <div class="fighter" onclick="pickFighter('s1', '${f2}')"><div class="name">${f2}</div></div>
+        `;
+    }
+
+    function openEntry() {
+        // Validate bracket
+        if(!myPicks['m1'] || !myPicks['m2']) {
+            alert("Please pick a winner for all matches first!");
+            return;
+        }
+        document.getElementById('entryModal').style.display = 'flex';
+    }
+
+    function submitBracket() {
+        const name = document.getElementById('pName').value;
+        const table = document.getElementById('pTable').value;
+        
+        if(!name || !table) { alert("Enter name and table!"); return; }
+
+        document.getElementById('entryModal').style.display = 'none';
+        
+        // Add to leaderboard (Fake Data)
+        const lb = document.getElementById('leaderboard');
+        const html = `
+            <div class="leaderboard-row" style="background: rgba(0, 240, 255, 0.1);">
+                <div class="rank" style="color:#00f0ff;">-</div>
+                <div class="user-info">
+                    <div class="user-name">${name} (${table})</div>
+                    <div class="user-loc">Bracket Locked</div>
+                </div>
+                <div class="pts">0</div>
+            </div>
+        `;
+        lb.insertAdjacentHTML('afterbegin', html);
+        
+        alert("Bracket Submitted! Watch the screen for live updates.");
+    }
+
+    // --- ADMIN LOGIC ---
+    function triggerAdmin() {
+        adminClicks++;
+        if(adminClicks === 3) {
+            document.getElementById('adminModal').style.display = 'flex';
+            adminClicks = 0;
+        }
+    }
+
+    function adminAdvance(matchId, winnerName) {
+        // In a real app, this would update the database and recalculate scores
+        alert(`ADMIN: ${winnerName} declared winner of ${matchId}. Leaderboard updating...`);
+        document.getElementById('adminModal').style.display = 'none';
+        
+        // Mark winner visually
+        const matchBox = document.getElementById(matchId);
+        const fighters = matchBox.getElementsByClassName('fighter');
+        for(let f of fighters) {
+            if(f.innerText.includes(winnerName)) {
+                f.classList.add('winner');
+                f.style.background = "var(--neon-blue)";
+                f.style.color = "black";
+            } else {
+                f.style.opacity = "0.3";
+            }
+        }
+    }
+    
+    function resetTourney() {
+        if(confirm("Reset entire tournament?")) location.reload();
+    }
+
+    // Close modals on outside click
+    window.onclick = function(e) {
+        if(e.target.className === 'modal') e.target.style.display = 'none';
+    }
+</script>
+
+</body>
+</html>

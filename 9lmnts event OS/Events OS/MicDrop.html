@@ -1,0 +1,1318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MIC DROP: Karaoke Battle OS</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Canvas Confetti for Winner Celebration -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    
+    <style>
+        /* Neon Tokyo Theme */
+        :root {
+            --neon-pink: #ff0054;
+            --neon-cyan: #00f5d4;
+            --dark-bg: #0f0e17;
+            --darker-bg: #0a0911;
+            --card-bg: #1a1827;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background-color: var(--dark-bg);
+            font-family: 'Montserrat', sans-serif;
+            color: white;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+        
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 900;
+        }
+        
+        .neon-text-pink {
+            color: var(--neon-pink);
+            text-shadow: 
+                0 0 7px var(--neon-pink),
+                0 0 10px var(--neon-pink),
+                0 0 21px var(--neon-pink);
+        }
+        
+        .neon-text-cyan {
+            color: var(--neon-cyan);
+            text-shadow: 
+                0 0 7px var(--neon-cyan),
+                0 0 10px var(--neon-cyan),
+                0 0 21px var(--neon-cyan);
+        }
+        
+        .neon-border-pink {
+            border: 2px solid var(--neon-pink);
+            box-shadow: 
+                0 0 5px var(--neon-pink),
+                inset 0 0 5px var(--neon-pink);
+        }
+        
+        .neon-border-cyan {
+            border: 2px solid var(--neon-cyan);
+            box-shadow: 
+                0 0 5px var(--neon-cyan),
+                inset 0 0 5px var(--neon-cyan);
+        }
+        
+        .neon-glow-pink {
+            box-shadow: 
+                0 0 10px var(--neon-pink),
+                0 0 20px var(--neon-pink),
+                0 0 30px var(--neon-pink);
+        }
+        
+        .neon-glow-cyan {
+            box-shadow: 
+                0 0 10px var(--neon-cyan),
+                0 0 20px var(--neon-cyan),
+                0 0 30px var(--neon-cyan);
+        }
+        
+        .gradient-text {
+            background: linear-gradient(90deg, var(--neon-pink), var(--neon-cyan));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        /* Glitch Effect */
+        @keyframes glitch {
+            0% {
+                transform: translate(0);
+            }
+            20% {
+                transform: translate(-2px, 2px);
+            }
+            40% {
+                transform: translate(-2px, -2px);
+            }
+            60% {
+                transform: translate(2px, 2px);
+            }
+            80% {
+                transform: translate(2px, -2px);
+            }
+            100% {
+                transform: translate(0);
+            }
+        }
+        
+        .glitch {
+            position: relative;
+            animation: glitch 0.5s infinite;
+        }
+        
+        .glitch:hover {
+            animation: none;
+        }
+        
+        /* Microphone Bouncing Animation */
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-20px);
+            }
+        }
+        
+        .bounce {
+            animation: bounce 2s infinite;
+        }
+        
+        /* Floating Emoji Animation */
+        @keyframes floatUp {
+            0% {
+                transform: translateY(100vh) scale(0.5);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100px) scale(1.5);
+                opacity: 0;
+            }
+        }
+        
+        .floating-emoji {
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            font-size: 2rem;
+            animation: floatUp 3s linear forwards;
+        }
+        
+        /* Progress Bar Animation */
+        .progress-bar {
+            transition: width 1s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        
+        /* Pulse Animation */
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(255, 0, 84, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 20px rgba(255, 0, 84, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(255, 0, 84, 0);
+            }
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        /* VS Glow Animation */
+        @keyframes vs-glow {
+            0%, 100% {
+                text-shadow: 
+                    0 0 10px #fff,
+                    0 0 20px var(--neon-pink),
+                    0 0 30px var(--neon-pink),
+                    0 0 40px var(--neon-pink);
+            }
+            50% {
+                text-shadow: 
+                    0 0 20px #fff,
+                    0 0 30px var(--neon-cyan),
+                    0 0 40px var(--neon-cyan),
+                    0 0 50px var(--neon-cyan);
+            }
+        }
+        
+        .vs-glow {
+            animation: vs-glow 1.5s infinite alternate;
+        }
+        
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--neon-pink);
+            border-radius: 4px;
+        }
+        
+        /* Hide scrollbar for TV view */
+        .tv-view::-webkit-scrollbar {
+            display: none;
+        }
+    </style>
+</head>
+<body class="relative">
+    <!-- Floating Emojis Container -->
+    <div id="emojiContainer"></div>
+    
+    <!-- Main App Container -->
+    <div id="app" class="min-h-screen">
+        <!-- Guest View (Default - No URL parameters) -->
+        <div id="guestView" class="min-h-screen p-4 md:p-6 flex flex-col">
+            <!-- Header -->
+            <header class="text-center mb-8 pt-4">
+                <h1 class="text-3xl md:text-4xl font-black gradient-text mb-2 glitch">MIC DROP</h1>
+                <p class="text-lg neon-text-cyan">Karaoke Battle OS • Judge Panel</p>
+                <div id="guestPhaseIndicator" class="mt-4 inline-block px-4 py-2 rounded-full bg-card-bg neon-border-pink">
+                    <span id="guestPhaseText" class="font-bold">WAITING FOR BATTLE</span>
+                </div>
+            </header>
+            
+            <!-- Performance Phase: Tomato/Fire Buttons -->
+            <div id="performancePhase" class="hidden flex-1">
+                <section class="cyber-border rounded-2xl p-6 mb-8 bg-card-bg bg-opacity-80 backdrop-blur-sm">
+                    <h2 class="text-2xl font-bold mb-6 text-center neon-text-pink">LIVE REACTIONS</h2>
+                    <p class="text-gray-300 text-center mb-8">Tap to throw reactions during the performance!</p>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-2xl mx-auto">
+                        <!-- Tomato Button -->
+                        <div class="text-center">
+                            <button id="throwTomato" class="w-full aspect-square rounded-2xl flex flex-col items-center justify-center bg-gradient-to-br from-red-900 to-red-700 neon-border-pink hover:neon-glow-pink transition-all duration-300 pulse">
+                                <span class="text-8xl mb-4">🍅</span>
+                                <span class="text-2xl font-black">TOMATO</span>
+                                <p class="text-sm mt-2 text-gray-300">Throw if they're off-key!</p>
+                            </button>
+                            <div class="mt-4 p-3 bg-darker-bg rounded-xl">
+                                <p class="text-sm text-gray-400">Total Thrown:</p>
+                                <p id="tomatoCount" class="text-2xl font-bold neon-text-pink">0</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Fire Button -->
+                        <div class="text-center">
+                            <button id="throwFire" class="w-full aspect-square rounded-2xl flex flex-col items-center justify-center bg-gradient-to-br from-orange-900 to-yellow-600 neon-border-cyan hover:neon-glow-cyan transition-all duration-300 pulse">
+                                <span class="text-8xl mb-4">🔥</span>
+                                <span class="text-2xl font-black">FIRE</span>
+                                <p class="text-sm mt-2 text-gray-300">Throw if they're killing it!</p>
+                            </button>
+                            <div class="mt-4 p-3 bg-darker-bg rounded-xl">
+                                <p class="text-sm text-gray-400">Total Thrown:</p>
+                                <p id="fireCount" class="text-2xl font-bold neon-text-cyan">0</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-10 p-4 bg-darker-bg rounded-xl max-w-2xl mx-auto">
+                        <h3 class="font-bold mb-3 text-center neon-text-cyan">BATTLE INFO</h3>
+                        <div class="flex justify-between items-center">
+                            <div class="text-center">
+                                <div class="w-16 h-16 rounded-full bg-gradient-to-br from-red-900 to-red-700 flex items-center justify-center mx-auto mb-2 neon-border-pink">
+                                    <span class="text-2xl">🎤</span>
+                                </div>
+                                <h4 id="redCornerNameGuest" class="font-bold text-xl">RED</h4>
+                            </div>
+                            
+                            <div class="text-center">
+                                <span class="text-4xl font-black vs-glow">VS</span>
+                            </div>
+                            
+                            <div class="text-center">
+                                <div class="w-16 h-16 rounded-full bg-gradient-to-br from-blue-900 to-blue-700 flex items-center justify-center mx-auto mb-2 neon-border-cyan">
+                                    <span class="text-2xl">🎤</span>
+                                </div>
+                                <h4 id="blueCornerNameGuest" class="font-bold text-xl">BLUE</h4>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+            
+            <!-- Voting Phase: Vote for Singer -->
+            <div id="votingPhase" class="hidden flex-1">
+                <section class="cyber-border rounded-2xl p-6 mb-8 bg-card-bg bg-opacity-80 backdrop-blur-sm">
+                    <h2 class="text-3xl font-black mb-8 text-center neon-text-pink">WHO SANG IT BETTER?</h2>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+                        <!-- Red Corner Vote -->
+                        <div class="bg-gradient-to-br from-red-900 to-red-700 rounded-2xl p-8 text-center neon-border-pink">
+                            <div class="text-8xl mb-6">🎤</div>
+                            <h3 id="redCornerNameVote" class="text-3xl font-black mb-4">RED</h3>
+                            <div class="h-4 bg-red-900 rounded-full overflow-hidden mb-6">
+                                <div id="redVoteProgress" class="h-full bg-white progress-bar" style="width: 50%"></div>
+                            </div>
+                            <p id="redVoteCount" class="text-4xl font-black mb-8">0</p>
+                            <button id="voteRed" class="w-full py-4 bg-white text-red-900 font-black text-2xl rounded-xl hover:scale-105 transition-transform duration-300">VOTE RED</button>
+                        </div>
+                        
+                        <!-- Blue Corner Vote -->
+                        <div class="bg-gradient-to-br from-blue-900 to-blue-700 rounded-2xl p-8 text-center neon-border-cyan">
+                            <div class="text-8xl mb-6">🎤</div>
+                            <h3 id="blueCornerNameVote" class="text-3xl font-black mb-4">BLUE</h3>
+                            <div class="h-4 bg-blue-900 rounded-full overflow-hidden mb-6">
+                                <div id="blueVoteProgress" class="h-full bg-white progress-bar" style="width: 50%"></div>
+                            </div>
+                            <p id="blueVoteCount" class="text-4xl font-black mb-8">0</p>
+                            <button id="voteBlue" class="w-full py-4 bg-white text-blue-900 font-black text-2xl rounded-xl hover:scale-105 transition-transform duration-300">VOTE BLUE</button>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-10 p-6 bg-darker-bg rounded-xl max-w-2xl mx-auto text-center">
+                        <h3 class="font-bold mb-3 text-xl neon-text-cyan">YOUR VOTE MATTERS!</h3>
+                        <p class="text-gray-300">The winner gets bragging rights and eternal glory!</p>
+                    </div>
+                </section>
+            </div>
+            
+            <!-- Waiting Phase -->
+            <div id="waitingPhase" class="flex-1 flex flex-col items-center justify-center">
+                <div class="text-center max-w-2xl">
+                    <div class="text-9xl bounce mb-8">🎤</div>
+                    <h2 class="text-4xl font-black mb-6 gradient-text">WAITING FOR BATTLE</h2>
+                    <p class="text-xl text-gray-300 mb-8">The DJ will start a karaoke battle soon. Get ready to judge!</p>
+                    
+                    <div class="cyber-border rounded-2xl p-6 bg-card-bg">
+                        <h3 class="font-bold mb-4 neon-text-cyan">HOW TO PLAY</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-left">
+                            <div class="flex items-start space-x-3">
+                                <div class="text-2xl">🍅</div>
+                                <div>
+                                    <p class="font-bold">Throw Tomatoes</p>
+                                    <p class="text-sm text-gray-400">During performances when they're off-key</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start space-x-3">
+                                <div class="text-2xl">🔥</div>
+                                <div>
+                                    <p class="font-bold">Throw Fire</p>
+                                    <p class="text-sm text-gray-400">During performances when they're killing it</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start space-x-3">
+                                <div class="text-2xl">📊</div>
+                                <div>
+                                    <p class="font-bold">Vote for Winner</p>
+                                    <p class="text-sm text-gray-400">After both performances end</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start space-x-3">
+                                <div class="text-2xl">🏆</div>
+                                <div>
+                                    <p class="font-bold">Crown Champion</p>
+                                    <p class="text-sm text-gray-400">Watch the winner revealed on the big screen</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Footer -->
+            <footer class="text-center mt-8 pt-6 border-t border-gray-800">
+                <p class="text-gray-400">MIC DROP: Karaoke Battle OS • Neon Tokyo Edition</p>
+                <p class="text-sm text-gray-500 mt-2">Your reactions and votes update the big screen in real-time!</p>
+            </footer>
+        </div>
+        
+        <!-- DJ View (?mode=dj) -->
+        <div id="djView" class="hidden min-h-screen p-6">
+            <div class="max-w-6xl mx-auto">
+                <!-- Header -->
+                <header class="text-center mb-10 pt-4">
+                    <h1 class="text-5xl font-black gradient-text mb-2 glitch">MIC DROP • DJ CONTROL</h1>
+                    <p class="text-xl neon-text-cyan">Ringmaster Panel • Control the Battle</p>
+                </header>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <!-- Left Column: Battle Setup -->
+                    <div class="lg:col-span-2 space-y-8">
+                        <!-- Battle Setup Card -->
+                        <section class="cyber-border rounded-2xl p-8 bg-card-bg bg-opacity-90 backdrop-blur-sm">
+                            <h2 class="text-3xl font-black mb-6 neon-text-pink">BATTLE SETUP</h2>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                                <!-- Red Corner -->
+                                <div class="bg-darker-bg rounded-xl p-6 neon-border-pink">
+                                    <h3 class="text-2xl font-black mb-4 neon-text-pink">RED CORNER</h3>
+                                    <div class="mb-6">
+                                        <label class="block text-gray-300 mb-2">Singer Name</label>
+                                        <input type="text" id="redCornerInput" placeholder="e.g. Uncle Bob" class="w-full p-4 rounded-lg bg-black border-2 border-neon-pink text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-neon-pink">
+                                    </div>
+                                    <div class="text-center">
+                                        <div class="text-6xl mb-4">🎤</div>
+                                        <p class="text-sm text-gray-400">Will appear on the left side of the TV</p>
+                                    </div>
+                                </div>
+                                
+                                <!-- Blue Corner -->
+                                <div class="bg-darker-bg rounded-xl p-6 neon-border-cyan">
+                                    <h3 class="text-2xl font-black mb-4 neon-text-cyan">BLUE CORNER</h3>
+                                    <div class="mb-6">
+                                        <label class="block text-gray-300 mb-2">Singer Name</label>
+                                        <input type="text" id="blueCornerInput" placeholder="e.g. Aunt Sarah" class="w-full p-4 rounded-lg bg-black border-2 border-neon-cyan text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-neon-cyan">
+                                    </div>
+                                    <div class="text-center">
+                                        <div class="text-6xl mb-4">🎤</div>
+                                        <p class="text-sm text-gray-400">Will appear on the right side of the TV</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="text-center">
+                                <button id="startBattle" class="px-10 py-5 bg-gradient-to-r from-neon-pink to-neon-cyan text-black font-black text-2xl rounded-xl hover:scale-105 transition-transform duration-300">
+                                    START BATTLE
+                                </button>
+                            </div>
+                        </section>
+                        
+                        <!-- Battle Control Card -->
+                        <section class="cyber-border rounded-2xl p-8 bg-card-bg bg-opacity-90 backdrop-blur-sm">
+                            <h2 class="text-3xl font-black mb-6 neon-text-cyan">BATTLE CONTROLS</h2>
+                            <p class="text-gray-300 mb-8">Follow this sequence to run the battle:</p>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                                <!-- Step 1 -->
+                                <div class="bg-darker-bg rounded-xl p-6 text-center">
+                                    <div class="text-3xl w-12 h-12 rounded-full bg-neon-pink text-black flex items-center justify-center mx-auto mb-4">1</div>
+                                    <h3 class="text-xl font-black mb-3">PERFORMANCE</h3>
+                                    <p class="text-gray-400 text-sm mb-4">Singers perform, audience throws reactions</p>
+                                    <div id="performanceStatus" class="text-sm px-3 py-1 rounded-full bg-gray-800 text-gray-300">NOT ACTIVE</div>
+                                </div>
+                                
+                                <!-- Step 2 -->
+                                <div class="bg-darker-bg rounded-xl p-6 text-center">
+                                    <div class="text-3xl w-12 h-12 rounded-full bg-gray-700 text-white flex items-center justify-center mx-auto mb-4">2</div>
+                                    <h3 class="text-xl font-black mb-3">VOTING</h3>
+                                    <p class="text-gray-400 text-sm mb-4">Audience votes for the best singer</p>
+                                    <button id="openVoting" class="w-full py-3 bg-gray-700 text-white font-bold rounded-lg hover:bg-gray-600 transition-colors">OPEN VOTING</button>
+                                </div>
+                                
+                                <!-- Step 3 -->
+                                <div class="bg-darker-bg rounded-xl p-6 text-center">
+                                    <div class="text-3xl w-12 h-12 rounded-full bg-gray-700 text-white flex items-center justify-center mx-auto mb-4">3</div>
+                                    <h3 class="text-xl font-black mb-3">REVEAL WINNER</h3>
+                                    <p class="text-gray-400 text-sm mb-4">Show results with dramatic reveal</p>
+                                    <button id="revealWinner" class="w-full py-3 bg-gray-700 text-white font-bold rounded-lg hover:bg-gray-600 transition-colors">REVEAL WINNER</button>
+                                </div>
+                            </div>
+                            
+                            <!-- Reset Button -->
+                            <div class="text-center">
+                                <button id="resetBattle" class="px-8 py-4 bg-black text-white font-bold rounded-xl border-2 border-red-600 hover:bg-red-900 transition-colors">
+                                    RESET BATTLE
+                                </button>
+                            </div>
+                        </section>
+                    </div>
+                    
+                    <!-- Right Column: Battle Stats & QR Code -->
+                    <div class="space-y-8">
+                        <!-- Battle Stats -->
+                        <section class="cyber-border rounded-2xl p-6 bg-card-bg bg-opacity-90 backdrop-blur-sm">
+                            <h2 class="text-2xl font-black mb-6 neon-text-pink">BATTLE STATS</h2>
+                            
+                            <div class="space-y-6">
+                                <!-- Audience Reactions -->
+                                <div class="bg-darker-bg rounded-xl p-4">
+                                    <h3 class="font-bold mb-3 neon-text-cyan">AUDIENCE REACTIONS</h3>
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <div class="text-center">
+                                            <div class="text-4xl">🍅</div>
+                                            <p class="text-sm text-gray-400">Tomatoes</p>
+                                            <p id="djTomatoCount" class="text-2xl font-bold neon-text-pink">0</p>
+                                        </div>
+                                        <div class="text-center">
+                                            <div class="text-4xl">🔥</div>
+                                            <p class="text-sm text-gray-400">Fire</p>
+                                            <p id="djFireCount" class="text-2xl font-bold neon-text-cyan">0</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Current Votes -->
+                                <div class="bg-darker-bg rounded-xl p-4">
+                                    <h3 class="font-bold mb-3 neon-text-pink">CURRENT VOTES</h3>
+                                    <div class="space-y-4">
+                                        <div>
+                                            <div class="flex justify-between mb-1">
+                                                <span id="djRedName" class="font-bold">Red</span>
+                                                <span id="djRedVotes" class="font-bold">0</span>
+                                            </div>
+                                            <div class="h-4 bg-gray-800 rounded-full overflow-hidden">
+                                                <div id="djRedProgress" class="h-full bg-red-600 progress-bar" style="width: 0%"></div>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <div class="flex justify-between mb-1">
+                                                <span id="djBlueName" class="font-bold">Blue</span>
+                                                <span id="djBlueVotes" class="font-bold">0</span>
+                                            </div>
+                                            <div class="h-4 bg-gray-800 rounded-full overflow-hidden">
+                                                <div id="djBlueProgress" class="h-full bg-blue-600 progress-bar" style="width: 0%"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Battle Status -->
+                                <div class="bg-darker-bg rounded-xl p-4">
+                                    <h3 class="font-bold mb-3 neon-text-cyan">BATTLE STATUS</h3>
+                                    <div class="space-y-3">
+                                        <div class="flex justify-between">
+                                            <span class="text-gray-400">Phase:</span>
+                                            <span id="djPhase" class="font-bold neon-text-pink">IDLE</span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <span class="text-gray-400">Active Guests:</span>
+                                            <span id="activeGuests" class="font-bold neon-text-cyan">0</span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <span class="text-gray-400">Total Votes:</span>
+                                            <span id="totalVotes" class="font-bold">0</span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <span class="text-gray-400">Winner:</span>
+                                            <span id="currentWinner" class="font-bold">Not Decided</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                        
+                        <!-- QR Code for Guests -->
+                        <section class="cyber-border rounded-2xl p-6 bg-card-bg bg-opacity-90 backdrop-blur-sm">
+                            <h2 class="text-2xl font-black mb-4 neon-text-pink">GUEST JOIN</h2>
+                            <p class="text-gray-300 mb-6">Scan this QR code to join as a judge</p>
+                            
+                            <!-- QR Code Placeholder -->
+                            <div class="bg-gradient-to-br from-neon-pink to-neon-cyan p-4 rounded-xl flex items-center justify-center mb-4">
+                                <div class="bg-white p-4 rounded-lg">
+                                    <div class="w-48 h-48 flex flex-col items-center justify-center bg-white">
+                                        <div class="grid grid-cols-3 gap-1">
+                                            <!-- Simple QR code pattern -->
+                                            <div class="w-12 h-12 bg-black"></div>
+                                            <div class="w-12 h-12 bg-black"></div>
+                                            <div class="w-12 h-12 bg-black"></div>
+                                            <div class="w-12 h-12 bg-black"></div>
+                                            <div class="w-12 h-12 bg-white"></div>
+                                            <div class="w-12 h-12 bg-black"></div>
+                                            <div class="w-12 h-12 bg-black"></div>
+                                            <div class="w-12 h-12 bg-white"></div>
+                                            <div class="w-12 h-12 bg-black"></div>
+                                        </div>
+                                        <p class="mt-4 text-black font-bold">MIC DROP</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <p class="text-center text-sm text-gray-400">Guests scan to become judges and vote</p>
+                            
+                            <div class="mt-6 p-4 bg-darker-bg rounded-xl">
+                                <h3 class="font-bold mb-2 neon-text-cyan">QUICK LINK</h3>
+                                <p class="text-sm text-gray-400 break-all" id="guestLink">https://micdrop.party</p>
+                                <button onclick="navigator.clipboard.writeText(document.getElementById('guestLink').textContent)" class="w-full mt-3 py-2 bg-gray-800 rounded-lg hover:bg-gray-700 transition-colors">
+                                    Copy Link
+                                </button>
+                            </div>
+                        </section>
+                    </div>
+                </div>
+                
+                <!-- Footer -->
+                <footer class="text-center mt-10 pt-6 border-t border-gray-800">
+                    <p class="text-gray-400">DJ Control Panel • MIC DROP: Karaoke Battle OS</p>
+                    <p class="text-sm text-gray-500 mt-2">You control the flow of the battle. Follow the sequence for best results.</p>
+                </footer>
+            </div>
+        </div>
+        
+        <!-- TV View (?mode=tv) -->
+        <div id="tvView" class="hidden min-h-screen p-8 tv-view">
+            <div class="h-full flex flex-col">
+                <!-- TV Header -->
+                <header class="text-center mb-8">
+                    <h1 class="text-6xl font-black gradient-text glitch">MIC DROP</h1>
+                    <p class="text-2xl neon-text-cyan mt-2">KARAOKE BATTLE ARENA</p>
+                </header>
+                
+                <!-- Main TV Content -->
+                <div class="flex-1 flex flex-col">
+                    <!-- Idle State -->
+                    <div id="idleState" class="flex-1 flex flex-col items-center justify-center">
+                        <div class="text-center max-w-3xl">
+                            <div class="text-9xl bounce mb-10">🎤</div>
+                            <h2 class="text-7xl font-black mb-8 gradient-text">WAITING FOR BATTLE</h2>
+                            <p class="text-3xl text-gray-300 mb-10">The next karaoke battle will begin soon...</p>
+                            
+                            <div class="cyber-border rounded-3xl p-8 bg-card-bg inline-block">
+                                <h3 class="text-3xl font-black mb-6 neon-text-cyan">SCAN TO JOIN</h3>
+                                <div class="flex items-center justify-center space-x-8">
+                                    <div class="bg-white p-4 rounded-2xl">
+                                        <div class="w-64 h-64 bg-gradient-to-br from-neon-pink to-neon-cyan flex items-center justify-center rounded-xl">
+                                            <div class="bg-white p-4 rounded-lg">
+                                                <p class="text-4xl font-black text-black">MIC DROP</p>
+                                                <p class="text-black">Scan with phone</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="text-left max-w-md">
+                                        <div class="text-4xl mb-6">📱</div>
+                                        <h4 class="text-2xl font-bold mb-4">Become a Judge</h4>
+                                        <ul class="space-y-3 text-lg text-gray-300">
+                                            <li class="flex items-center">
+                                                <span class="text-2xl mr-3">🍅</span>
+                                                <span>Throw tomatoes during performances</span>
+                                            </li>
+                                            <li class="flex items-center">
+                                                <span class="text-2xl mr-3">🔥</span>
+                                                <span>Throw fire for amazing performances</span>
+                                            </li>
+                                            <li class="flex items-center">
+                                                <span class="text-2xl mr-3">📊</span>
+                                                <span>Vote for the winner</span>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Battle State: VS Screen -->
+                    <div id="battleState" class="hidden flex-1 flex flex-col items-center justify-center">
+                        <div class="text-center w-full">
+                            <h2 class="text-4xl font-black mb-12 neon-text-cyan">WHO WILL WIN?</h2>
+                            
+                            <div class="flex items-center justify-center space-x-16 mb-16">
+                                <!-- Red Corner -->
+                                <div class="text-center">
+                                    <div class="w-64 h-64 rounded-full bg-gradient-to-br from-red-900 to-red-700 flex items-center justify-center mx-auto mb-8 neon-border-pink neon-glow-pink">
+                                        <span class="text-8xl">🎤</span>
+                                    </div>
+                                    <h3 id="tvRedName" class="text-6xl font-black neon-text-pink">RED</h3>
+                                    <div class="mt-6 text-3xl">
+                                        <span class="text-red-400">🍅</span>
+                                        <span id="tvRedTomatoes" class="ml-2">0</span>
+                                    </div>
+                                </div>
+                                
+                                <!-- VS -->
+                                <div class="text-center">
+                                    <div class="text-9xl font-black vs-glow">VS</div>
+                                    <div class="mt-8 text-3xl">
+                                        <span>🔥</span>
+                                        <span id="tvTotalFire" class="ml-2">0</span>
+                                    </div>
+                                </div>
+                                
+                                <!-- Blue Corner -->
+                                <div class="text-center">
+                                    <div class="w-64 h-64 rounded-full bg-gradient-to-br from-blue-900 to-blue-700 flex items-center justify-center mx-auto mb-8 neon-border-cyan neon-glow-cyan">
+                                        <span class="text-8xl">🎤</span>
+                                    </div>
+                                    <h3 id="tvBlueName" class="text-6xl font-black neon-text-cyan">BLUE</h3>
+                                    <div class="mt-6 text-3xl">
+                                        <span class="text-red-400">🍅</span>
+                                        <span id="tvBlueTomatoes" class="ml-2">0</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="max-w-2xl mx-auto">
+                                <h4 class="text-3xl font-black mb-6 gradient-text">AUDIENCE REACTIONS</h4>
+                                <div class="grid grid-cols-2 gap-8">
+                                    <div class="bg-darker-bg rounded-2xl p-6">
+                                        <div class="text-4xl">🍅</div>
+                                        <p class="text-2xl font-bold mt-2">TOMATOES</p>
+                                        <p id="tvTotalTomatoes" class="text-5xl font-black mt-4 neon-text-pink">0</p>
+                                    </div>
+                                    <div class="bg-darker-bg rounded-2xl p-6">
+                                        <div class="text-4xl">🔥</div>
+                                        <p class="text-2xl font-bold mt-2">FIRE</p>
+                                        <p id="tvTotalFireCount" class="text-5xl font-black mt-4 neon-text-cyan">0</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Result State: Winner Reveal -->
+                    <div id="resultState" class="hidden flex-1 flex flex-col items-center justify-center">
+                        <div class="text-center max-w-4xl">
+                            <h2 class="text-5xl font-black mb-12 neon-text-cyan">AND THE WINNER IS...</h2>
+                            
+                            <!-- Winner Display -->
+                            <div id="winnerDisplay" class="mb-16">
+                                <div id="winnerRed" class="hidden">
+                                    <div class="w-96 h-96 rounded-full bg-gradient-to-br from-red-900 to-yellow-500 flex items-center justify-center mx-auto mb-10 neon-border-pink neon-glow-pink">
+                                        <span class="text-9xl">🏆</span>
+                                    </div>
+                                    <h3 id="winnerRedName" class="text-7xl font-black neon-text-pink glitch">RED WINS!</h3>
+                                </div>
+                                
+                                <div id="winnerBlue" class="hidden">
+                                    <div class="w-96 h-96 rounded-full bg-gradient-to-br from-blue-900 to-cyan-500 flex items-center justify-center mx-auto mb-10 neon-border-cyan neon-glow-cyan">
+                                        <span class="text-9xl">🏆</span>
+                                    </div>
+                                    <h3 id="winnerBlueName" class="text-7xl font-black neon-text-cyan glitch">BLUE WINS!</h3>
+                                </div>
+                                
+                                <div id="winnerTie" class="hidden">
+                                    <div class="w-96 h-96 rounded-full bg-gradient-to-br from-neon-pink to-neon-cyan flex items-center justify-center mx-auto mb-10">
+                                        <span class="text-9xl">🤝</span>
+                                    </div>
+                                    <h3 class="text-7xl font-black gradient-text glitch">IT'S A TIE!</h3>
+                                </div>
+                            </div>
+                            
+                            <!-- Vote Results -->
+                            <div class="cyber-border rounded-3xl p-8 bg-card-bg">
+                                <h3 class="text-3xl font-black mb-8 neon-text-pink">FINAL SCORE</h3>
+                                
+                                <div class="grid grid-cols-2 gap-12 mb-10">
+                                    <div class="text-center">
+                                        <h4 id="resultRedName" class="text-4xl font-black mb-6 neon-text-pink">RED</h4>
+                                        <div class="h-12 bg-gray-800 rounded-full overflow-hidden">
+                                            <div id="resultRedBar" class="h-full bg-red-600 progress-bar flex items-center justify-end pr-4" style="width: 50%">
+                                                <span id="resultRedPercent" class="font-black text-white text-2xl">50%</span>
+                                            </div>
+                                        </div>
+                                        <p id="resultRedVotes" class="text-5xl font-black mt-4">0</p>
+                                    </div>
+                                    
+                                    <div class="text-center">
+                                        <h4 id="resultBlueName" class="text-4xl font-black mb-6 neon-text-cyan">BLUE</h4>
+                                        <div class="h-12 bg-gray-800 rounded-full overflow-hidden">
+                                            <div id="resultBlueBar" class="h-full bg-blue-600 progress-bar flex items-center justify-end pr-4" style="width: 50%">
+                                                <span id="resultBluePercent" class="font-black text-white text-2xl">50%</span>
+                                            </div>
+                                        </div>
+                                        <p id="resultBlueVotes" class="text-5xl font-black mt-4">0</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="grid grid-cols-2 gap-8">
+                                    <div class="bg-darker-bg rounded-2xl p-6">
+                                        <p class="text-xl font-bold mb-3">Total Reactions</p>
+                                        <div class="flex justify-center space-x-8">
+                                            <div class="text-center">
+                                                <div class="text-4xl">🍅</div>
+                                                <p id="resultTomatoes" class="text-3xl font-black mt-2">0</p>
+                                            </div>
+                                            <div class="text-center">
+                                                <div class="text-4xl">🔥</div>
+                                                <p id="resultFire" class="text-3xl font-black mt-2">0</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="bg-darker-bg rounded-2xl p-6">
+                                        <p class="text-xl font-bold mb-3">Total Votes</p>
+                                        <p id="resultTotalVotes" class="text-5xl font-black neon-text-cyan">0</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- TV Footer -->
+                <footer class="text-center mt-8 pt-6 border-t border-gray-800">
+                    <p class="text-2xl text-gray-400">MIC DROP: Karaoke Battle Arena • TV Display</p>
+                    <p class="text-lg text-gray-500 mt-2">Reactions and votes update in real-time from audience phones</p>
+                </footer>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Firebase Configuration and App Logic -->
+    <script>
+        // ============================================
+        // FIREBASE CONFIGURATION
+        // ============================================
+        // REPLACE WITH YOUR FIREBASE CONFIG FROM console.firebase.google.com
+        const firebaseConfig = {
+            apiKey: "AIzaSyDEXAMPLEEXAMPLEEXAMPLEEXAMPLE",
+            authDomain: "mic-drop-karaoke.firebaseapp.com",
+            projectId: "mic-drop-karaoke",
+            storageBucket: "mic-drop-karaoke.appspot.com",
+            messagingSenderId: "123456789012",
+            appId: "1:123456789012:web:abcdef1234567890abcdef"
+        };
+        
+        // ============================================
+        // APP INITIALIZATION
+        // ============================================
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        
+        // Check URL for mode parameter
+        const urlParams = new URLSearchParams(window.location.search);
+        const mode = urlParams.get('mode');
+        
+        // DOM Elements
+        const guestView = document.getElementById('guestView');
+        const djView = document.getElementById('djView');
+        const tvView = document.getElementById('tvView');
+        
+        // Guest View Elements
+        const performancePhase = document.getElementById('performancePhase');
+        const votingPhase = document.getElementById('votingPhase');
+        const waitingPhase = document.getElementById('waitingPhase');
+        const guestPhaseText = document.getElementById('guestPhaseText');
+        
+        // Initialize view based on URL parameter
+        function initializeView() {
+            if (mode === 'dj') {
+                guestView.classList.add('hidden');
+                tvView.classList.add('hidden');
+                djView.classList.remove('hidden');
+                startDJMode();
+            } else if (mode === 'tv') {
+                guestView.classList.add('hidden');
+                djView.classList.add('hidden');
+                tvView.classList.remove('hidden');
+                startTVMode();
+            } else {
+                djView.classList.add('hidden');
+                tvView.classList.add('hidden');
+                guestView.classList.remove('hidden');
+                startGuestMode();
+            }
+            
+            // Update guest link with current URL
+            const guestLink = document.getElementById('guestLink');
+            if (guestLink) {
+                guestLink.textContent = window.location.origin + window.location.pathname;
+            }
+        }
+        
+        // ============================================
+        // FIREBASE DATA MODEL
+        // ============================================
+        // Battle state document
+        const battleStateRef = db.collection('battle').doc('current');
+        
+        // Initialize Firebase data
+        async function initializeFirebaseData() {
+            const doc = await battleStateRef.get();
+            if (!doc.exists) {
+                await battleStateRef.set({
+                    phase: 'idle', // idle, performance, voting, result
+                    redCorner: {
+                        name: 'Red Corner',
+                        votes: 0,
+                        tomatoes: 0,
+                        fires: 0
+                    },
+                    blueCorner: {
+                        name: 'Blue Corner',
+                        votes: 0,
+                        tomatoes: 0,
+                        fires: 0
+                    },
+                    audienceReactions: {
+                        tomatoes: 0,
+                        fires: 0
+                    },
+                    winner: null, // 'red', 'blue', or 'tie'
+                    activeGuests: 0,
+                    lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+                });
+            }
+        }
+        
+        // ============================================
+        // GUEST MODE LOGIC
+        // ============================================
+        function startGuestMode() {
+            let hasVoted = false;
+            let userId = localStorage.getItem('micDropUserId');
+            if (!userId) {
+                userId = 'guest_' + Math.random().toString(36).substr(2, 9);
+                localStorage.setItem('micDropUserId', userId);
+            }
+            
+            // Track active guest
+            battleStateRef.update({
+                activeGuests: firebase.firestore.FieldValue.increment(1)
+            });
+            
+            // Listen for battle state changes
+            battleStateRef.onSnapshot((doc) => {
+                if (doc.exists) {
+                    const data = doc.data();
+                    updateGuestUI(data);
+                }
+            });
+            
+            // Update guest UI based on battle phase
+            function updateGuestUI(data) {
+                guestPhaseText.textContent = data.phase.toUpperCase();
+                
+                // Show appropriate phase
+                waitingPhase.classList.add('hidden');
+                performancePhase.classList.add('hidden');
+                votingPhase.classList.add('hidden');
+                
+                if (data.phase === 'idle') {
+                    waitingPhase.classList.remove('hidden');
+                } else if (data.phase === 'performance') {
+                    performancePhase.classList.remove('hidden');
+                    // Update names
+                    document.getElementById('redCornerNameGuest').textContent = data.redCorner.name;
+                    document.getElementById('blueCornerNameGuest').textContent = data.blueCorner.name;
+                    // Update reaction counts
+                    document.getElementById('tomatoCount').textContent = data.audienceReactions.tomatoes;
+                    document.getElementById('fireCount').textContent = data.audienceReactions.fires;
+                } else if (data.phase === 'voting') {
+                    votingPhase.classList.remove('hidden');
+                    // Update names
+                    document.getElementById('redCornerNameVote').textContent = data.redCorner.name;
+                    document.getElementById('blueCornerNameVote').textContent = data.blueCorner.name;
+                    // Update vote counts
+                    const totalVotes = data.redCorner.votes + data.blueCorner.votes;
+                    const redPercent = totalVotes > 0 ? Math.round((data.redCorner.votes / totalVotes) * 100) : 0;
+                    const bluePercent = totalVotes > 0 ? Math.round((data.blueCorner.votes / totalVotes) * 100) : 0;
+                    
+                    document.getElementById('redVoteCount').textContent = data.redCorner.votes;
+                    document.getElementById('blueVoteCount').textContent = data.blueCorner.votes;
+                    document.getElementById('redVoteProgress').style.width = `${redPercent}%`;
+                    document.getElementById('blueVoteProgress').style.width = `${bluePercent}%`;
+                    
+                    // Reset voting state if phase changed
+                    if (data.phase === 'voting') {
+                        hasVoted = false;
+                        document.getElementById('voteRed').textContent = 'VOTE RED';
+                        document.getElementById('voteBlue').textContent = 'VOTE BLUE';
+                        document.getElementById('voteRed').classList.remove('bg-gray-600');
+                        document.getElementById('voteBlue').classList.remove('bg-gray-600');
+                    }
+                }
+            }
+            
+            // Throw Tomato
+            document.getElementById('throwTomato').addEventListener('click', () => {
+                battleStateRef.update({
+                    'audienceReactions.tomatoes': firebase.firestore.FieldValue.increment(1)
+                });
+                
+                // Create floating emoji
+                createFloatingEmoji('🍅', 'red');
+            });
+            
+            // Throw Fire
+            document.getElementById('throwFire').addEventListener('click', () => {
+                battleStateRef.update({
+                    'audienceReactions.fires': firebase.firestore.FieldValue.increment(1)
+                });
+                
+                // Create floating emoji
+                createFloatingEmoji('🔥', 'orange');
+            });
+            
+            // Vote for Red
+            document.getElementById('voteRed').addEventListener('click', () => {
+                if (hasVoted) {
+                    alert('You already voted!');
+                    return;
+                }
+                
+                battleStateRef.update({
+                    'redCorner.votes': firebase.firestore.FieldValue.increment(1)
+                });
+                
+                hasVoted = true;
+                document.getElementById('voteRed').textContent = 'VOTED!';
+                document.getElementById('voteRed').classList.add('bg-gray-600');
+            });
+            
+            // Vote for Blue
+            document.getElementById('voteBlue').addEventListener('click', () => {
+                if (hasVoted) {
+                    alert('You already voted!');
+                    return;
+                }
+                
+                battleStateRef.update({
+                    'blueCorner.votes': firebase.firestore.FieldValue.increment(1)
+                });
+                
+                hasVoted = true;
+                document.getElementById('voteBlue').textContent = 'VOTED!';
+                document.getElementById('voteBlue').classList.add('bg-gray-600');
+            });
+            
+            // Create floating emoji animation
+            function createFloatingEmoji(emoji, color) {
+                const container = document.getElementById('emojiContainer');
+                const emojiElement = document.createElement('div');
+                emojiElement.className = 'floating-emoji';
+                emojiElement.textContent = emoji;
+                emojiElement.style.left = `${Math.random() * 80 + 10}vw`;
+                emojiElement.style.color = color === 'red' ? '#ff0054' : '#ff9900';
+                
+                container.appendChild(emojiElement);
+                
+                // Remove after animation completes
+                setTimeout(() => {
+                    emojiElement.remove();
+                }, 3000);
+            }
+            
+            // Clean up when guest leaves
+            window.addEventListener('beforeunload', () => {
+                battleStateRef.update({
+                    activeGuests: firebase.firestore.FieldValue.increment(-1)
+                });
+            });
+        }
+        
+        // ============================================
+        // DJ MODE LOGIC
+        // ============================================
+        function startDJMode() {
+            // Listen for battle state changes
+            battleStateRef.onSnapshot((doc) => {
+                if (doc.exists) {
+                    const data = doc.data();
+                    updateDJUI(data);
+                }
+            });
+            
+            // Update DJ UI
+            function updateDJUI(data) {
+                // Update phase
+                document.getElementById('djPhase').textContent = data.phase.toUpperCase();
+                
+                // Update names
+                document.getElementById('djRedName').textContent = data.redCorner.name;
+                document.getElementById('djBlueName').textContent = data.blueCorner.name;
+                
+                // Update stats
+                document.getElementById('djTomatoCount').textContent = data.audienceReactions.tomatoes;
+                document.getElementById('djFireCount').textContent = data.audienceReactions.fires;
+                
+                // Update votes
+                const totalVotes = data.redCorner.votes + data.blueCorner.votes;
+                const redPercent = totalVotes > 0 ? Math.round((data.redCorner.votes / totalVotes) * 100) : 0;
+                const bluePercent = totalVotes > 0 ? Math.round((data.blueCorner.votes / totalVotes) * 100) : 0;
+                
+                document.getElementById('djRedVotes').textContent = data.redCorner.votes;
+                document.getElementById('djBlueVotes').textContent = data.blueCorner.votes;
+                document.getElementById('djRedProgress').style.width = `${redPercent}%`;
+                document.getElementById('djBlueProgress').style.width = `${bluePercent}%`;
+                
+                document.getElementById('totalVotes').textContent = totalVotes;
+                document.getElementById('activeGuests').textContent = data.activeGuests;
+                
+                // Update winner
+                if (data.winner === 'red') {
+                    document.getElementById('currentWinner').textContent = data.redCorner.name;
+                    document.getElementById('currentWinner').className = 'font-bold neon-text-pink';
+                } else if (data.winner === 'blue') {
+                    document.getElementById('currentWinner').textContent = data.blueCorner.name;
+                    document.getElementById('currentWinner').className = 'font-bold neon-text-cyan';
+                } else if (data.winner === 'tie') {
+                    document.getElementById('currentWinner').textContent = 'TIE';
+                    document.getElementById('currentWinner').className = 'font-bold gradient-text';
+                } else {
+                    document.getElementById('currentWinner').textContent = 'Not Decided';
+                    document.getElementById('currentWinner').className = 'font-bold';
+                }
+                
+                // Update performance status
+                const performanceStatus = document.getElementById('performanceStatus');
+                if (data.phase === 'performance') {
+                    performanceStatus.textContent = 'ACTIVE';
+                    performanceStatus.className = 'text-sm px-3 py-1 rounded-full bg-green-900 text-green-300';
+                } else {
+                    performanceStatus.textContent = 'NOT ACTIVE';
+                    performanceStatus.className = 'text-sm px-3 py-1 rounded-full bg-gray-800 text-gray-300';
+                }
+            }
+            
+            // Start Battle
+            document.getElementById('startBattle').addEventListener('click', () => {
+                const redName = document.getElementById('redCornerInput').value || 'Red Corner';
+                const blueName = document.getElementById('blueCornerInput').value || 'Blue Corner';
+                
+                battleStateRef.update({
+                    phase: 'performance',
+                    redCorner: {
+                        name: redName,
+                        votes: 0,
+                        tomatoes: 0,
+                        fires: 0
+                    },
+                    blueCorner: {
+                        name: blueName,
+                        votes: 0,
+                        tomatoes: 0,
+                        fires: 0
+                    },
+                    audienceReactions: {
+                        tomatoes: 0,
+                        fires: 0
+                    },
+                    winner: null
+                });
+            });
+            
+            // Open Voting
+            document.getElementById('openVoting').addEventListener('click', () => {
+                battleStateRef.update({
+                    phase: 'voting'
+                });
+            });
+            
+            // Reveal Winner
+            document.getElementById('revealWinner').addEventListener('click', () => {
+                // Calculate winner
+                battleStateRef.get().then((doc) => {
+                    if (doc.exists) {
+                        const data = doc.data();
+                        const redVotes = data.redCorner.votes;
+                        const blueVotes = data.blueCorner.votes;
+                        
+                        let winner = 'tie';
+                        if (redVotes > blueVotes) {
+                            winner = 'red';
+                        } else if (blueVotes > redVotes) {
+                            winner = 'blue';
+                        }
+                        
+                        battleStateRef.update({
+                            phase: 'result',
+                            winner: winner
+                        });
+                    }
+                });
+            });
+            
+            // Reset Battle
+            document.getElementById('resetBattle').addEventListener('click', () => {
+                battleStateRef.update({
+                    phase: 'idle',
+                    redCorner: {
+                        name: 'Red Corner',
+                        votes: 0,
+                        tomatoes: 0,
+                        fires: 0
+                    },
+                    blueCorner: {
+                        name: 'Blue Corner',
+                        votes: 0,
+                        tomatoes: 0,
+                        fires: 0
+                    },
+                    audienceReactions: {
+                        tomatoes: 0,
+                        fires: 0
+                    },
+                    winner: null
+                });
+            });
+        }
+        
+        // ============================================
+        // TV MODE LOGIC
+        // ============================================
+        function startTVMode() {
+            // Listen for battle state changes
+            battleStateRef.onSnapshot((doc) => {
+                if (doc.exists) {
+                    const data = doc.data();
+                    updateTVUI(data);
+                }
+            });
+            
+            // Update TV UI
+            function updateTVUI(data) {
+                // Show appropriate state
+                document.getElementById('idleState').classList.add('hidden');
+                document.getElementById('battleState').classList.add('hidden');
+                document.getElementById('resultState').classList.add('hidden');
+                
+                if (data.phase === 'idle') {
+                    document.getElementById('idleState').classList.remove('hidden');
+                } else if (data.phase === 'performance' || data.phase === 'voting') {
+                    document.getElementById('battleState').classList.remove('hidden');
+                    
+                    // Update battle state
+                    document.getElementById('tvRedName').textContent = data.redCorner.name;
+                    document.getElementById('tvBlueName').textContent = data.blueCorner.name;
+                    document.getElementById('tvRedTomatoes').textContent = data.redCorner.tomatoes;
+                    document.getElementById('tvBlueTomatoes').textContent = data.blueCorner.tomatoes;
+                    document.getElementById('tvTotalTomatoes').textContent = data.audienceReactions.tomatoes;
+                    document.getElementById('tvTotalFire').textContent = data.audienceReactions.fires;
+                    document.getElementById('tvTotalFireCount').textContent = data.audienceReactions.fires;
+                } else if (data.phase === 'result') {
+                    document.getElementById('resultState').classList.remove('hidden');
+                    
+                    // Calculate percentages
+                    const totalVotes = data.redCorner.votes + data.blueCorner.votes;
+                    const redPercent = totalVotes > 0 ? Math.round((data.redCorner.votes / totalVotes) * 100) : 0;
+                    const bluePercent = totalVotes > 0 ? Math.round((data.blueCorner.votes / totalVotes) * 100) : 0;
+                    
+                    // Update result display
+                    document.getElementById('resultRedName').textContent = data.redCorner.name;
+                    document.getElementById('resultBlueName').textContent = data.blueCorner.name;
+                    document.getElementById('resultRedVotes').textContent = data.redCorner.votes;
+                    document.getElementById('resultBlueVotes').textContent = data.blueCorner.votes;
+                    document.getElementById('resultRedPercent').textContent = `${redPercent}%`;
+                    document.getElementById('resultBluePercent').textContent = `${bluePercent}%`;
+                    document.getElementById('resultRedBar').style.width = `${redPercent}%`;
+                    document.getElementById('resultBlueBar').style.width = `${bluePercent}%`;
+                    document.getElementById('resultTomatoes').textContent = data.audienceReactions.tomatoes;
+                    document.getElementById('resultFire').textContent = data.audienceReactions.fires;
+                    document.getElementById('resultTotalVotes').textContent = totalVotes;
+                    
+                    // Show winner
+                    document.getElementById('winnerRed').classList.add('hidden');
+                    document.getElementById('winnerBlue').classList.add('hidden');
+                    document.getElementById('winnerTie').classList.add('hidden');
+                    
+                    if (data.winner === 'red') {
+                        document.getElementById('winnerRed').classList.remove('hidden');
+                        document.getElementById('winnerRedName').textContent = `${data.redCorner.name} WINS!`;
+                    } else if (data.winner === 'blue') {
+                        document.getElementById('winnerBlue').classList.remove('hidden');
+                        document.getElementById('winnerBlueName').textContent = `${data.blueCorner.name} WINS!`;
+                    } else {
+                        document.getElementById('winnerTie').classList.remove('hidden');
+                    }
+                    
+                    // Trigger confetti for winner
+                    if (data.winner !== 'tie') {
+                        triggerConfetti(data.winner === 'red' ? '#ff0054' : '#00f5d4');
+                    } else {
+                        triggerConfettiTie();
+                    }
+                }
+            }
+            
+            // Confetti effect for winner
+            function triggerConfetti(color) {
+                confetti({
+                    particleCount: 150,
+                    spread: 70,
+                    origin: { y: 0.6 },
+                    colors: [color, '#ffffff']
+                });
+                
+                // Additional bursts
+                setTimeout(() => confetti({
+                    particleCount: 100,
+                    angle: 60,
+                    spread: 55,
+                    origin: { x: 0, y: 0.6 },
+                    colors: [color, '#ffffff']
+                }), 250);
+                
+                setTimeout(() => confetti({
+                    particleCount: 100,
+                    angle: 120,
+                    spread: 55,
+                    origin: { x: 1, y: 0.6 },
+                    colors: [color, '#ffffff']
+                }), 500);
+            }
+            
+            // Confetti effect for tie
+            function triggerConfettiTie() {
+                confetti({
+                    particleCount: 100,
+                    spread: 70,
+                    origin: { y: 0.6 },
+                    colors: ['#ff0054', '#00f5d4', '#ffffff']
+                });
+            }
+        }
+        
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeFirebaseData();
+            initializeView();
+        });
+    </script>
+</body>
+</html>

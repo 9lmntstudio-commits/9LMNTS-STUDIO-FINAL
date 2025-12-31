@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>9LMNTS STUDIO | Event Tech & Design</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Teko:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* --- 9LMNT BRAND IDENTITY --- */
+        :root {
+            --bg: #050505;
+            --surface: #111111;
+            --surface-light: #1a1a1a;
+            --brand: #FF5E00; /* 9LMNT Orange */
+            --brand-glow: rgba(255, 94, 0, 0.3);
+            --text: #ffffff;
+            --text-dim: #888888;
+            --border: #222;
+            --font-head: 'Teko', sans-serif;
+            --font-body: 'Inter', sans-serif;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+
+        body { 
+            background-color: var(--bg); 
+            color: var(--text); 
+            font-family: var(--font-body); 
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        a { text-decoration: none; color: inherit; transition: 0.3s; }
+        ul { list-style: none; }
+
+        /* --- UTILITIES --- */
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+        .text-brand { color: var(--brand); }
+        .flex { display: flex; align-items: center; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; }
+        
+        .btn { 
+            display: inline-block; padding: 14px 35px; 
+            font-family: var(--font-head); font-size: 1.2rem; letter-spacing: 1px; text-transform: uppercase;
+            border-radius: 4px; cursor: pointer; transition: 0.3s; border: 1px solid transparent; font-weight: 700;
+        }
+        .btn-primary { background: var(--brand); color: #000; }
+        .btn-primary:hover { background: #fff; box-shadow: 0 0 25px var(--brand-glow); }
+        .btn-outline { border-color: var(--text); background: transparent; color: var(--text); }
+        .btn-outline:hover { border-color: var(--brand); color: var(--brand); }
+
+        /* --- NAVIGATION --- */
+        nav { 
+            position: fixed; top: 0; left: 0; width: 100%; z-index: 1000;
+            background: rgba(5,5,5,0.9); backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border); padding: 20px 0;
+        }
+        .nav-wrap { justify-content: space-between; }
+        .logo { font-family: var(--font-head); font-size: 2.2rem; font-weight: 700; letter-spacing: 2px; }
+        .nav-links { gap: 40px; }
+        .nav-links a { font-size: 0.9rem; font-weight: 600; text-transform: uppercase; color: var(--text-dim); }
+        .nav-links a:hover { color: var(--brand); }
+        .portal-link { border: 1px solid var(--brand); padding: 8px 20px; color: var(--brand) !important; border-radius: 20px; }
+        .portal-link:hover { background: var(--brand); color: #000 !important; }
+
+        /* --- HERO --- */
+        .hero { 
+            height: 90vh; display: flex; align-items: center; justify-content: center; text-align: center;
+            background: 
+                radial-gradient(circle at center, rgba(255,94,0,0.1) 0%, rgba(5,5,5,1) 70%),
+                url('https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=1920&q=80');
+            background-size: cover; background-position: center; position: relative;
+        }
+        .hero::before { content:''; position: absolute; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.7); }
+        .hero-content { z-index: 2; max-width: 900px; }
+        
+        .hero h1 { 
+            font-family: var(--font-head); font-size: 6rem; line-height: 0.9; margin-bottom: 20px; text-transform: uppercase;
+            text-shadow: 0 0 30px rgba(0,0,0,0.8);
+        }
+        .hero p { font-size: 1.3rem; color: #ccc; margin-bottom: 40px; max-width: 600px; margin-left: auto; margin-right: auto; }
+
+        /* --- SECTIONS --- */
+        .section { padding: 100px 0; border-bottom: 1px solid var(--border); }
+        .section-head { text-align: center; margin-bottom: 60px; }
+        .section-head h2 { font-family: var(--font-head); font-size: 4rem; text-transform: uppercase; margin-bottom: 10px; line-height: 1; }
+        .section-head .sub { color: var(--brand); font-weight: bold; letter-spacing: 3px; text-transform: uppercase; font-size: 1rem; }
+
+        /* --- SERVICES GRID --- */
+        .service-card { 
+            background: var(--surface); padding: 40px; border: 1px solid var(--border); 
+            border-radius: 8px; transition: 0.3s; position: relative; overflow: hidden;
+        }
+        .service-card:hover { border-color: var(--brand); transform: translateY(-10px); }
+        .service-icon { font-size: 2.5rem; color: var(--text); margin-bottom: 25px; }
+        .service-card h3 { font-family: var(--font-head); font-size: 2rem; margin-bottom: 15px; text-transform: uppercase; }
+        .service-card p { color: var(--text-dim); margin-bottom: 20px; }
+        .service-list li { margin-bottom: 8px; font-size: 0.9rem; color: #ccc; }
+        .service-list i { color: var(--brand); margin-right: 10px; }
+
+        /* --- PROJECT LOA: CROWDFUNDING SECTION --- */
+        .loa-section { background: linear-gradient(180deg, #050505 0%, #1a0500 100%); }
+        .loa-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: 50px; align-items: center; }
+        
+        .loa-info h3 { font-family: var(--font-head); font-size: 3rem; margin-bottom: 20px; line-height: 1; }
+        .loa-info p { color: #ccc; margin-bottom: 30px; font-size: 1.1rem; }
+        .progress-bar { width: 100%; height: 15px; background: #333; border-radius: 10px; overflow: hidden; margin-bottom: 10px; }
+        .progress-fill { width: 65%; height: 100%; background: var(--brand); box-shadow: 0 0 20px var(--brand); }
+        .stats-row { display: flex; gap: 40px; margin-bottom: 40px; }
+        .stat h4 { font-size: 2rem; font-family: var(--font-head); color: #fff; margin: 0; }
+        .stat span { color: var(--brand); font-size: 0.9rem; text-transform: uppercase; font-weight: bold; }
+
+        /* NPC TIERS CARD */
+        .npc-tiers { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
+        .tier-card { 
+            background: rgba(255,255,255,0.05); padding: 20px; border: 1px solid var(--border); 
+            text-align: center; cursor: pointer; transition: 0.2s;
+        }
+        .tier-card:hover { background: var(--brand); border-color: var(--brand); }
+        .tier-card:hover * { color: #000 !important; }
+        
+        .t-name { font-weight: bold; text-transform: uppercase; font-size: 0.9rem; display: block; margin-bottom: 5px; }
+        .t-price { font-family: var(--font-head); font-size: 2rem; display: block; margin-bottom: 5px; color: var(--brand); }
+        .t-desc { font-size: 0.8rem; color: #888; line-height: 1.2; }
+
+        /* --- EVENTS & TICKETS --- */
+        .event-banner { 
+            background: var(--surface); border: 1px solid var(--border); padding: 40px; 
+            display: flex; justify-content: space-between; align-items: center; border-left: 5px solid var(--brand);
+        }
+        .event-info h3 { font-family: var(--font-head); font-size: 2.5rem; margin-bottom: 5px; }
+        .event-meta { display: flex; gap: 20px; color: var(--text-dim); text-transform: uppercase; font-size: 0.9rem; font-weight: bold; }
+        .event-meta i { color: var(--brand); }
+
+        /* --- CONTACT/FOOTER --- */
+        footer { padding: 80px 0; border-top: 1px solid var(--border); text-align: center; background: #000; }
+        .footer-logo { font-family: var(--font-head); font-size: 3rem; display: inline-block; margin-bottom: 20px; }
+        .contact-box { max-width: 600px; margin: 0 auto; }
+        .input-group { display: flex; gap: 10px; margin-bottom: 20px; }
+        input { flex: 1; padding: 15px; background: var(--surface); border: 1px solid var(--border); color: #fff; }
+        
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 4rem; }
+            .loa-grid { grid-template-columns: 1fr; }
+            .event-banner { flex-direction: column; text-align: center; gap: 20px; }
+            .nav-links { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="container flex nav-wrap">
+            <div class="logo">9LMNTS <span class="text-brand">STUDIO</span></div>
+            <div class="nav-links flex">
+                <a href="#events">Upcoming Events</a>
+                <a href="#services">Services</a>
+                <a href="#loa">Project LOA</a>
+                <a href="#" class="portal-link">Client Portal</a>
+            </div>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <div class="hero-content">
+            <p class="text-brand" style="font-weight: bold; letter-spacing: 4px;">EVENT PLANNING • WEB DESIGN • BRANDING</p>
+            <h1>We Design<br>The Experience</h1>
+            <p>9LMNTS is a creative studio that blends live event production with proprietary technology. We build the app, run the show, and fund the future.</p>
+            <div style="display:flex; gap: 20px; justify-content: center;">
+                <a href="#events" class="btn btn-primary">BUY TICKETS</a>
+                <a href="#services" class="btn btn-outline">HIRE THE STUDIO</a>
+            </div>
+        </div>
+    </section>
+
+    <section id="events" class="section">
+        <div class="container">
+            <div class="section-head">
+                <span class="sub">NEXT LIVE EXPERIENCE</span>
+                <h2>Corporate Clash</h2>
+            </div>
+            
+            <div class="event-banner">
+                <div class="event-info">
+                    <h3>Q1 Pitch Battle & Networking</h3>
+                    <div class="event-meta">
+                        <span><i class="fas fa-calendar"></i> Feb 28, 2025</span>
+                        <span><i class="fas fa-map-marker-alt"></i> 70 Bongard, Ottawa</span>
+                        <span><i class="fas fa-glass-cheers"></i> Bar Open</span>
+                    </div>
+                </div>
+                <div style="text-align:right;">
+                    <div style="font-size:0.9rem; color:#888; margin-bottom:10px;">General Admission</div>
+                    <a href="https://buy.stripe.com/YOUR_TICKET_LINK" class="btn btn-primary" style="padding: 10px 30px;">GET TICKETS ($25)</a>
+                </div>
+            </div>
+
+            <div style="margin-top:50px; text-align:center;">
+                <p style="color:#888; margin-bottom:20px;">Experience our proprietary "Event OS" technology live at the show.</p>
+                <a href="https://YOUR-APP-LINK.netlify.app" target="_blank" class="btn btn-outline">PREVIEW THE APP</a>
+            </div>
+        </div>
+    </section>
+
+    <section id="loa" class="section loa-section">
+        <div class="container">
+            <div class="loa-grid">
+                <div class="loa-info">
+                    <span class="sub">GAMIFIED FUNDRAISING</span>
+                    <h3>Project: LOA</h3>
+                    <p>We are funding an Open World RPG based on Ottawa's nightlife. Proceeds from our events and "Vote Packs" go directly to development.</p>
+                    
+                    <div class="progress-bar"><div class="progress-fill"></div></div>
+                    <div class="stats-row">
+                        <div class="stat"><h4>$12,450</h4><span>Raised</span></div>
+                        <div class="stat"><h4>320</h4><span>Backers</span></div>
+                    </div>
+
+                    <a href="#pledge" class="btn btn-primary">BACK THE GAME</a>
+                </div>
+
+                <div class="npc-tiers">
+                    <div class="tier-card" onclick="window.location.href='https://buy.stripe.com/LINK_250'">
+                        <span class="t-name">Club Extra</span>
+                        <span class="t-price">$250</span>
+                        <span class="t-desc">Get your face scanned as a background party-goer NPC.</span>
+                    </div>
+                    <div class="tier-card" onclick="window.location.href='https://buy.stripe.com/LINK_500'">
+                        <span class="t-name">Street Talker</span>
+                        <span class="t-price">$500</span>
+                        <span class="t-desc">NPC with 3 lines of dialog and custom outfit.</span>
+                    </div>
+                    <div class="tier-card" onclick="window.location.href='https://buy.stripe.com/LINK_1000'">
+                        <span class="t-name">Sidequest Hero</span>
+                        <span class="t-price">$1,000</span>
+                        <span class="t-desc">You give the player a mission. Featured Credit.</span>
+                    </div>
+                    <div class="tier-card" onclick="window.location.href='https://buy.stripe.com/LINK_2500'">
+                        <span class="t-name">The Mogul</span>
+                        <span class="t-price">$2,500</span>
+                        <span class="t-desc">Your real-life business integrated into the game map.</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="services" class="section">
+        <div class="container">
+            <div class="section-head">
+                <span class="sub">WHAT WE DO</span>
+                <h2>The Studio</h2>
+            </div>
+            <div class="grid">
+                <div class="service-card">
+                    <i class="fas fa-calendar-alt service-icon"></i>
+                    <h3>Event Planning</h3>
+                    <p>We handle logistics, venue negotiation, and promotion. We focus on "Experience First" events.</p>
+                    <ul class="service-list">
+                        <li><i class="fas fa-check"></i> Venue & Vendor Management</li>
+                        <li><i class="fas fa-check"></i> Staffing & Security</li>
+                        <li><i class="fas fa-check"></i> Ticket Sales Strategy</li>
+                    </ul>
+                </div>
+                <div class="service-card">
+                    <i class="fas fa-mobile-alt service-icon"></i>
+                    <h3>Event Tech</h3>
+                    <p>License our "Event OS" for your own gala or wedding. Live voting, tipping, and networking.</p>
+                    <ul class="service-list">
+                        <li><i class="fas fa-check"></i> Custom Web App</li>
+                        <li><i class="fas fa-check"></i> Live Voting System</li>
+                        <li><i class="fas fa-check"></i> Digital Revenue Collection</li>
+                    </ul>
+                </div>
+                <div class="service-card">
+                    <i class="fas fa-paint-brush service-icon"></i>
+                    <h3>Branding & Web</h3>
+                    <p>From logos to landing pages. We build the digital face of your brand with a modern edge.</p>
+                    <ul class="service-list">
+                        <li><i class="fas fa-check"></i> Logo & Identity</li>
+                        <li><i class="fas fa-check"></i> Website Development</li>
+                        <li><i class="fas fa-check"></i> Marketing Assets</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container contact-box">
+            <div class="footer-logo">9LMNTS <span class="text-brand">STUDIO</span></div>
+            <p style="color:#888; margin-bottom:30px;">Ready to build something legendary? Let's talk.</p>
+            <div class="input-group">
+                <input type="email" placeholder="Enter your email...">
+                <button class="btn btn-primary">SUBSCRIBE</button>
+            </div>
+            <p style="font-size:0.8rem; color:#444;">© 2025 9LMNTS.ENT | Ottawa, Canada</p>
+        </div>
+    </footer>
+
+</body>
+</html>

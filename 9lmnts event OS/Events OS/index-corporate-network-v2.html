@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Global Innovation Summit 2025</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        /* --- MASTER THEME VARIABLES (Dark Mode Default) --- */
+        :root {
+            --bg-color: #0f172a;       /* Slate 900 */
+            --card-bg: #1e293b;        /* Slate 800 */
+            --modal-bg: #1e293b;
+            --primary: #38bdf8;        /* Sky Blue */
+            --accent: #22d3ee;         /* Cyan */
+            --gold: #fbbf24;           /* Amber 400 */
+            --text-main: #f8fafc;      /* Slate 50 */
+            --text-sub: #94a3b8;       /* Slate 400 */
+            --border: #334155;         /* Slate 700 */
+            --input-bg: #0f172a;
+            --success: #2ecc71;
+            --font-main: 'Inter', sans-serif;
+        }
+
+        /* LIGHT MODE OVERRIDES */
+        body[data-theme="light"] {
+            --bg-color: #f4f6f8;
+            --card-bg: #ffffff;
+            --modal-bg: #ffffff;
+            --primary: #003366;
+            --accent: #00b894;
+            --text-main: #2c3e50;
+            --text-sub: #7f8c8d;
+            --border: #e1e4e8;
+            --input-bg: #f8f9fa;
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        body { 
+            background-color: var(--bg-color);
+            color: var(--text-main); 
+            font-family: var(--font-main); 
+            margin: 0; padding-bottom: 90px;
+            transition: background 0.3s, color 0.3s;
+        }
+        
+        .app-container { 
+            max-width: 480px; margin: 0 auto; min-height: 100vh; 
+            background: var(--bg-color); border-left: 1px solid var(--border); border-right: 1px solid var(--border); 
+            position: relative; overflow-x: hidden;
+        }
+        
+        /* HEADER */
+        header { 
+            background: var(--card-bg); padding: 15px 20px; 
+            position: sticky; top: 0; z-index: 90; 
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid var(--border);
+        }
+        .logo { font-size: 1.1rem; font-weight: 800; letter-spacing: 0.5px; text-transform: uppercase; color: var(--primary); }
+        .theme-toggle { background: transparent; border: none; color: var(--text-sub); cursor: pointer; font-size: 1.2rem; }
+
+        /* 1. HERO DASHBOARD */
+        .hero-dashboard {
+            background: var(--card-bg); padding: 30px 20px 20px; text-align: center; border-bottom: 1px solid var(--border);
+        }
+        .hero-dashboard h1 { margin: 0; font-size: 1.8rem; color: var(--primary); letter-spacing: -0.5px; }
+        
+        .hero-details { display: flex; justify-content: center; gap: 20px; margin: 10px 0 20px; color: var(--text-sub); font-size: 0.9rem; }
+        .hero-details span { display: flex; align-items: center; gap: 6px; }
+
+        .main-cta-btn { 
+            width: 100%; padding: 16px; background: var(--accent); color: #000; 
+            border: none; border-radius: 8px; font-weight: 800; font-size: 1rem; 
+            margin-bottom: 25px; cursor: pointer; transition: 0.2s; text-transform: uppercase;
+            box-shadow: 0 4px 15px rgba(34, 211, 238, 0.2);
+        }
+        .main-cta-btn:active { transform: scale(0.98); }
+        
+        .kpi-row { display: flex; gap: 10px; justify-content: center; }
+        .kpi-card { background: var(--bg-color); border: 1px solid var(--border); padding: 12px; border-radius: 8px; flex: 1; }
+        .kpi-num { font-size: 1.3rem; font-weight: 900; color: var(--text-main); display: block; }
+        .kpi-label { font-size: 0.65rem; text-transform: uppercase; color: var(--text-sub); font-weight: bold; margin-top: 4px; display:block; }
+
+        /* 2. REVENUE RACK (Fixed Layout) */
+        .contribution-section {
+            padding: 20px 0 25px 20px; margin: 20px 15px; background: var(--card-bg); border-radius: 12px;
+            border: 1px solid var(--gold); box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+        }
+        .section-header { display: flex; align-items: center; gap: 8px; margin-bottom: 15px; color: var(--text-main); font-weight: 700; font-size: 0.95rem; }
+        
+        .ticket-row {
+            display: flex; gap: 12px; overflow-x: auto; padding-bottom: 5px; padding-right: 20px;
+            scrollbar-width: none; -webkit-overflow-scrolling: touch;
+        }
+        .ticket-row::-webkit-scrollbar { display: none; }
+
+        .ticket-card {
+            min-width: 130px; padding: 15px 10px; border-radius: 10px; border: 1px solid var(--border);
+            background: var(--bg-color); cursor: pointer; position: relative; text-align: center;
+            transition: 0.2s; display: flex; flex-direction: column; justify-content: space-between;
+        }
+        .ticket-card:active { transform: scale(0.97); }
+        .ticket-card.vip { border: 1px solid var(--gold); background: linear-gradient(145deg, rgba(251, 191, 36, 0.1), transparent); }
+        
+        .t-price { font-size: 1.4rem; font-weight: 800; color: var(--text-main); margin-bottom: 2px; }
+        .t-label { font-size: 0.7rem; color: var(--text-sub); margin-bottom: 12px; line-height: 1.2; }
+        .t-btn { 
+            font-size: 0.75rem; font-weight: 800; padding: 8px 0; border-radius: 20px; 
+            border: none; background: var(--primary); color: #000; cursor: pointer; width: 100%;
+        }
+        .vip .t-btn { background: var(--gold); }
+
+        /* TABS */
+        .nav-tabs { display: flex; background: var(--card-bg); padding: 0 10px; border-bottom: 1px solid var(--border); margin-top: 0; overflow-x: auto; }
+        .tab { 
+            padding: 15px 20px; color: var(--text-sub); font-weight: 600; font-size: 0.9rem; cursor: pointer; white-space: nowrap; border-bottom: 3px solid transparent; transition: 0.2s;
+        }
+        .tab.active { color: var(--primary); border-bottom: 3px solid var(--primary); }
+
+        /* SECTIONS */
+        .view-section { display: none; padding: 20px; animation: fadeIn 0.4s ease; }
+        .view-section.active { display: block; }
+
+        /* PITCH CARDS */
+        .pitch-card {
+            background: var(--card-bg); border-radius: 12px; overflow: hidden; margin-bottom: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1); border: 1px solid var(--border);
+        }
+        .pitch-header { padding: 15px; display: flex; align-items: center; gap: 15px; border-bottom: 1px solid var(--border); background: rgba(255,255,255,0.02); }
+        .team-avatar { width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.2rem; }
+        .pitch-body { padding: 20px; }
+        .pitch-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 8px; color: var(--text-main); }
+        .pitch-desc { font-size: 0.9rem; color: var(--text-sub); line-height: 1.5; margin-bottom: 15px; }
+        .progress-bar { background: var(--border); height: 8px; border-radius: 4px; overflow: hidden; margin: 10px 0 15px; }
+        .fill { height: 100%; background: var(--accent); width: 0%; transition: width 1s ease; }
+        .vote-btn { width: 100%; background: var(--primary); color: #000; border: none; padding: 14px; font-weight: 800; border-radius: 6px; cursor: pointer; text-transform: uppercase; letter-spacing: 0.5px; }
+
+        /* NETWORKING GRID ("Who's Here" Style) */
+        .network-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .profile-card-grid { 
+            background: var(--card-bg); padding: 20px 10px; border-radius: 12px; text-align: center; 
+            border: 1px solid var(--border); cursor: pointer; transition: 0.2s; 
+        }
+        .profile-card-grid:active { transform: scale(0.98); border-color: var(--primary); }
+        .pcg-avatar { width: 65px; height: 65px; background-color: var(--bg-color); border-radius: 50%; margin: 0 auto 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: var(--text-sub); border: 2px solid var(--border); background-size: cover; background-position: center; }
+        .pcg-name { font-weight: 700; font-size: 0.95rem; margin-bottom: 4px; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .pcg-role { font-size: 0.7rem; color: var(--text-sub); text-transform: uppercase; margin-bottom: 15px; font-weight: 600; letter-spacing: 0.5px; }
+        .pcg-btn { background: transparent; border: 1px solid var(--accent); color: var(--accent); padding: 8px 16px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; cursor: pointer; transition: 0.2s; }
+        .pcg-btn:hover { background: var(--accent); color: #000; }
+
+        /* QA SECTION */
+        .qa-card { background: var(--card-bg); padding: 15px; border-radius: 8px; margin-bottom: 10px; border: 1px solid var(--border); display: flex; gap: 15px; }
+        .upvote-box { display: flex; flex-direction: column; align-items: center; min-width: 40px; justify-content: center; }
+        .arrow { font-size: 1.2rem; color: var(--text-sub); cursor: pointer; }
+        .arrow.active { color: var(--accent); }
+        .count { font-weight: bold; font-size: 0.9rem; margin-top: 2px; }
+
+        /* FOOTER NAV */
+        .bottom-nav { position: fixed; bottom: 0; width: 100%; max-width: 480px; background: var(--card-bg); border-top: 1px solid var(--border); display: flex; justify-content: space-around; padding: 12px 0; z-index: 100; box-shadow: 0 -5px 20px rgba(0,0,0,0.2); }
+        .nav-item { text-align: center; color: var(--text-sub); font-size: 0.65rem; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 6px; font-weight: 600; }
+        .nav-item.active { color: var(--primary); }
+        .nav-item i { font-size: 1.3rem; }
+
+        /* --- MODALS --- */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 200; justify-content: center; align-items: center; backdrop-filter: blur(8px); }
+        .modal-box { width: 85%; max-width: 380px; background: var(--modal-bg); padding: 25px; border-radius: 16px; text-align: center; position: relative; border-top: 4px solid var(--accent); animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); }
+        .close { position: absolute; top: 15px; right: 20px; font-size: 24px; cursor: pointer; color: var(--text-sub); }
+        .modal-title { margin: 0 0 20px 0; color: var(--primary); font-size: 1.2rem; font-weight: 800; }
+        
+        .submit-action { background: var(--primary); color: #000; border: none; padding: 14px; width: 100%; font-weight: 800; border-radius: 8px; cursor: pointer; transition: 0.3s; text-transform: uppercase; margin-top: 10px; }
+        .submit-action:active { transform: scale(0.98); }
+
+        /* PROFILE MODAL (Circular + Goal Bar) */
+        .profile-header-lg { display: flex; flex-direction: column; align-items: center; margin-bottom: 20px; }
+        .avatar-lg { width: 90px; height: 90px; background: var(--bg-color); border-radius: 50%; margin-bottom: 15px; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; color: var(--text-sub); border: 3px solid var(--border); background-size: cover; background-position: center; }
+        
+        /* The Contribution Bar Container */
+        .goal-wrapper { width: 100%; margin: 20px 0 25px; text-align: left; }
+        .goal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .goal-title { font-weight: 700; color: var(--primary); font-size: 0.85rem; }
+        .contribute-btn-mini { background: var(--accent); color: #000; border: none; padding: 6px 12px; border-radius: 12px; font-size: 0.7rem; font-weight: 800; cursor: pointer; }
+        
+        .goal-bar-bg { width: 100%; height: 10px; background: var(--border); border-radius: 5px; overflow: hidden; margin-bottom: 8px; }
+        .goal-fill { height: 100%; background: var(--accent); width: 0%; transition: width 0.8s ease-out; }
+        .goal-labels { display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-sub); font-weight: 600; }
+
+        .connect-btn-lg { background: transparent; border: 1px solid var(--accent); color: var(--accent); padding: 12px 0; width: 100%; border-radius: 8px; font-weight: 700; cursor: pointer; transition: 0.2s; margin-bottom: 15px; }
+        .connect-btn-lg:hover { background: var(--accent); color: #000; }
+        .connect-btn-lg.connected { background: var(--success); border-color: var(--success); color: white; }
+
+        /* AGENDA MODAL (Functional List from agenda1.jpg) */
+        .agenda-list { list-style: none; padding: 0; margin: 10px 0 20px; text-align: left; }
+        .agenda-item { padding: 15px 0; border-bottom: 1px solid var(--border); color: var(--text-main); display: flex; align-items: flex-start; gap: 15px; }
+        .agenda-item:last-child { border-bottom: none; }
+        .agenda-time { font-weight: 800; color: var(--primary); white-space: nowrap; font-size: 0.9rem; min-width: 75px; }
+        .agenda-desc { font-size: 0.9rem; color: var(--text-main); font-weight: 500; }
+
+        /* ASK QUESTION MODAL */
+        .ask-textarea { width: 100%; height: 120px; padding: 15px; background: #fff; border: none; color: #333; border-radius: 8px; resize: none; font-family: inherit; box-sizing: border-box; margin-bottom: 15px; font-size: 1rem; }
+        
+        /* CONTRIBUTION TIER SELECT */
+        .tier-select { width: 100%; padding: 15px; background: var(--input-bg); border: 1px solid var(--border); color: var(--text-main); border-radius: 8px; margin-bottom: 20px; font-family: inherit; font-size: 1rem; appearance: none; outline: none; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    </style>
+</head>
+<body data-theme="dark">
+
+<div class="app-container">
+    <header>
+        <div class="logo">ACME <span style="font-weight:300">SUMMIT</span></div>
+        <button class="theme-toggle" onclick="toggleTheme()">
+            <i class="fas fa-adjust"></i>
+        </button>
+    </header>
+
+    <div class="hero-dashboard">
+        <h1>Innovation Challenge</h1>
+        <div class="hero-details">
+            <span><i class="far fa-calendar-alt"></i> Oct 24-26</span>
+            <span><i class="fas fa-map-marker-alt"></i> Grand Hall A</span>
+        </div>
+        
+        <button class="main-cta-btn" onclick="openModal('contributeModal')">INVITE & CONTRIBUTE</button>
+
+        <div class="kpi-row">
+            <div class="kpi-card">
+                <span class="kpi-num">$12k</span>
+                <span class="kpi-label">Raised</span>
+            </div>
+            <div class="kpi-card">
+                <span class="kpi-num">320</span>
+                <span class="kpi-label">Voters</span>
+            </div>
+            <div class="kpi-card">
+                <span class="kpi-num">4</span>
+                <span class="kpi-label">Teams</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="contribution-section">
+        <div class="section-header">
+            <i class="fas fa-ticket-alt" style="color:var(--gold)"></i> Tickets & Upgrades
+        </div>
+        <div class="ticket-row">
+            <div class="ticket-card" onclick="openPay('Standard Ticket', 25)">
+                <div class="t-price">$25</div>
+                <div class="t-label">Entry Pass</div>
+                <button class="t-btn">BUY</button>
+            </div>
+            <div class="ticket-card" onclick="openPay('Vote Pack', 50)">
+                <div class="t-price">$50</div>
+                <div class="t-label">10x Power Votes</div>
+                <button class="t-btn">BOOST</button>
+            </div>
+            <div class="ticket-card vip" onclick="openPay('VIP Access', 150)">
+                <div style="position:absolute; top:-10px; right:10px; background:var(--gold); color:black; font-size:0.6rem; padding:2px 6px; border-radius:4px; font-weight:bold;">POPULAR</div>
+                <div class="t-price">$150</div>
+                <div class="t-label">VIP Experience</div>
+                <button class="t-btn">UPGRADE</button>
+            </div>
+            <div class="ticket-card" onclick="openPay('Raffle Bundle', 20)">
+                <div class="t-price">$20</div>
+                <div class="t-label">5 Raffle Tickets</div>
+                <button class="t-btn">ENTER</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="nav-tabs">
+        <div class="tab active" onclick="switchTab('pitch', this)">Pitch Battle</div>
+        <div class="tab" onclick="switchTab('qa', this)">Live Q&A</div>
+        <div class="tab" onclick="switchTab('network', this)">Networking</div>
+    </div>
+
+    <div id="pitch" class="view-section active">
+        <div class="pitch-card">
+            <div class="pitch-header">
+                <div class="team-avatar" style="background:rgba(25, 118, 210, 0.1); color:#1976d2;">A</div>
+                <div>
+                    <div style="font-weight:bold; font-size:0.95rem;">Team Alpha</div>
+                    <div style="font-size:0.75rem; color:var(--text-sub);">Sales Dept</div>
+                </div>
+            </div>
+            <div class="pitch-body">
+                <div class="pitch-title">Project: AI Client Onboarding</div>
+                <div class="pitch-desc">Using generative AI to reduce setup time by 40% for new enterprise clients.</div>
+                <div class="progress-bar"><div class="fill" style="width: 65%;"></div></div>
+                <div style="font-size:0.75rem; color:var(--text-sub); display:flex; justify-content:space-between;">
+                    <span>65% Approval</span> <span>320 Votes</span>
+                </div>
+                <button class="vote-btn" style="margin-top:15px;" onclick="openModal('voteModal', 'Team Alpha')">VOTE FOR ALPHA</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="qa" class="view-section">
+        <button class="main-cta-btn" style="padding:12px; margin-bottom:20px; font-size:0.9rem;" onclick="openModal('askModal')">+ ASK A QUESTION</button>
+        <div class="qa-card">
+            <div class="upvote-box" onclick="toggleVote(this)">
+                <i class="fas fa-chevron-up arrow"></i>
+                <span class="count">42</span>
+            </div>
+            <div>
+                <div style="font-weight:bold; font-size:0.95rem; margin-bottom:5px;">Will we be expanding the remote work policy in 2025?</div>
+                <div style="font-size:0.75rem; color:var(--text-sub);">Anonymous • 2m ago</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="network" class="view-section">
+        <div style="margin-bottom:20px; text-align:center;">
+            <h3 style="margin:0; color:var(--primary); font-size:1.1rem;">Who's Here?</h3>
+            <p style="font-size:0.8rem; color:var(--text-sub);">Connect with colleagues attending the summit.</p>
+        </div>
+
+        <div class="network-grid">
+            <div class="profile-card-grid" onclick="openProfile('Sarah Jenkins', 'VP Marketing', 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=200', '85%')">
+                <div class="pcg-avatar" style="background-image: url('https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=200');"></div>
+                <div class="pcg-name">Sarah Jenkins</div>
+                <div class="pcg-role">VP Marketing</div>
+                <button class="pcg-btn">View Profile</button>
+            </div>
+            <div class="profile-card-grid" onclick="openProfile('David Chen', 'Lead Engineer', 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=200', '40%')">
+                <div class="pcg-avatar" style="background-image: url('https://images.unsplash.com/photo-1560250097-0b93528c311a?w=200');"></div>
+                <div class="pcg-name">David Chen</div>
+                <div class="pcg-role">Lead Engineer</div>
+                <button class="pcg-btn">View Profile</button>
+            </div>
+            <div class="profile-card-grid" onclick="openProfile('Elena Ross', 'HR Director', 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=200', '95%')">
+                <div class="pcg-avatar" style="background-image: url('https://images.unsplash.com/photo-1580489944761-15a19d654956?w=200');"></div>
+                <div class="pcg-name">Elena Ross</div>
+                <div class="pcg-role">HR Director</div>
+                <button class="pcg-btn">View Profile</button>
+            </div>
+            <div class="profile-card-grid" onclick="openProfile('Mark T.', 'Sales Manager', '', '15%')">
+                <div class="pcg-avatar"><i class="fas fa-user"></i></div>
+                <div class="pcg-name">Mark T.</div>
+                <div class="pcg-role">Sales Manager</div>
+                <button class="pcg-btn">View Profile</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="bottom-nav">
+        <div class="nav-item active" onclick="switchTab('pitch', this)"><i class="fas fa-rocket"></i> PITCH</div>
+        <div class="nav-item" onclick="openModal('agendaModal')"><i class="far fa-calendar-alt"></i> AGENDA</div>
+        <div class="nav-item" onclick="switchTab('network', this)"><i class="fas fa-users"></i> NETWORK</div>
+    </div>
+</div>
+
+<div id="agendaModal" class="modal">
+    <div class="modal-box" style="text-align:left;">
+        <span class="close" onclick="closeModal('agendaModal')">&times;</span>
+        <h3 class="modal-title" style="text-align:center;">Today's Agenda</h3>
+        <ul class="agenda-list">
+            <li class="agenda-item">
+                <span class="agenda-time">09:00 AM</span> 
+                <span class="agenda-desc">Keynote Speech</span>
+            </li>
+            <li class="agenda-item">
+                <span class="agenda-time">10:30 AM</span> 
+                <span class="agenda-desc">Innovation Pitches</span>
+            </li>
+            <li class="agenda-item">
+                <span class="agenda-time">12:00 PM</span> 
+                <span class="agenda-desc">Networking Lunch</span>
+            </li>
+            <li class="agenda-item">
+                <span class="agenda-time">01:30 PM</span> 
+                <span class="agenda-desc">Awards Ceremony</span>
+            </li>
+        </ul>
+        <button class="submit-action" onclick="closeModal('agendaModal')">CLOSE</button>
+    </div>
+</div>
+
+<div id="profileModal" class="modal">
+    <div class="modal-box">
+        <span class="close" onclick="closeModal('profileModal')">&times;</span>
+        <div class="profile-header-lg">
+            <div id="pAvatar" class="avatar-lg"><i class="fas fa-user"></i></div>
+            <h2 id="pName" style="margin:0; font-size:1.3rem;">Name</h2>
+            <p id="pRole" style="color:var(--text-sub); margin:5px 0 0;">Role</p>
+        </div>
+
+        <div class="goal-wrapper">
+            <div class="goal-header">
+                <span class="goal-title">Charity Matching Goal</span>
+                <button class="contribute-btn-mini" onclick="openPay('Match Donation', 50)">CONTRIBUTE</button>
+            </div>
+            <div class="goal-bar-bg">
+                <div id="pGoalFill" class="goal-fill"></div>
+            </div>
+            <div class="goal-labels">
+                <span>Raised</span>
+                <span>Target: $1,000</span>
+            </div>
+        </div>
+        
+        <button class="connect-btn-lg" onclick="toggleConnect(this)">+ CONNECT</button>
+        <div style="text-align:center; font-size:0.85rem; color:var(--primary); font-weight:600; cursor:pointer;" onclick="alert('Message Sent')">Send Direct Message</div>
+    </div>
+</div>
+
+<div id="contributeModal" class="modal">
+    <div class="modal-box" style="border-top-color: var(--gold);">
+        <span class="close" onclick="closeModal('contributeModal')">&times;</span>
+        <h3 class="modal-title" style="color:var(--gold);">Select Contribution</h3>
+        <p style="color:var(--text-sub); margin-bottom:20px; font-size:0.9rem;">Choose your tier to support the event.</p>
+        
+        <select class="tier-select" id="tierSelection">
+            <option value="25">Standard Ticket ($25)</option>
+            <option value="50">Vote Pack Boost ($50)</option>
+            <option value="150">VIP Experience ($150)</option>
+            <option value="20">Raffle Bundle ($20)</option>
+        </select>
+
+        <button class="submit-action" style="background:var(--gold); color:black;" onclick="processTierSelection()">PROCEED TO PAYMENT</button>
+    </div>
+</div>
+
+<div id="payModal" class="modal">
+    <div class="modal-box">
+        <span class="close" onclick="closeModal('payModal')">&times;</span>
+        <h3 id="payTitle" class="modal-title">Confirm</h3>
+        <div style="font-size:2.5rem; font-weight:800; margin:10px 0;">$<span id="payAmount">0</span></div>
+        <p style="font-size:0.85rem; color:var(--text-sub);">Secure Checkout</p>
+        <button class="submit-action" onclick="processAction('payModal', 'Payment Successful!')">CONFIRM & PAY</button>
+    </div>
+</div>
+
+<div id="voteModal" class="modal">
+    <div class="modal-box">
+        <span class="close" onclick="closeModal('voteModal')">&times;</span>
+        <h3 class="modal-title">Cast Vote</h3>
+        <p style="color:var(--text-sub);">Voting for: <strong id="voteTarget" style="color:var(--text-main)">Team</strong></p>
+        <button class="submit-action" onclick="processAction('voteModal', 'Vote Submitted!')">SUBMIT VOTE</button>
+    </div>
+</div>
+
+<div id="askModal" class="modal">
+    <div class="modal-box">
+        <span class="close" onclick="closeModal('askModal')">&times;</span>
+        <h3 class="modal-title">Ask Question</h3>
+        <textarea class="ask-textarea" placeholder="Type here..."></textarea>
+        <button class="submit-action" onclick="processAction('askModal', 'Question Submitted')">SUBMIT</button>
+    </div>
+</div>
+
+<script>
+    // Theme Logic
+    function toggleTheme() {
+        const body = document.body;
+        if (body.getAttribute('data-theme') === 'dark') body.removeAttribute('data-theme');
+        else body.setAttribute('data-theme', 'dark');
+    }
+
+    // Navigation
+    function switchTab(id, el) {
+        document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.nav-item').forEach(t => t.classList.remove('active'));
+        
+        document.getElementById(id).classList.add('active');
+        if(el) el.classList.add('active');
+        
+        // Bottom Nav Sync
+        if(id === 'pitch') document.querySelector('.bottom-nav .nav-item:nth-child(1)').classList.add('active');
+        if(id === 'network') document.querySelector('.bottom-nav .nav-item:nth-child(3)').classList.add('active');
+    }
+
+    // Modal System
+    function openModal(id, data) {
+        if(data && id === 'voteModal') document.getElementById('voteTarget').innerText = data;
+        document.getElementById(id).style.display = 'flex';
+    }
+    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+    // Payment Logic
+    function openPay(title, amount) {
+        document.getElementById('payTitle').innerText = title;
+        document.getElementById('payAmount').innerText = amount;
+        closeModal('contributeModal'); 
+        closeModal('profileModal');
+        document.getElementById('payModal').style.display = 'flex';
+    }
+
+    function processTierSelection() {
+        const select = document.getElementById('tierSelection');
+        const amount = select.value;
+        const title = select.options[select.selectedIndex].text.split(' ($')[0];
+        openPay(title, amount);
+    }
+    
+    function processAction(modalId, msg) {
+        let btn = document.querySelector(`#${modalId} .submit-action`);
+        let originalText = btn.innerText;
+        btn.innerText = "PROCESSING...";
+        setTimeout(() => { alert(msg); closeModal(modalId); btn.innerText = originalText; }, 800);
+    }
+
+    // Profile Logic (Updated with Goal Percentage)
+    function openProfile(name, role, imgUrl, goalPercent) {
+        document.getElementById('pName').innerText = name;
+        document.getElementById('pRole').innerText = role;
+        const avatarEl = document.getElementById('pAvatar');
+        
+        // Handle Avatar Image
+        if(imgUrl) {
+            avatarEl.style.backgroundImage = `url('${imgUrl}')`;
+            avatarEl.innerHTML = '';
+        } else {
+            avatarEl.style.backgroundImage = 'none';
+            avatarEl.innerHTML = '<i class="fas fa-user"></i>';
+        }
+        
+        // Reset Button
+        let btn = document.querySelector('.connect-btn-lg');
+        btn.innerHTML = "+ CONNECT";
+        btn.classList.remove('connected');
+
+        // Reset and animate goal bar
+        const goalFill = document.getElementById('pGoalFill');
+        goalFill.style.width = '0%';
+        document.getElementById('profileModal').style.display = 'flex';
+        
+        // Slight delay for animation
+        setTimeout(() => { goalFill.style.width = goalPercent; }, 200);
+    }
+
+    function toggleConnect(btn) {
+        if(btn.innerText.includes("CONNECT")) {
+            btn.innerHTML = "<i class='fas fa-check'></i> PENDING";
+            btn.classList.add('connected');
+        } else {
+            btn.innerHTML = "+ CONNECT";
+            btn.classList.remove('connected');
+        }
+    }
+
+    // Upvote Logic
+    function toggleVote(el) {
+        let arrow = el.querySelector('.arrow');
+        let count = el.querySelector('.count');
+        if(arrow.classList.contains('active')) {
+            arrow.classList.remove('active');
+            count.innerText = parseInt(count.innerText) - 1;
+        } else {
+            arrow.classList.add('active');
+            count.innerText = parseInt(count.innerText) + 1;
+        }
+    }
+</script>
+
+</body>
+</html>

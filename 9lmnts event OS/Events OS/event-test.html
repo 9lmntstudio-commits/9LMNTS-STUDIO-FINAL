@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>9LMNTS Event OS - Neon Mode</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        bgDark: '#0a0a0f',
+                        electricBlue: '#00f3ff',
+                        neonPurple: '#a855f7',
+                        brightCyan: '#00ffea',
+                        neonGreen: '#00ff88',
+                    },
+                    fontFamily: {
+                        sans: ['"Exo 2"', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        'neon-blue': '0 0 10px rgba(0, 243, 255, 0.5), 0 0 20px rgba(0, 243, 255, 0.3)',
+                        'neon-purple': '0 0 10px rgba(168, 85, 247, 0.5), 0 0 20px rgba(168, 85, 247, 0.3)',
+                        'glass-inset': 'inset 0 0 20px rgba(255, 255, 255, 0.05)',
+                    },
+                    animation: {
+                        'pulse-fast': 'pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'gradient-x': 'gradient-x 3s ease infinite',
+                    },
+                    keyframes: {
+                        'gradient-x': {
+                            '0%, 100%': {
+                                'background-size': '200% 200%',
+                                'background-position': 'left center'
+                            },
+                            '50%': {
+                                'background-size': '200% 200%',
+                                'background-position': 'right center'
+                            },
+                        },
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #0a0a0f;
+            color: white;
+            /* Subtle Noise Texture for Depth */
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
+        }
+        
+        /* Glassmorphism Class */
+        .glass-panel {
+            background: rgba(10, 10, 15, 0.6);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(0, 243, 255, 0.1);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Scanline effect optional */
+        .scanline {
+            background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0.2));
+            background-size: 100% 4px;
+            pointer-events: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            opacity: 0.15;
+            z-index: 50;
+        }
+    </style>
+</head>
+<body class="min-h-screen p-4 md:p-8 flex flex-col gap-8 items-center justify-start relative">
+
+    <div class="scanline"></div>
+
+    <div class="w-full max-w-4xl rounded-lg overflow-hidden shadow-neon-purple animate-pulse-fast relative z-10">
+        <div class="bg-gradient-to-r from-electricBlue via-neonPurple to-electricBlue bg-[length:200%_auto] animate-gradient-x p-1">
+            <div class="bg-black/80 backdrop-blur-sm p-4 text-center flex items-center justify-center gap-4">
+                <span class="text-3xl">🚨</span>
+                <div>
+                    <h2 class="text-2xl font-bold text-white tracking-widest uppercase italic">DRINK PURCHASE DETECTED!</h2>
+                    <p class="text-brightCyan font-mono text-sm tracking-wider">TABLE 5 JUST DROPPED $500 ON BOTTLES</p>
+                </div>
+                <span class="text-3xl">🚨</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-4xl relative z-10">
+
+        <div class="glass-panel rounded-2xl p-6 relative group hover:border-electricBlue/40 transition-all duration-300">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-brightCyan font-semibold tracking-widest text-sm uppercase">King's Program Wallet</h3>
+                <span class="px-2 py-1 rounded bg-electricBlue/10 text-electricBlue text-xs border border-electricBlue/20">LIVE</span>
+            </div>
+
+            <div class="text-center py-4">
+                <div class="text-xs text-gray-400 font-mono mb-1">CURRENT BALANCE</div>
+                <div class="text-5xl font-bold text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.5)]">
+                    24,500 <span class="text-lg text-neonPurple">PTS</span>
+                </div>
+            </div>
+
+            <div class="mt-6 space-y-3">
+                <div class="flex items-center justify-between p-3 rounded-lg bg-white/5 border border-white/5 hover:bg-white/10 cursor-pointer transition">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-full bg-gradient-to-br from-neonPurple to-blue-600 flex items-center justify-center text-xs font-bold">1</div>
+                        <span class="font-medium">DJ Hype</span>
+                    </div>
+                    <span class="font-mono text-electricBlue">12,400</span>
+                </div>
+                <div class="flex items-center justify-between p-3 rounded-lg bg-white/5 border border-white/5 hover:bg-white/10 cursor-pointer transition">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center text-xs font-bold text-gray-400">2</div>
+                        <span class="font-medium text-gray-300">Guest #492</span>
+                    </div>
+                    <span class="font-mono text-gray-400">8,200</span>
+                </div>
+            </div>
+            
+            <div class="absolute inset-0 rounded-2xl bg-electricBlue/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
+        </div>
+
+        <div class="glass-panel rounded-2xl p-6 border-neonPurple/30 shadow-neon-purple/20">
+            <div class="flex items-center gap-2 mb-6 border-b border-white/10 pb-4">
+                <div class="w-3 h-3 rounded-full bg-neonGreen animate-pulse"></div>
+                <h3 class="text-white font-bold tracking-wider">ADMIN COMMAND</h3>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div class="col-span-2">
+                    <label class="text-xs text-gray-500 uppercase font-mono ml-1">Manual Adjustment</label>
+                    <input type="text" placeholder="Enter Amount" class="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-electricBlue focus:ring-1 focus:ring-electricBlue transition-all font-mono">
+                </div>
+
+                <button class="col-span-1 py-3 rounded-lg border border-neonGreen/50 text-neonGreen font-bold hover:bg-neonGreen hover:text-black transition-all shadow-[0_0_15px_rgba(0,255,136,0.1)] hover:shadow-[0_0_20px_rgba(0,255,136,0.6)]">
+                    APPROVE
+                </button>
+                <button class="col-span-1 py-3 rounded-lg border border-red-500/50 text-red-500 font-bold hover:bg-red-500 hover:text-black transition-all">
+                    DENY
+                </button>
+
+                <button class="col-span-2 py-2 mt-2 rounded border border-white/10 text-gray-400 text-sm hover:text-white hover:border-electricBlue hover:shadow-neon-blue transition-all uppercase tracking-widest">
+                    Reset Leaderboard
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>

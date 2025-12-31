@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>9LMNTS STUDIO | Mobile HQ</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* --- 9LMNTS CYBER THEME --- */
+        :root {
+            --primary: #00D4FF;      /* Neon Cyan */
+            --primary-glow: rgba(0, 212, 255, 0.4);
+            --accent: #FF00E5;       /* Neon Pink */
+            --success: #00FF9D;      /* Matrix Green */
+            --bg-dark: #050A1F;      /* Deep Space Navy */
+            --card-bg: rgba(10, 20, 40, 0.7); /* Glass Dark */
+            --glass-blur: blur(16px);
+            --text-main: #ffffff;
+            --text-sub: #94a3b8;
+            --radius: 20px;
+            
+            --font-head: 'Orbitron', sans-serif;
+            --font-ui: 'Inter', sans-serif;
+            
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        /* --- GLOBAL RESET --- */
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { 
+            margin: 0; padding: 0; 
+            font-family: var(--font-ui); 
+            background: var(--bg-dark); 
+            color: var(--text-main); 
+            overflow-x: hidden; 
+        }
+        
+        /* Animated Background */
+        .ambient-bg {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1;
+            background: 
+                radial-gradient(circle at 10% 20%, rgba(255, 0, 229, 0.15), transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(0, 212, 255, 0.15), transparent 40%);
+            animation: pulseBg 10s infinite alternate;
+        }
+        @keyframes pulseBg { 0% { opacity: 0.5; } 100% { opacity: 1; } }
+
+        /* --- APP SHELL --- */
+        .app-container {
+            max-width: 480px; margin: 0 auto; padding-bottom: 120px; min-height: 100vh; position: relative;
+        }
+
+        /* --- HEADER & HERO --- */
+        header {
+            display: flex; justify-content: space-between; align-items: center; padding: 20px 24px;
+            position: sticky; top: 0; z-index: 100;
+            background: rgba(5, 10, 31, 0.8); backdrop-filter: var(--glass-blur);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .brand { font-family: var(--font-head); font-weight: 900; font-size: 1.2rem; letter-spacing: 1px; color: var(--text-main); }
+        .brand span { color: var(--primary); }
+        
+        .status-badge { 
+            font-size: 0.7rem; font-weight: 700; padding: 5px 12px; border-radius: 20px;
+            background: rgba(0, 255, 157, 0.1); color: var(--success); border: 1px solid var(--success);
+            display: flex; align-items: center; gap: 6px;
+        }
+        .status-dot { width: 8px; height: 8px; background: var(--success); border-radius: 50%; animation: blink 2s infinite; }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+        .hero { padding: 30px 24px 20px; text-align: center; }
+        .hero-tag { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 3px; color: var(--primary); margin-bottom: 10px; font-weight: 700; }
+        .hero-title { 
+            font-family: var(--font-head); font-size: 3rem; line-height: 0.95; margin: 0; 
+            background: linear-gradient(135deg, #fff, #94a3b8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; 
+        }
+        
+        .hero-cta { 
+            margin-top: 25px; width: 100%; padding: 18px; 
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            border: none; border-radius: 12px; color: white;
+            font-size: 1rem; font-weight: 900; letter-spacing: 1px; text-transform: uppercase;
+            box-shadow: 0 0 20px var(--primary-glow);
+            cursor: pointer; transition: var(--transition);
+        }
+        .hero-cta:active { transform: scale(0.98); }
+
+        /* --- NAVIGATION TABS --- */
+        .nav-scroller {
+            display: flex; gap: 12px; overflow-x: auto; padding: 10px 24px 20px; scrollbar-width: none;
+        }
+        .nav-pill {
+            padding: 10px 20px; border-radius: 100px; background: rgba(255,255,255,0.05); 
+            font-size: 0.85rem; font-weight: 600; white-space: nowrap; cursor: pointer; transition: var(--transition);
+            border: 1px solid transparent; color: var(--text-sub);
+        }
+        .nav-pill.active { 
+            background: rgba(0, 212, 255, 0.15); color: var(--primary); 
+            border-color: var(--primary); box-shadow: 0 0 15px rgba(0,212,255,0.2); 
+        }
+
+        /* --- SECTIONS --- */
+        .section { display: none; padding: 0 24px; animation: slideUp 0.4s ease; }
+        .section.active { display: block; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        .glass-card {
+            background: var(--card-bg); backdrop-filter: var(--glass-blur);
+            border: 1px solid rgba(255,255,255,0.08); border-radius: var(--radius); padding: 20px;
+            margin-bottom: 16px; position: relative; overflow: hidden;
+        }
+        
+        .section-title { 
+            font-family: var(--font-head); font-size: 1.1rem; margin: 0 0 15px 0; 
+            color: white; display: flex; align-items: center; gap: 10px; 
+        }
+        .section-title i { color: var(--primary); }
+
+        /* --- PRODUCT CARDS (Event OS) --- */
+        .os-grid { display: grid; grid-template-columns: 1fr; gap: 15px; }
+        .os-card {
+            display: flex; align-items: center; gap: 15px; padding: 15px;
+            background: rgba(255,255,255,0.03); border-radius: 16px; border: 1px solid rgba(255,255,255,0.05);
+            transition: var(--transition); text-decoration: none; color: white;
+        }
+        .os-card:active { transform: scale(0.98); background: rgba(255,255,255,0.08); }
+        
+        .os-icon {
+            width: 50px; height: 50px; border-radius: 12px; background: rgba(0,0,0,0.3);
+            display: flex; align-items: center; justify-content: center; font-size: 1.5rem;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .pink-icon { color: var(--accent); border-color: var(--accent); background: rgba(255, 0, 229, 0.1); }
+        .blue-icon { color: var(--primary); border-color: var(--primary); background: rgba(0, 212, 255, 0.1); }
+        
+        .os-info h3 { margin: 0 0 4px 0; font-family: var(--font-head); font-size: 1rem; }
+        .os-info p { margin: 0; font-size: 0.8rem; color: var(--text-sub); }
+
+        /* --- BOOKING SYSTEM STYLES --- */
+        .service-option {
+            padding: 15px; border: 2px solid rgba(255,255,255,0.1); border-radius: 12px; margin-bottom: 10px;
+            cursor: pointer; transition: 0.2s; display: flex; justify-content: space-between; align-items: center;
+        }
+        .service-option.selected { border-color: var(--primary); background: rgba(0, 212, 255, 0.1); }
+        .service-price { font-weight: 900; color: var(--primary); }
+
+        /* --- BOTTOM DOCK --- */
+        .bottom-dock {
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 400px;
+            background: rgba(10, 15, 30, 0.9); backdrop-filter: blur(20px);
+            border-radius: 100px; padding: 12px 20px; display: flex; justify-content: space-between;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5); z-index: 200; border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .dock-item {
+            background: none; border: none; color: rgba(255,255,255,0.4); font-size: 1.4rem;
+            width: 45px; height: 45px; border-radius: 50%; cursor: pointer; transition: 0.3s;
+            display: flex; align-items: center; justify-content: center; position: relative;
+        }
+        .dock-item.active { color: white; background: var(--primary); transform: translateY(-10px); box-shadow: 0 5px 15px var(--primary-glow); }
+        .dock-label { 
+            position: absolute; bottom: -20px; font-size: 0.6rem; width: 100px; text-align: center; 
+            opacity: 0; transition: 0.2s; font-weight: 700; pointer-events: none;
+        }
+        .dock-item.active .dock-label { opacity: 1; bottom: -25px; color: var(--primary); }
+
+        /* --- MODALS --- */
+        .modal-overlay { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(0,0,0,0.8); backdrop-filter: blur(8px); z-index: 300; 
+            display: none; align-items: flex-end; 
+        }
+        .modal-sheet { 
+            background: #0f172a; width: 100%; max-width: 480px; margin: 0 auto; 
+            border-radius: 24px 24px 0 0; padding: 30px 24px 50px; 
+            border-top: 1px solid var(--primary);
+            animation: slideUpModal 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        @keyframes slideUpModal { from { transform: translateY(100%); } to { transform: translateY(0); } }
+
+        .form-input {
+            width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+            padding: 15px; border-radius: 12px; color: white; margin-bottom: 15px; font-family: var(--font-ui);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="ambient-bg"></div>
+
+    <div class="app-container">
+        
+        <header>
+            <div class="brand">9LMNTS <span>STUDIO</span></div>
+            <div class="status-badge">
+                <div class="status-dot"></div> OPEN FOR BOOKING
+            </div>
+        </header>
+
+        <div class="hero">
+            <div class="hero-tag">CREATIVE TECHNOLOGY AGENCY</div>
+            <h1 class="hero-title">NEXT GEN<br>EVENT TECH</h1>
+            <button class="hero-cta" onclick="openBooking()">
+                BOOK SERVICES
+            </button>
+        </div>
+
+        <div class="nav-scroller">
+            <div class="nav-pill active" onclick="nav('products', this)">Event OS</div>
+            <div class="nav-pill" onclick="nav('services', this)">Agency Services</div>
+            <div class="nav-pill" onclick="nav('booking', this)">Book Now</div>
+            <div class="nav-pill" onclick="nav('about', this)">About</div>
+        </div>
+
+        <div id="products" class="section active">
+            <div class="glass-card">
+                <div class="section-title"><i class="fas fa-rocket"></i> Launch Your Event</div>
+                <div class="os-grid">
+                    <a href="/sound/" class="os-card">
+                        <div class="os-icon pink-icon"><i class="fas fa-music"></i></div>
+                        <div class="os-info">
+                            <h3>Sound Clash OS</h3>
+                            <p>Live Voting for DJ Battles</p>
+                        </div>
+                        <i class="fas fa-chevron-right" style="opacity:0.5;"></i>
+                    </a>
+                    
+                    <a href="/fashion/" class="os-card">
+                        <div class="os-icon blue-icon"><i class="fas fa-tshirt"></i></div>
+                        <div class="os-info">
+                            <h3>Runway OS</h3>
+                            <p>Fashion Show Interaction</p>
+                        </div>
+                        <i class="fas fa-chevron-right" style="opacity:0.5;"></i>
+                    </a>
+
+                    <a href="/pitch/" class="os-card">
+                        <div class="os-icon pink-icon"><i class="fas fa-bolt"></i></div>
+                        <div class="os-info">
+                            <h3>Pitch Battle OS</h3>
+                            <p>Startup Competition Voting</p>
+                        </div>
+                        <i class="fas fa-chevron-right" style="opacity:0.5;"></i>
+                    </a>
+
+                    <a href="/wedding/" class="os-card">
+                        <div class="os-icon blue-icon"><i class="fas fa-rings-wedding"></i></div>
+                        <div class="os-info">
+                            <h3>The Union OS</h3>
+                            <p>Modern Wedding Guestbook</p>
+                        </div>
+                        <i class="fas fa-chevron-right" style="opacity:0.5;"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div id="services" class="section">
+            <div class="glass-card">
+                <div class="section-title"><i class="fas fa-code"></i> Tech Services</div>
+                <p style="color:var(--text-sub); font-size:0.9rem; line-height:1.6;">
+                    We convert designs into functional software. Specializing in interactive events, live voting systems, and digital guest experiences.
+                </p>
+                <div style="margin-top:20px; display:flex; flex-wrap:wrap; gap:10px;">
+                    <span style="background:rgba(255,255,255,0.1); padding:5px 10px; border-radius:5px; font-size:0.75rem;">Figma to Code</span>
+                    <span style="background:rgba(255,255,255,0.1); padding:5px 10px; border-radius:5px; font-size:0.75rem;">React Development</span>
+                    <span style="background:rgba(255,255,255,0.1); padding:5px 10px; border-radius:5px; font-size:0.75rem;">Event Wi-Fi Systems</span>
+                </div>
+            </div>
+        </div>
+
+        <div id="booking" class="section">
+            <div class="glass-card">
+                <div class="section-title"><i class="fas fa-calendar-check"></i> Instant Booking</div>
+                <p style="margin-bottom:20px; font-size:0.9rem;">Select a service to secure your date.</p>
+                
+                <div class="service-option" onclick="selectService(this, 'Figma to Code', 300)">
+                    <div>
+                        <div style="font-weight:bold;">Figma to Code</div>
+                        <div style="font-size:0.75rem; opacity:0.7;">Convert 1 Page Design</div>
+                    </div>
+                    <div class="service-price">$300</div>
+                </div>
+
+                <div class="service-option" onclick="selectService(this, 'Event OS License', 500)">
+                    <div>
+                        <div style="font-weight:bold;">Event OS License</div>
+                        <div style="font-size:0.75rem; opacity:0.7;">One-Time Event Use</div>
+                    </div>
+                    <div class="service-price">$500</div>
+                </div>
+
+                <div class="service-option" onclick="selectService(this, 'Full Development', 1500)">
+                    <div>
+                        <div style="font-weight:bold;">Full Custom App</div>
+                        <div style="font-size:0.75rem; opacity:0.7;">Design + Code + Hosting</div>
+                    </div>
+                    <div class="service-price">$1,500</div>
+                </div>
+
+                <button class="hero-cta" style="margin-top:10px;" onclick="openPayment()">CONTINUE</button>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="bottom-dock">
+        <button class="dock-item active" onclick="nav('products', this)">
+            <i class="fas fa-layer-group"></i>
+            <span class="dock-label">Products</span>
+        </button>
+        <button class="dock-item" onclick="nav('services', this)">
+            <i class="fas fa-briefcase"></i>
+            <span class="dock-label">Services</span>
+        </button>
+        <button class="dock-item" onclick="nav('booking', this)">
+            <i class="fas fa-calendar-plus"></i>
+            <span class="dock-label">Book</span>
+        </button>
+        <button class="dock-item" onclick="window.location.href='mailto:contact@9lmnts.com'">
+            <i class="fas fa-envelope"></i>
+            <span class="dock-label">Contact</span>
+        </button>
+    </div>
+
+    <div class="modal-overlay" id="paymentModal" onclick="closeModal()">
+        <div class="modal-sheet" onclick="event.stopPropagation()">
+            <div style="text-align:center; margin-bottom:20px;">
+                <div style="width:40px; height:4px; background:rgba(255,255,255,0.2); border-radius:2px; margin:0 auto 15px;"></div>
+                <h2 style="font-family:var(--font-head); margin:0; color:var(--primary);">SECURE SPOT</h2>
+            </div>
+            
+            <div style="background:rgba(0,0,0,0.3); padding:15px; border-radius:12px; margin-bottom:20px; border:1px solid var(--primary);">
+                <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+                    <span style="opacity:0.7;">Service:</span>
+                    <span id="modalServiceName" style="font-weight:bold;">Select a service</span>
+                </div>
+                <div style="display:flex; justify-content:space-between; font-size:1.2rem;">
+                    <span style="opacity:0.7;">Total:</span>
+                    <span id="modalServicePrice" style="font-weight:900; color:var(--primary);">$0.00</span>
+                </div>
+            </div>
+
+            <input type="text" class="form-input" placeholder="Your Name">
+            <input type="email" class="form-input" placeholder="Email Address">
+            <input type="date" class="form-input">
+            
+            <button class="hero-cta" onclick="processFakePayment()">
+                PAY DEPOSIT & BOOK
+            </button>
+            <p style="text-align:center; font-size:0.7rem; opacity:0.5; margin-top:15px;">
+                Secured by Stripe. 100% Money Back Guarantee.
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // --- NAVIGATION LOGIC ---
+        function nav(id, el) {
+            // Switch Sections
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            
+            // Switch Top Tabs
+            if(el && el.classList.contains('nav-pill')) {
+                document.querySelectorAll('.nav-pill').forEach(p => p.classList.remove('active'));
+                el.classList.add('active');
+            }
+
+            // Sync Bottom Dock (Simple logic)
+            document.querySelectorAll('.dock-item').forEach(d => d.classList.remove('active'));
+            if(id === 'products') document.querySelectorAll('.dock-item')[0].classList.add('active');
+            if(id === 'services') document.querySelectorAll('.dock-item')[1].classList.add('active');
+            if(id === 'booking') document.querySelectorAll('.dock-item')[2].classList.add('active');
+        }
+
+        // --- BOOKING LOGIC ---
+        let selectedService = { name: '', price: 0 };
+
+        function selectService(el, name, price) {
+            // Visual Selection
+            document.querySelectorAll('.service-option').forEach(o => o.classList.remove('selected'));
+            el.classList.add('selected');
+            
+            // Store Data
+            selectedService = { name, price };
+        }
+
+        function openBooking() {
+            nav('booking', document.querySelectorAll('.nav-pill')[2]);
+        }
+
+        function openPayment() {
+            if(selectedService.price === 0) {
+                alert("Please select a service first.");
+                return;
+            }
+            document.getElementById('modalServiceName').innerText = selectedService.name;
+            document.getElementById('modalServicePrice').innerText = '$' + selectedService.price;
+            document.getElementById('paymentModal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('paymentModal').style.display = 'none';
+        }
+
+        function processFakePayment() {
+            const btn = document.querySelector('#paymentModal .hero-cta');
+            const originalText = btn.innerText;
+            
+            btn.innerText = "PROCESSING...";
+            btn.style.opacity = "0.7";
+            
+            setTimeout(() => {
+                btn.innerText = "SUCCESS! 🚀";
+                btn.style.background = "var(--success)";
+                
+                setTimeout(() => {
+                    closeModal();
+                    alert("Booking Confirmed! Check your email.");
+                    btn.innerText = originalText;
+                    btn.style.background = "";
+                    btn.style.opacity = "1";
+                }, 1000);
+            }, 1500);
+        }
+    </script>
+</body>
+</html>

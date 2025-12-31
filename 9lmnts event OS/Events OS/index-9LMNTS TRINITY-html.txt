@@ -1,0 +1,1115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>9LMNTS TRINITY | LIVE NETWORK</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/recharts/umd/Recharts.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap');
+        * { font-family: 'Inter', sans-serif; }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+        .bg-primary { background-color: #050505; }
+        .text-accent { color: #FF5500; }
+        .bg-accent { background-color: #FF5500; }
+        .glass { background: rgba(20, 20, 20, 0.6); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.05); }
+        
+        /* Platinum Glow */
+        .platinum-glow {
+            background: linear-gradient(90deg, rgba(255,85,0,0.1) 0%, rgba(229,231,235,0.15) 50%, rgba(255,85,0,0.1) 100%);
+            border: 1px solid rgba(255,85,0,0.3);
+            box-shadow: 0 0 40px rgba(255,85,0,0.2);
+        }
+        
+        /* Network Surge Effects */
+        .network-surge {
+            animation: surge 2s ease-in-out infinite;
+        }
+        
+        @keyframes surge {
+            0%, 100% { box-shadow: 0 0 20px rgba(16, 185, 129, 0.3); }
+            50% { box-shadow: 0 0 40px rgba(16, 185, 129, 0.6); }
+        }
+        
+        .pulse-rapid {
+            animation: pulse-rapid 0.5s ease-in-out infinite;
+        }
+        
+        @keyframes pulse-rapid {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        /* Ticker Animation */
+        @keyframes ticker {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+        
+        .ticker-container {
+            overflow: hidden;
+            white-space: nowrap;
+        }
+        
+        .ticker-content {
+            display: inline-block;
+            animation: ticker 30s linear infinite;
+            padding-left: 100%;
+        }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
+        
+        /* Terminal Blink */
+        .terminal-blink {
+            animation: blink 1s step-end infinite;
+        }
+        
+        @keyframes blink {
+            50% { opacity: 0; }
+        }
+        
+        /* Loading Screen */
+        .loading-grid {
+            background-image: 
+                linear-gradient(rgba(255,85,0,0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,85,0,0.1) 1px, transparent 1px);
+            background-size: 50px 50px;
+        }
+    </style>
+</head>
+<body class="bg-primary min-h-screen text-gray-100 overflow-x-hidden">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useMemo, useRef } = React;
+        const { Building, Users, Activity, Wallet, PieChart, Plus, ArrowUpRight, ShieldAlert, Zap, ChevronRight, Home, TrendingUp, Map, DollarSign, BarChart3, Layout, AlertCircle, Globe, Cpu, Server } = lucide;
+        const { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } = Recharts;
+
+        // --- UTILS ---
+        const formatMoney = (n) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(n);
+        const formatMoneyFull = (n) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n);
+        const formatTokens = (n) => new Intl.NumberFormat('en-US', { maximumFractionDigits: 2 }).format(n);
+
+        // --- LOADING SCREEN COMPONENT ---
+        const LoadingScreen = ({ onComplete }) => {
+            const [progress, setProgress] = useState(0);
+            const [status, setStatus] = useState("INITIALIZING NETWORK...");
+            
+            useEffect(() => {
+                const statuses = [
+                    "CONNECTING TO POLYGON MAINNET...",
+                    "SYNCING BLOCKCHAIN STATE...",
+                    "LOADING SMART CONTRACTS...",
+                    "INITIALIZING LIQUIDITY POOLS...",
+                    "READY FOR LIVE DEMO"
+                ];
+                
+                const interval = setInterval(() => {
+                    setProgress(prev => {
+                        const newProgress = prev + 20;
+                        if (newProgress <= 100) {
+                            setStatus(statuses[newProgress / 20 - 1]);
+                        }
+                        
+                        if (newProgress >= 100) {
+                            clearInterval(interval);
+                            setTimeout(() => onComplete(), 1000);
+                            return 100;
+                        }
+                        return newProgress;
+                    });
+                }, 600);
+                
+                return () => clearInterval(interval);
+            }, [onComplete]);
+
+            return (
+                <div className="fixed inset-0 bg-primary flex items-center justify-center z-50 loading-grid">
+                    <div className="text-center max-w-2xl p-8 glass rounded-3xl border border-gray-800">
+                        <div className="flex items-center justify-center mb-8">
+                            <div className="relative">
+                                <div className="w-24 h-24 bg-accent/20 rounded-full flex items-center justify-center">
+                                    <div className="w-16 h-16 bg-accent rounded-full flex items-center justify-center text-2xl font-black text-black">
+                                        9
+                                    </div>
+                                </div>
+                                <div className="absolute inset-0 rounded-full border-2 border-accent border-t-transparent animate-spin"></div>
+                            </div>
+                        </div>
+                        
+                        <h1 className="text-4xl font-black text-white mb-2">9LMNTS TRINITY</h1>
+                        <p className="text-gray-400 mb-8">DIGITAL REAL ESTATE NETWORK v3.0</p>
+                        
+                        <div className="mb-6">
+                            <div className="flex justify-between text-sm text-gray-400 mb-2">
+                                <span>{status}</span>
+                                <span>{progress}%</span>
+                            </div>
+                            <div className="w-full bg-gray-800 h-2 rounded-full overflow-hidden">
+                                <div 
+                                    className="h-full bg-accent transition-all duration-500"
+                                    style={{ width: `${progress}%` }}
+                                ></div>
+                            </div>
+                        </div>
+                        
+                        <div className="text-xs text-gray-500 font-mono mt-4">
+                            <div className="flex items-center justify-center">
+                                <div className="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></div>
+                                <span>LIVE TESTNET CONNECTION ACTIVE</span>
+                            </div>
+                        </div>
+                        
+                        <div className="mt-8 text-xs text-gray-600">
+                            <div className="flex justify-center space-x-4">
+                                <span>⚡ POLYGON</span>
+                                <span>🔗 CHAINLINK ORACLES</span>
+                                <span>🛡️ OPENZEPPELIN</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // --- MOCK DATA ---
+        const INITIAL_ASSETS = [
+            { 
+                id: 1, 
+                name: "THE ETHER TOWER", 
+                type: "Luxury Residential", 
+                price: 1.00, 
+                target: 50000000, 
+                raised: 28500000, 
+                apy: 8.2, 
+                holders: 1240, 
+                image: "https://placehold.co/1200x600/111/FF5500/png?text=THE+ETHER+TOWER+LUXURY+RENDER",
+                description: "72-story architectural marvel in the financial district. LEED Platinum certified with private club and panoramic city views.",
+                capRate: 7.8,
+                occupancy: 94,
+                yearBuilt: 2023,
+                floors: 72,
+                units: 412,
+                financials: [
+                    { year: 2024, projected: 45 },
+                    { year: 2025, projected: 52 },
+                    { year: 2026, projected: 58 },
+                    { year: 2027, projected: 61 },
+                    { year: 2028, projected: 75 },
+                    { year: 2029, projected: 82 },
+                    { year: 2030, projected: 85 }
+                ],
+                suites: [
+                    { id: '12A', name: "City View Studio", price: 425000, size: "650 sqft", yield: 6.2 },
+                    { id: '12B', name: "Executive One-Bedroom", price: 850000, size: "1,200 sqft", yield: 7.5 },
+                    { id: '45C', name: "Corner Two-Bedroom", price: 1250000, size: "1,850 sqft", yield: 8.1 },
+                    { id: '68P', name: "Penthouse Sky Residence", price: 3850000, size: "4,200 sqft", yield: 9.8 }
+                ]
+            },
+            { 
+                id: 2, 
+                name: "9LMNTS HQ", 
+                type: "Commercial", 
+                price: 1.00, 
+                target: 20000000, 
+                raised: 18000000, 
+                apy: 11.5, 
+                holders: 850, 
+                image: "https://placehold.co/1200x600/111/10B981/png?text=9LMNTS+HQ",
+                description: "Flagship creative studio and office complex for Web3 startups.",
+                capRate: 9.2,
+                occupancy: 87,
+                yearBuilt: 2022,
+                floors: 12,
+                units: 85,
+                financials: [
+                    { year: 2024, projected: 38 },
+                    { year: 2025, projected: 45 },
+                    { year: 2026, projected: 51 },
+                    { year: 2027, projected: 58 },
+                    { year: 2028, projected: 65 },
+                    { year: 2029, projected: 72 },
+                    { year: 2030, projected: 78 }
+                ],
+                suites: [
+                    { id: 'G01', name: "Ground Floor Retail", price: 1250000, size: "3,200 sqft", yield: 10.5 },
+                    { id: '5A', name: "Tech Suite", price: 750000, size: "2,100 sqft", yield: 9.8 }
+                ]
+            },
+            { 
+                id: 3, 
+                name: "LOGISTICS HUB ALPHA", 
+                type: "Industrial", 
+                price: 1.00, 
+                target: 15000000, 
+                raised: 2500000, 
+                apy: 7.8, 
+                holders: 120, 
+                image: "https://placehold.co/1200x600/111/3B82F6/png?text=LOGISTICS+HUB+ALPHA",
+                description: "State-of-the-art logistics center with autonomous vehicle integration.",
+                capRate: 8.5,
+                occupancy: 100,
+                yearBuilt: 2021,
+                floors: 3,
+                units: 1,
+                financials: [
+                    { year: 2024, projected: 32 },
+                    { year: 2025, projected: 38 },
+                    { year: 2026, projected: 42 },
+                    { year: 2027, projected: 45 },
+                    { year: 2028, projected: 48 },
+                    { year: 2029, projected: 52 },
+                    { year: 2030, projected: 55 }
+                ],
+                suites: [
+                    { id: 'WH1', name: "Main Warehouse", price: 15000000, size: "250,000 sqft", yield: 7.8 }
+                ]
+            }
+        ];
+
+        // --- UPDATED INVESTOR VIEW (WITH LIVE DEMO MODE) ---
+        const InvestorView = ({ assets, updateAsset, demoMode = false }) => {
+            const [balance, setBalance] = useState(demoMode ? 1000000 : 50000);
+            const [portfolio, setPortfolio] = useState([]);
+            const [selectedAsset, setSelectedAsset] = useState(null);
+            const [activeTab, setActiveTab] = useState('overview');
+            const [investmentOption, setInvestmentOption] = useState('fractional');
+            const [fractionalAmount, setFractionalAmount] = useState(50000);
+            const [selectedSuite, setSelectedSuite] = useState(null);
+            const [showModal, setShowModal] = useState(false);
+
+            const handleInvest = () => {
+                let investAmount = 0;
+                
+                if (investmentOption === 'fractional') {
+                    investAmount = fractionalAmount;
+                } else if (investmentOption === 'unit' && selectedSuite) {
+                    investAmount = selectedSuite.price;
+                }
+                
+                if (balance < investAmount) {
+                    alert("INSUFFICIENT LIQUIDITY");
+                    return;
+                }
+                
+                // Epic confetti for demo
+                confetti({ 
+                    particleCount: 200, 
+                    spread: 100, 
+                    origin: { y: 0.6 }, 
+                    colors: ['#FF5500', '#10B981', '#FFFFFF', '#3B82F6'],
+                    gravity: 0.8
+                });
+                
+                setBalance(prev => prev - investAmount);
+                const tokens = investAmount / selectedAsset.price;
+                
+                // Update Global State
+                updateAsset(selectedAsset.id, investAmount);
+                
+                // Update Local Portfolio
+                const existing = portfolio.find(p => p.id === selectedAsset.id);
+                if (existing) {
+                    setPortfolio(portfolio.map(p => p.id === selectedAsset.id ? 
+                        { ...p, tokens: p.tokens + tokens, val: p.val + investAmount } : p));
+                } else {
+                    setPortfolio([...portfolio, { 
+                        id: selectedAsset.id, 
+                        name: selectedAsset.name, 
+                        tokens: tokens, 
+                        val: investAmount 
+                    }]);
+                }
+                
+                // Success notification
+                setTimeout(() => {
+                    setShowModal(false);
+                    setSelectedAsset(null);
+                    setActiveTab('overview');
+                    setFractionalAmount(50000);
+                    setSelectedSuite(null);
+                }, 1500);
+            };
+
+            // Live news for ticker
+            const tickerNews = [
+                "LIVE DEMO: VIP INVESTORS ACTIVATED WITH $1M LIQUIDITY CREDITS",
+                "ANNOUNCEMENT: ETHER TOWER FUNDING TARGET 57% REACHED",
+                "MARKET UPDATE: COMMERCIAL YIELDS UP 2.4% THIS QUARTER",
+                "TRANSACTION: $4.2M PENTHOUSE SOLD VIA 9LMNTS PLATFORM",
+                "PARTNERSHIP: BLACKROCK DIGITAL ASSETS INTEGRATION CONFIRMED",
+                "NETWORK STATUS: 14205 ACTIVE INVESTORS | $285M TVL",
+                "DEMO MODE: SPACEBAR TO TRIGGER NETWORK SURGE ON GOD MODE SCREEN"
+            ];
+
+            return (
+                <div className="p-4 md:p-6 max-w-7xl mx-auto min-h-screen">
+                    {/* DEMO MODE BANNER */}
+                    {demoMode && (
+                        <div className="mb-6 network-surge rounded-2xl p-4 border border-green-500/50 bg-green-900/10">
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center">
+                                    <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse mr-3"></div>
+                                    <span className="text-green-400 font-bold text-lg">LIVE DEMO MODE ACTIVE</span>
+                                </div>
+                                <div className="text-white font-mono text-xl">
+                                    {formatMoneyFull(balance)}
+                                </div>
+                            </div>
+                            <p className="text-gray-300 text-sm mt-2">
+                                You have been allocated $1,000,000 in Liquidity Credits for this demonstration.
+                                Deploy capital to participate in the live network surge.
+                            </p>
+                        </div>
+                    )}
+
+                    {/* Platinum Partner Banner */}
+                    {assets[0] && (
+                        <div className="platinum-glow rounded-2xl p-6 mb-8 relative overflow-hidden">
+                            <div className="absolute top-4 right-4">
+                                <span className="px-3 py-1 bg-accent text-black text-xs font-bold rounded-full">PLATINUM PARTNER</span>
+                            </div>
+                            <div className="flex flex-col md:flex-row items-center">
+                                <div className="md:w-2/3 pr-0 md:pr-8">
+                                    <h2 className="text-2xl md:text-3xl font-bold text-white mb-2">LIVE OPPORTUNITY: {assets[0].name}</h2>
+                                    <p className="text-gray-300 mb-4">Exclusive early access for VIP investors. Premium downtown location with projected 9.2% annual yield.</p>
+                                    <div className="flex flex-wrap gap-4 mb-4">
+                                        <div className="flex items-center">
+                                            <div className="w-2 h-2 bg-accent rounded-full mr-2"></div>
+                                            <span className="text-sm text-gray-300">{assets[0].capRate}% Cap Rate</span>
+                                        </div>
+                                        <div className="flex items-center">
+                                            <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
+                                            <span className="text-sm text-gray-300">{assets[0].occupancy}% Occupancy</span>
+                                        </div>
+                                        <div className="flex items-center">
+                                            <div className="w-2 h-2 bg-blue-500 rounded-full mr-2"></div>
+                                            <span className="text-sm text-gray-300">{assets[0].yearBuilt} Built</span>
+                                        </div>
+                                    </div>
+                                    <button 
+                                        onClick={() => {
+                                            setSelectedAsset(assets[0]);
+                                            setShowModal(true);
+                                        }}
+                                        className="inline-flex items-center px-6 py-3 bg-accent hover:bg-orange-600 rounded-xl font-bold text-black transition-all hover:scale-105"
+                                    >
+                                        <TrendingUp className="w-4 h-4 mr-2" />
+                                        DEPLOY CAPITAL NOW
+                                    </button>
+                                </div>
+                                <div className="md:w-1/3 mt-4 md:mt-0">
+                                    <div className="glass rounded-xl p-4">
+                                        <div className="text-xs text-gray-400 uppercase font-bold mb-2">FUNDING PROGRESS</div>
+                                        <div className="text-2xl font-bold text-white mb-2">{((assets[0].raised/assets[0].target)*100).toFixed(1)}%</div>
+                                        <div className="w-full bg-gray-800 h-2 rounded-full mb-2">
+                                            <div className="bg-accent h-full rounded-full" style={{ width: `${(assets[0].raised/assets[0].target)*100}%` }}></div>
+                                        </div>
+                                        <div className="flex justify-between text-xs text-gray-400">
+                                            <span>{formatMoney(assets[0].raised)} raised</span>
+                                            <span>Goal: {formatMoney(assets[0].target)}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Header Stats */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+                        <div className="glass p-6 rounded-2xl border-l-4 border-accent">
+                            <div className="text-xs text-gray-400 uppercase font-bold flex items-center">
+                                <Wallet className="w-4 h-4 mr-2" />
+                                Available Liquidity
+                            </div>
+                            <div className="text-3xl text-white font-mono font-bold mt-2">{formatMoneyFull(balance)}</div>
+                            <div className="text-xs text-gray-500 mt-1">USDC • Polygon Network</div>
+                        </div>
+                        <div className="glass p-6 rounded-2xl border-l-4 border-blue-500">
+                            <div className="text-xs text-gray-400 uppercase font-bold flex items-center">
+                                <PieChart className="w-4 h-4 mr-2" />
+                                Portfolio Value
+                            </div>
+                            <div className="text-3xl text-white font-mono font-bold mt-2">{formatMoneyFull(portfolio.reduce((a,b)=>a+b.val,0))}</div>
+                            <div className="text-xs text-gray-500 mt-1">Across {portfolio.length} assets</div>
+                        </div>
+                        <div className="glass p-6 rounded-2xl border-l-4 border-green-500">
+                            <div className="text-xs text-gray-400 uppercase font-bold flex items-center">
+                                <TrendingUp className="w-4 h-4 mr-2" />
+                                Projected Annual Yield
+                            </div>
+                            <div className="text-3xl text-green-400 font-mono font-bold mt-2">
+                                +{formatMoneyFull(portfolio.reduce((a,b)=>a+b.val,0) * 0.092)}
+                            </div>
+                            <div className="text-xs text-gray-500 mt-1">Based on 9.2% avg APY</div>
+                        </div>
+                    </div>
+
+                    {/* Asset Grid */}
+                    <div className="flex justify-between items-center mb-6">
+                        <h2 className="text-2xl font-bold text-white">Available Properties</h2>
+                        <div className="flex space-x-2">
+                            <span className="px-3 py-1 glass rounded-full text-xs text-gray-400 cursor-pointer hover:text-white hover:bg-white/10">All Assets</span>
+                            <span className="px-3 py-1 glass rounded-full text-xs text-gray-400 cursor-pointer hover:text-white hover:bg-white/10">High Yield</span>
+                            <span className="px-3 py-1 glass rounded-full text-xs text-gray-400 cursor-pointer hover:text-white hover:bg-white/10">Commercial</span>
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+                        {assets.map(asset => (
+                            <div key={asset.id} className="glass rounded-xl overflow-hidden hover:border-accent transition-all border border-gray-800 group hover:scale-[1.02]">
+                                <div className="h-48 relative">
+                                    <img src={asset.image} className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" alt={asset.name} />
+                                    <div className="absolute top-3 right-3 bg-black/80 backdrop-blur px-3 py-1 rounded-full text-xs font-bold text-green-400">
+                                        {asset.apy}% APY
+                                    </div>
+                                </div>
+                                <div className="p-5">
+                                    <div className="flex justify-between items-start mb-2">
+                                        <h3 className="font-bold text-lg text-white">{asset.name}</h3>
+                                        <span className="text-xs px-2 py-1 bg-white/10 rounded text-gray-300">{asset.type}</span>
+                                    </div>
+                                    <p className="text-xs text-gray-400 mb-4 flex items-center">
+                                        <Users className="w-3 h-3 mr-1" />
+                                        {formatTokens(asset.holders)} Investors
+                                    </p>
+                                    
+                                    <div className="w-full bg-gray-800 h-2 rounded-full mb-3">
+                                        <div className="bg-accent h-full rounded-full" style={{ width: `${(asset.raised/asset.target)*100}%` }}></div>
+                                    </div>
+                                    <div className="flex justify-between text-xs text-gray-500 mb-6">
+                                        <span>{formatMoney(asset.raised)} Raised</span>
+                                        <span>Goal: {formatMoney(asset.target)}</span>
+                                    </div>
+
+                                    <button 
+                                        onClick={() => {
+                                            setSelectedAsset(asset);
+                                            setShowModal(true);
+                                        }}
+                                        className="w-full py-3 bg-white/10 hover:bg-accent hover:text-white rounded-xl font-bold text-sm transition-all duration-300 flex items-center justify-center group"
+                                    >
+                                        <ChevronRight className="w-4 h-4 mr-2 transition-transform group-hover:translate-x-1" />
+                                        DEPLOY CAPITAL
+                                    </button>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+
+                    {/* Full-Screen Deep Dive Modal */}
+                    {showModal && selectedAsset && (
+                        <div className="fixed inset-0 bg-black/95 backdrop-blur-xl z-50 overflow-y-auto">
+                            <div className="min-h-screen">
+                                {/* Modal Header */}
+                                <div className="sticky top-0 z-50 glass border-b border-gray-800 p-6">
+                                    <div className="flex justify-between items-center max-w-7xl mx-auto">
+                                        <div>
+                                            <h2 className="text-3xl font-bold text-white">{selectedAsset.name}</h2>
+                                            <p className="text-gray-400">{selectedAsset.type} • {selectedAsset.floors} Floors • {selectedAsset.units} Units</p>
+                                        </div>
+                                        <div className="flex space-x-3">
+                                            <button 
+                                                onClick={() => setShowModal(false)}
+                                                className="px-4 py-2 glass rounded-xl text-gray-400 hover:text-white transition-colors"
+                                            >
+                                                Close
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Tab Navigation */}
+                                <div className="sticky top-20 z-40 bg-black/50 backdrop-blur border-b border-gray-800">
+                                    <div className="max-w-7xl mx-auto px-6">
+                                        <div className="flex space-x-1 overflow-x-auto">
+                                            {[
+                                                { id: 'overview', label: 'Overview', icon: Home },
+                                                { id: 'financials', label: 'Financials', icon: BarChart3 },
+                                                { id: 'floorplans', label: 'Floorplans', icon: Map },
+                                                { id: 'invest', label: 'Deploy Capital', icon: DollarSign }
+                                            ].map(tab => (
+                                                <button
+                                                    key={tab.id}
+                                                    onClick={() => setActiveTab(tab.id)}
+                                                    className={`flex items-center px-6 py-3 text-sm font-medium transition-colors ${activeTab === tab.id ? 'text-accent border-b-2 border-accent' : 'text-gray-500 hover:text-gray-300'}`}
+                                                >
+                                                    <tab.icon className="w-4 h-4 mr-2" />
+                                                    {tab.label}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Tab Content */}
+                                <div className="max-w-7xl mx-auto p-6">
+                                    {activeTab === 'invest' && (
+                                        <div className="max-w-4xl mx-auto">
+                                            <div className="glass rounded-2xl p-8">
+                                                <h3 className="text-2xl font-bold text-white mb-2">CAPITAL DEPLOYMENT</h3>
+                                                <p className="text-gray-400 mb-8">Deploy your liquidity into {selectedAsset.name}</p>
+                                                
+                                                {/* Investment Options */}
+                                                <div className="flex mb-8">
+                                                    <button
+                                                        onClick={() => setInvestmentOption('fractional')}
+                                                        className={`flex-1 py-4 text-center font-bold rounded-l-xl ${investmentOption === 'fractional' ? 'bg-accent text-black' : 'bg-gray-900 text-gray-400 hover:text-white'}`}
+                                                    >
+                                                        FRACTIONAL OWNERSHIP
+                                                    </button>
+                                                    <button
+                                                        onClick={() => setInvestmentOption('unit')}
+                                                        className={`flex-1 py-4 text-center font-bold rounded-r-xl ${investmentOption === 'unit' ? 'bg-accent text-black' : 'bg-gray-900 text-gray-400 hover:text-white'}`}
+                                                    >
+                                                        UNIT ALLOCATION
+                                                    </button>
+                                                </div>
+
+                                                {/* Fractional Option */}
+                                                {investmentOption === 'fractional' && (
+                                                    <div className="space-y-8">
+                                                        <div>
+                                                            <div className="flex justify-between mb-4">
+                                                                <label className="text-lg font-medium text-white">INVESTMENT AMOUNT</label>
+                                                                <span className="text-accent font-bold text-2xl">{formatMoneyFull(fractionalAmount)}</span>
+                                                            </div>
+                                                            <input
+                                                                type="range"
+                                                                min="50000"
+                                                                max="100000"
+                                                                step="5000"
+                                                                value={fractionalAmount}
+                                                                onChange={(e) => setFractionalAmount(parseInt(e.target.value))}
+                                                                className="w-full h-3 bg-gray-800 rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-6 [&::-webkit-slider-thumb]:w-6 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-accent"
+                                                            />
+                                                            <div className="flex justify-between text-sm text-gray-400 mt-2">
+                                                                <span>$50,000</span>
+                                                                <span>$75,000</span>
+                                                                <span>$100,000</span>
+                                                            </div>
+                                                        </div>
+                                                        <div className="grid grid-cols-4 gap-3">
+                                                            {[50000, 75000, 100000].map(amount => (
+                                                                <button
+                                                                    key={amount}
+                                                                    onClick={() => setFractionalAmount(amount)}
+                                                                    className="py-3 glass rounded-xl text-center hover:bg-white/10 transition-colors"
+                                                                >
+                                                                    <div className="text-white font-bold">${amount/1000}K</div>
+                                                                    <div className="text-xs text-gray-400">{(amount/selectedAsset.price).toLocaleString()} tokens</div>
+                                                                </button>
+                                                            ))}
+                                                            <button
+                                                                onClick={() => setFractionalAmount(balance)}
+                                                                className="py-3 glass rounded-xl text-center hover:bg-white/10 transition-colors"
+                                                            >
+                                                                <div className="text-green-400 font-bold">MAX</div>
+                                                                <div className="text-xs text-gray-400">All liquidity</div>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                )}
+
+                                                {/* Investment Summary */}
+                                                <div className="glass rounded-xl p-6 mt-8">
+                                                    <h4 className="text-lg font-bold text-white mb-4">TRANSACTION SUMMARY</h4>
+                                                    <div className="space-y-3">
+                                                        <div className="flex justify-between">
+                                                            <span className="text-gray-400">Investment Amount</span>
+                                                            <span className="text-white font-mono">
+                                                                {investmentOption === 'fractional' 
+                                                                    ? formatMoneyFull(fractionalAmount) 
+                                                                    : selectedSuite ? formatMoney(selectedSuite.price) : '$0'
+                                                                }
+                                                            </span>
+                                                        </div>
+                                                        <div className="flex justify-between">
+                                                            <span className="text-gray-400">Tokens Received</span>
+                                                            <span className="text-accent font-mono">
+                                                                {investmentOption === 'fractional' 
+                                                                    ? formatTokens(fractionalAmount / selectedAsset.price)
+                                                                    : selectedSuite ? formatTokens(selectedSuite.price / selectedAsset.price) : '0'
+                                                                } TOKENS
+                                                            </span>
+                                                        </div>
+                                                        <div className="flex justify-between">
+                                                            <span className="text-gray-400">Estimated Annual Yield</span>
+                                                            <span className="text-green-400 font-mono">
+                                                                {investmentOption === 'fractional'
+                                                                    ? formatMoneyFull((fractionalAmount * selectedAsset.apy) / 100)
+                                                                    : selectedSuite ? formatMoney((selectedSuite.price * selectedAsset.apy) / 100) : '$0'
+                                                                }
+                                                            </span>
+                                                        </div>
+                                                        <div className="border-t border-gray-800 pt-3 mt-3">
+                                                            <div className="flex justify-between text-lg font-bold">
+                                                                <span className="text-white">Total Cost</span>
+                                                                <span className="text-white">
+                                                                    {investmentOption === 'fractional' 
+                                                                        ? formatMoneyFull(fractionalAmount) 
+                                                                        : selectedSuite ? formatMoney(selectedSuite.price) : '$0'
+                                                                    }
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                {/* Action Buttons */}
+                                                <div className="flex space-x-4 mt-8">
+                                                    <button
+                                                        onClick={handleInvest}
+                                                        disabled={investmentOption === 'unit' && !selectedSuite}
+                                                        className="flex-1 py-4 bg-accent hover:bg-orange-600 disabled:bg-gray-700 rounded-xl font-bold text-black text-lg transition-all hover:scale-105 flex items-center justify-center"
+                                                    >
+                                                        <DollarSign className="w-5 h-5 mr-2" />
+                                                        CONFIRM DEPLOYMENT
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Live News Ticker */}
+                    <div className="fixed bottom-0 left-0 right-0 bg-black/95 border-t border-gray-800 z-40 py-3">
+                        <div className="ticker-container">
+                            <div className="ticker-content">
+                                {tickerNews.map((news, index) => (
+                                    <span key={index} className="inline-block mx-8 text-sm">
+                                        <span className="text-accent font-bold">◉ LIVE:</span> 
+                                        <span className="text-gray-300 ml-2">{news}</span>
+                                    </span>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // --- GOD MODE WITH SPACEBAR HACK ---
+        const GodModeView = ({ assets }) => {
+            const [tvl, setTvl] = useState(assets.reduce((a,b) => a + b.raised, 0));
+            const [fees, setFees] = useState(assets.reduce((a,b) => a + b.raised, 0) * 0.015);
+            const [txCount, setTxCount] = useState(14205);
+            const [feed, setFeed] = useState([]);
+            const [isSpiking, setIsSpiking] = useState(false);
+            const [networkLoad, setNetworkLoad] = useState(42);
+            const audioRef = useRef(null);
+
+            // THE HACK: Press Spacebar to trigger "The Flood"
+            useEffect(() => {
+                const handleKeyDown = (e) => {
+                    if (e.code === 'Space') {
+                        e.preventDefault();
+                        if (!isSpiking) {
+                            setIsSpiking(true);
+                            // Play subtle sound if available
+                            if (audioRef.current) {
+                                audioRef.current.currentTime = 0;
+                                audioRef.current.play().catch(e => console.log("Audio play failed:", e));
+                            }
+                        }
+                    }
+                    
+                    // Press 'Escape' to stop
+                    if (e.code === 'Escape' && isSpiking) {
+                        setIsSpiking(false);
+                    }
+                };
+                
+                window.addEventListener('keydown', handleKeyDown);
+                return () => window.removeEventListener('keydown', handleKeyDown);
+            }, [isSpiking]);
+
+            // The Animation Loop
+            useEffect(() => {
+                let interval;
+                if (isSpiking) {
+                    let surgeMultiplier = 1;
+                    interval = setInterval(() => {
+                        // Increase multiplier for dramatic effect
+                        surgeMultiplier = Math.min(surgeMultiplier * 1.05, 5);
+                        
+                        // 1. Add Millions to TVL
+                        const chunk = Math.floor(Math.random() * 1500000 * surgeMultiplier) + 500000;
+                        setTvl(prev => prev + chunk);
+                        
+                        // 2. Update Fees (1.5%)
+                        setFees(prev => prev + (chunk * 0.015));
+
+                        // 3. Increment Investors
+                        setTxCount(prev => prev + Math.floor(Math.random() * 12 * surgeMultiplier));
+
+                        // 4. Update Network Load
+                        setNetworkLoad(prev => Math.min(prev + Math.random() * 3, 99));
+
+                        // 5. Update Feed (Visual Chaos)
+                        const newTx = {
+                            id: Date.now() + Math.random(),
+                            user: `INV_${Math.floor(Math.random()*9999)}...${Math.floor(Math.random()*9999)}`,
+                            amt: chunk,
+                            asset: ['ETHER TOWER', '9LMNTS HQ', 'LOGISTICS HUB'][Math.floor(Math.random()*3)],
+                            time: "Just now"
+                        };
+                        setFeed(prev => [newTx, ...prev].slice(0, 9));
+                        
+                        // Occasional confetti bursts
+                        if (Math.random() > 0.7) {
+                            confetti({ 
+                                particleCount: Math.floor(Math.random() * 30) + 10,
+                                spread: 70,
+                                origin: { x: Math.random(), y: 0 },
+                                colors: ['#FF5500', '#10B981']
+                            });
+                        }
+
+                    }, 80); // Fast updates for dramatic effect
+                } else {
+                    // Gradually reduce network load when not spiking
+                    setNetworkLoad(prev => Math.max(prev - 0.5, 42));
+                }
+                
+                return () => clearInterval(interval);
+            }, [isSpiking]);
+
+            return (
+                <div className="p-6 max-w-7xl mx-auto bg-black min-h-screen border-t-4 border-purple-600">
+                    {/* Hidden audio element for network surge sound */}
+                    <audio ref={audioRef} src="https://assets.mixkit.co/sfx/preview/mixkit-sci-fi-data-stream-893.mp3" preload="auto" />
+                    
+                    <div className="flex items-center mb-8 justify-between">
+                        <div className="flex items-center">
+                            <div className={`p-2 rounded mr-3 transition-colors ${isSpiking ? 'bg-green-500 animate-pulse' : 'bg-purple-600'}`}>
+                                <Server className="w-6 h-6 text-white"/>
+                            </div>
+                            <div>
+                                <h2 className="text-3xl font-black text-white tracking-tight">GOD MODE <span className="text-purple-500 text-lg font-normal">/// NETWORK ADMIN</span></h2>
+                                <p className="text-gray-500 text-sm">LIVE NETWORK DASHBOARD</p>
+                            </div>
+                        </div>
+                        <div className="text-right">
+                            <div className="text-xs text-gray-400 mb-1">DEMO CONTROLS</div>
+                            <div className="text-sm text-gray-300 font-mono">
+                                <span className="px-2 py-1 bg-gray-800 rounded">SPACEBAR</span>
+                                <span className="mx-2">= START SURGE</span>
+                                <span className="px-2 py-1 bg-gray-800 rounded">ESC</span>
+                                <span className="mx-2">= STOP</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Network Status Banner */}
+                    {isSpiking && (
+                        <div className="mb-8 p-4 rounded-xl bg-gradient-to-r from-green-900/30 to-purple-900/30 border border-green-500/50">
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center">
+                                    <div className="w-3 h-3 bg-yellow-400 rounded-full animate-ping mr-3"></div>
+                                    <span className="text-yellow-400 font-bold text-xl">⚡ NETWORK SURGE DETECTED</span>
+                                </div>
+                                <div className="text-white font-mono">
+                                    <Cpu className="w-5 h-5 inline mr-2" />
+                                    LOAD: {networkLoad.toFixed(1)}%
+                                </div>
+                            </div>
+                            <p className="text-gray-300 text-sm mt-2">
+                                Massive liquidity inflow detected from VIP investor pool. Processing transactions at 12,000 TPS.
+                            </p>
+                        </div>
+                    )}
+
+                    {/* Main Stats Grid */}
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
+                        <div className={`glass p-6 rounded-xl border transition-all duration-300 ${isSpiking ? 'border-green-500/50 bg-green-900/10 pulse-rapid' : 'border-purple-500/30'}`}>
+                            <div className="text-xs text-gray-400 font-bold uppercase mb-1 flex items-center">
+                                <Globe className="w-4 h-4 mr-2" />
+                                TOTAL VALUE LOCKED
+                            </div>
+                            <div className="text-4xl text-white font-mono font-bold">{formatMoney(tvl)}</div>
+                            <div className="text-xs text-gray-500 mt-2 flex items-center">
+                                {isSpiking && <ArrowUpRight className="w-3 h-3 mr-1 text-green-500 animate-bounce" />}
+                                + {formatMoney(tvl - assets.reduce((a,b)=>a+b.raised,0))} surge volume
+                            </div>
+                        </div>
+                        
+                        <div className={`glass p-6 rounded-xl border transition-all duration-300 ${isSpiking ? 'border-green-500/50 bg-green-900/10 pulse-rapid' : 'border-purple-500/30'}`}>
+                            <div className="text-xs text-gray-400 font-bold uppercase mb-1">NETWORK FEES (1.5%)</div>
+                            <div className="text-4xl text-green-400 font-mono font-bold">{formatMoney(fees)}</div>
+                            <div className="text-xs text-gray-500 mt-2">
+                                <span className="text-green-400">+ {formatMoney(fees - (assets.reduce((a,b)=>a+b.raised,0)*0.015))}</span> this session
+                            </div>
+                        </div>
+                        
+                        <div className="glass p-6 rounded-xl border border-purple-500/30">
+                            <div className="text-xs text-gray-400 font-bold uppercase mb-1">ACTIVE INVESTORS</div>
+                            <div className="text-4xl text-white font-mono font-bold">{txCount.toLocaleString()}</div>
+                            <div className="text-xs text-gray-500 mt-2">
+                                {isSpiking ? '+1.2k/min during surge' : '+142/hr steady state'}
+                            </div>
+                        </div>
+                        
+                        <div className="glass p-6 rounded-xl border border-purple-500/30">
+                            <div className="text-xs text-gray-400 font-bold uppercase mb-1">NETWORK STATUS</div>
+                            <div className="flex items-center text-xl text-white font-mono font-bold mb-2">
+                                <div className={`w-3 h-3 rounded-full mr-2 ${isSpiking ? 'bg-yellow-400 animate-ping' : 'bg-green-500 animate-pulse'}`}></div>
+                                {isSpiking ? "HIGH TRAFFIC" : "OPERATIONAL"}
+                            </div>
+                            <div className="w-full bg-gray-800 h-2 rounded-full mt-4">
+                                <div 
+                                    className="h-full rounded-full transition-all duration-300"
+                                    style={{ 
+                                        width: `${networkLoad}%`,
+                                        background: networkLoad > 80 ? '#EF4444' : networkLoad > 60 ? '#F59E0B' : '#10B981'
+                                    }}
+                                ></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Transaction Feed & Analytics */}
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        <div className="lg:col-span-2">
+                            <div className="glass p-6 rounded-xl h-[500px] overflow-hidden relative">
+                                <div className="flex justify-between items-center mb-6">
+                                    <h3 className="text-white font-bold flex items-center">
+                                        <Zap className={`w-5 h-5 mr-2 ${isSpiking ? 'text-yellow-400 animate-pulse' : 'text-yellow-400'}`}/>
+                                        LIVE TRANSACTION FEED
+                                    </h3>
+                                    <span className="text-xs px-3 py-1 bg-purple-900/50 text-purple-300 rounded-full">
+                                        {isSpiking ? '12,000 TPS' : '142 TPS'}
+                                    </span>
+                                </div>
+                                
+                                <div className="space-y-3 font-mono text-sm h-[400px] overflow-y-auto">
+                                    {feed.map((tx, index) => (
+                                        <div key={tx.id} className="flex items-center justify-between p-3 glass rounded-lg animate-fade-in">
+                                            <div className="flex items-center">
+                                                <div className="w-2 h-2 bg-green-500 rounded-full mr-3"></div>
+                                                <div>
+                                                    <div className="text-gray-300">{tx.user}</div>
+                                                    <div className="text-xs text-gray-500">{tx.asset}</div>
+                                                </div>
+                                            </div>
+                                            <div className="text-right">
+                                                <div className="text-green-400 font-bold">+{formatMoney(tx.amt)}</div>
+                                                <div className="text-xs text-gray-500">{tx.time}</div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                    
+                                    {feed.length === 0 && (
+                                        <div className="text-center py-20 text-gray-600">
+                                            <AlertCircle className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                                            <div>Waiting for transactions...</div>
+                                            <div className="text-sm mt-2">Press SPACEBAR to simulate network surge</div>
+                                        </div>
+                                    )}
+                                </div>
+                                
+                                {/* Fade overlay */}
+                                <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-black to-transparent"></div>
+                            </div>
+                        </div>
+                        
+                        <div className="space-y-8">
+                            <div className="glass p-6 rounded-xl">
+                                <h3 className="text-white font-bold mb-4">FEE DISTRIBUTION</h3>
+                                <div className="space-y-6">
+                                    <div>
+                                        <div className="flex justify-between text-sm text-gray-400 mb-2">
+                                            <span>9LMNTS TREASURY (80%)</span>
+                                            <span className="text-white">{formatMoney(fees * 0.8)}</span>
+                                        </div>
+                                        <div className="w-full bg-gray-800 h-2 rounded-full overflow-hidden">
+                                            <div className="bg-purple-600 h-full transition-all duration-75" style={{width: '80%'}}></div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div className="flex justify-between text-sm text-gray-400 mb-2">
+                                            <span>STAKING REWARDS (10%)</span>
+                                            <span className="text-white">{formatMoney(fees * 0.1)}</span>
+                                        </div>
+                                        <div className="w-full bg-gray-800 h-2 rounded-full overflow-hidden">
+                                            <div className="bg-blue-600 h-full transition-all duration-75" style={{width: '10%'}}></div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div className="flex justify-between text-sm text-gray-400 mb-2">
+                                            <span>BUYBACK & BURN (10%)</span>
+                                            <span className="text-white">{formatMoney(fees * 0.1)}</span>
+                                        </div>
+                                        <div className="w-full bg-gray-800 h-2 rounded-full overflow-hidden">
+                                            <div className="bg-orange-600 h-full transition-all duration-75" style={{width: '10%'}}></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div className="glass p-6 rounded-xl">
+                                <h3 className="text-white font-bold mb-4">NETWORK HEALTH</h3>
+                                <div className="space-y-4">
+                                    <div>
+                                        <div className="flex justify-between text-sm text-gray-400 mb-1">
+                                            <span>Block Time</span>
+                                            <span className="text-green-400">2.1s</span>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div className="flex justify-between text-sm text-gray-400 mb-1">
+                                            <span>Gas Price</span>
+                                            <span className={isSpiking ? "text-yellow-400 animate-pulse" : "text-green-400"}>
+                                                {isSpiking ? "42.8 Gwei ▲" : "12.3 Gwei"}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div className="flex justify-between text-sm text-gray-400 mb-1">
+                                            <span>Uptime</span>
+                                            <span className="text-green-400">99.98%</span>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div className="flex justify-between text-sm text-gray-400 mb-1">
+                                            <span>Active Nodes</span>
+                                            <span className="text-blue-400">142</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {/* Demo Instructions Footer */}
+                    <div className="mt-12 p-4 glass rounded-xl text-center">
+                        <div className="text-gray-400 text-sm font-mono">
+                            [ LIVE DEMO MODE ACTIVE ] • SPACEBAR = SIMULATE NETWORK SURGE • ESC = STOP
+                        </div>
+                        <div className="text-gray-600 text-xs mt-2">
+                            This dashboard shows real-time network activity during the 9LMNTS Trinity demonstration
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // --- DEVELOPER VIEW (UNCHANGED) ---
+        const DeveloperView = ({ assets }) => {
+            return (
+                <div className="p-6 max-w-7xl mx-auto">
+                    <div className="flex justify-between items-center mb-8">
+                        <div>
+                            <h2 className="text-2xl font-bold text-white">Developer Console</h2>
+                            <p className="text-gray-400 text-sm">Manage your listed assets and liquidity.</p>
+                        </div>
+                        <button className="flex items-center px-4 py-2 bg-accent rounded-lg font-bold text-black hover:bg-white transition-colors">
+                            <Plus className="w-4 h-4 mr-2" />
+                            NEW ASSET LISTING
+                        </button>
+                    </div>
+
+                    <div className="glass rounded-2xl overflow-hidden mb-8">
+                        <table className="w-full text-left">
+                            <thead className="bg-white/5 border-b border-gray-700 text-xs uppercase text-gray-400">
+                                <tr>
+                                    <th className="p-4">Asset Name</th>
+                                    <th className="p-4">Status</th>
+                                    <th className="p-4">Cap Table</th>
+                                    <th className="p-4">Capital Raised</th>
+                                    <th className="p-4 text-right">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-gray-800 text-sm text-gray-300">
+                                {assets.map(asset => (
+                                    <tr key={asset.id} className="hover:bg-white/5">
+                                        <td className="p-4 font-bold text-white">{asset.name}</td>
+                                        <td className="p-4"><span className="px-2 py-1 bg-green-500/20 text-green-400 rounded text-xs font-bold">TRADING</span></td>
+                                        <td className="p-4">{formatTokens(asset.holders)} Holders</td>
+                                        <td className="p-4">
+                                            <div className="flex items-center">
+                                                <span className="mr-2 font-mono">{((asset.raised/asset.target)*100).toFixed(1)}%</span>
+                                                <div className="w-24 bg-gray-800 h-1 rounded-full"><div className="bg-accent h-full rounded-full" style={{width: `${(asset.raised/asset.target)*100}%`}}></div></div>
+                                            </div>
+                                        </td>
+                                        <td className="p-4 text-right"><button className="text-accent hover:underline">Manage →</button></td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            );
+        };
+
+        // --- MAIN APP ---
+        const App = () => {
+            const [view, setView] = useState('investor');
+            const [assets, setAssets] = useState(INITIAL_ASSETS);
+            const [loading, setLoading] = useState(true);
+            const [demoMode] = useState(true); // Always in demo mode for pitch
+
+            const updateAsset = (id, amount) => {
+                setAssets(prev => prev.map(a => a.id === id ? { ...a, raised: a.raised + amount, holders: a.holders + 1 } : a));
+            };
+
+            if (loading) {
+                return <LoadingScreen onComplete={() => setLoading(false)} />;
+            }
+
+            return (
+                <div className="min-h-screen bg-primary">
+                    {/* TOP BAR NAVIGATION */}
+                    <div className="bg-gray-900 border-b border-gray-800 px-6 py-3 flex justify-between items-center sticky top-0 z-40">
+                        <div className="flex items-center space-x-2">
+                            <div className="w-8 h-8 bg-accent rounded flex items-center justify-center font-black text-black">9</div>
+                            <span className="font-bold text-white tracking-tight hidden md:inline">9LMNTS <span className="text-gray-500 font-normal">TRINITY</span></span>
+                            <span className="text-xs px-2 py-1 bg-green-500/20 text-green-400 rounded-full">LIVE DEMO</span>
+                        </div>
+                        
+                        {/* ROLE SWITCHER */}
+                        <div className="flex bg-black rounded-lg p-1 border border-gray-700">
+                            <button onClick={()=>setView('investor')} className={`px-4 py-1.5 rounded-md text-xs font-bold transition-all ${view==='investor' ? 'bg-accent text-white' : 'text-gray-500 hover:text-white'}`}>
+                                <div className="flex items-center">
+                                    <Wallet className="w-3 h-3 mr-1" />
+                                    Investor
+                                </div>
+                            </button>
+                            <button onClick={()=>setView('developer')} className={`px-4 py-1.5 rounded-md text-xs font-bold transition-all ${view==='developer' ? 'bg-blue-600 text-white' : 'text-gray-500 hover:text-white'}`}>
+                                <div className="flex items-center">
+                                    <Building className="w-3 h-3 mr-1" />
+                                    Developer
+                                </div>
+                            </button>
+                            <button onClick={()=>setView('god')} className={`px-4 py-1.5 rounded-md text-xs font-bold transition-all ${view==='god' ? 'bg-purple-600 text-white' : 'text-gray-500 hover:text-white'}`}>
+                                <div className="flex items-center">
+                                    <ShieldAlert className="w-3 h-3 mr-1" />
+                                    God Mode
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* CONTENT RENDER */}
+                    {view === 'investor' && <InvestorView assets={assets} updateAsset={updateAsset} demoMode={demoMode} />}
+                    {view === 'developer' && <DeveloperView assets={assets} />}
+                    {view === 'god' && <GodModeView assets={assets} />}
+                </div>
+            );
+        };
+
+        ReactDOM.render(<App />, document.getElementById('root'));
+    </script>
+</body>
+</html>

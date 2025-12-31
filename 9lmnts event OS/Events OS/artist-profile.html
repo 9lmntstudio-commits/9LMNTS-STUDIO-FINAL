@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>9LMNTS | Artist Profile</title>
+    <style>
+        /* --- CORE STYLES (MATCHING YOUR ECOSYSTEM) --- */
+        :root {
+            --bg: #050505;
+            --card-bg: #151515;
+            --orange: #FF5E00;
+            --red: #D32F2F;
+            --white: #ffffff;
+            --dim: #888888;
+            --green: #00e676; /* Money Color */
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--white);
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .mobile-container {
+            width: 100%;
+            max-width: 450px;
+            background: var(--bg);
+            position: relative;
+            padding-bottom: 80px; /* Space for fixed bottom bar */
+            border-left: 1px solid #222;
+            border-right: 1px solid #222;
+        }
+
+        /* NAVIGATION */
+        .nav-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 15px 20px; background: rgba(5,5,5,0.9); backdrop-filter: blur(10px);
+            border-bottom: 1px solid #222; position: sticky; top: 0; z-index: 100;
+        }
+        .back-btn { font-size: 0.9rem; color: var(--dim); cursor: pointer; text-transform: uppercase; letter-spacing: 1px; }
+        .back-btn:hover { color: var(--white); }
+        .profile-tag { font-weight: bold; color: var(--red); font-size: 0.8rem; border: 1px solid var(--red); padding: 4px 8px; }
+
+        /* HERO PROFILE */
+        .hero-section {
+            position: relative;
+            height: 300px;
+            background: url('https://images.unsplash.com/photo-1598520106830-8c45c2035460?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80') center/cover;
+            /* Placeholder Image */
+        }
+        .hero-overlay {
+            position: absolute; bottom: 0; left: 0; width: 100%;
+            background: linear-gradient(to top, #050505, transparent);
+            padding: 20px; box-sizing: border-box;
+        }
+        .artist-name { font-size: 2.5rem; font-weight: 900; margin: 0; text-transform: uppercase; line-height: 1; font-style: italic; }
+        .artist-hood { color: var(--orange); font-size: 0.9rem; margin-top: 5px; text-transform: uppercase; letter-spacing: 2px; }
+
+        /* STATS BAR */
+        .stats-bar {
+            display: flex; border-top: 1px solid #222; border-bottom: 1px solid #222;
+            background: var(--card-bg); padding: 15px 0;
+        }
+        .stat-box { flex: 1; text-align: center; border-right: 1px solid #222; }
+        .stat-box:last-child { border: none; }
+        .stat-num { display: block; font-size: 1.2rem; font-weight: bold; }
+        .stat-label { font-size: 0.6rem; color: var(--dim); text-transform: uppercase; letter-spacing: 1px; }
+
+        /* BIO & CONTENT */
+        .content-section { padding: 25px 20px; }
+        .section-title { font-size: 0.9rem; color: var(--dim); margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px; border-left: 3px solid var(--orange); padding-left: 10px; }
+        .bio-text { line-height: 1.6; color: #ccc; font-size: 0.9rem; margin-bottom: 30px; }
+
+        /* MEDIA PLAYER CARD */
+        .media-card {
+            background: var(--card-bg); border-top: 4px solid var(--red);
+            padding: 20px; margin-bottom: 30px;
+        }
+        .track-row {
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid #222; padding: 15px 0;
+        }
+        .track-row:last-child { border: none; }
+        .track-info h4 { margin: 0 0 5px 0; font-size: 1rem; }
+        .track-info span { font-size: 0.7rem; color: var(--dim); }
+        
+        .play-btn {
+            background: #222; border: 1px solid #444; color: white;
+            width: 40px; height: 40px; border-radius: 50%; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .buy-btn {
+            background: transparent; border: 1px solid var(--green); color: var(--green);
+            padding: 5px 15px; font-size: 0.7rem; font-weight: bold; cursor: pointer;
+            text-transform: uppercase; margin-left: 10px;
+        }
+        .buy-btn:hover { background: var(--green); color: black; }
+
+        /* TIP BUTTON (The Money Maker) */
+        .tip-section {
+            background: linear-gradient(90deg, #1a1a1a, #000);
+            border: 1px solid #333; padding: 20px; text-align: center; margin-bottom: 30px;
+        }
+        .tip-btn-large {
+            background: var(--green); color: black; font-weight: 900;
+            border: none; padding: 15px 40px; font-size: 1rem;
+            text-transform: uppercase; cursor: pointer; letter-spacing: 1px;
+            box-shadow: 0 0 20px rgba(0, 230, 118, 0.2);
+            width: 100%; margin-top: 10px;
+        }
+
+        /* FIXED BOTTOM ACTION BAR */
+        .action-bar {
+            position: fixed; bottom: 0; left: 0; width: 100%;
+            display: flex; z-index: 100;
+        }
+        .action-btn {
+            flex: 1; padding: 20px; border: none; font-weight: bold;
+            text-transform: uppercase; font-size: 1rem; cursor: pointer;
+        }
+        .vote-action { background: var(--red); color: white; }
+        .share-action { background: #222; color: white; max-width: 80px; font-size: 1.5rem; }
+
+        /* --- MODALS --- */
+        .modal-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.95); z-index: 2000; justify-content: center; align-items: center;
+            backdrop-filter: blur(5px); opacity: 0; transition: opacity 0.3s ease;
+        }
+        .modal-box {
+            background: #151515; width: 85%; max-width: 400px; padding: 30px;
+            position: relative; transform: translateY(20px); transition: transform 0.3s ease;
+            box-shadow: 0 0 50px rgba(0,0,0,0.8);
+        }
+        .modal-tip { border-top: 5px solid var(--green); }
+        .modal-buy { border-top: 5px solid var(--orange); }
+
+        .amount-grid { display: flex; gap: 10px; margin-bottom: 20px; }
+        .amount-option {
+            flex: 1; background: #000; border: 1px solid #333; padding: 15px;
+            text-align: center; cursor: pointer; color: var(--green); font-weight: bold;
+        }
+        .amount-option:hover, .amount-option.selected { border-color: var(--green); background: rgba(0, 230, 118, 0.1); }
+        
+        input { width: 100%; padding: 15px; background: #000; border: 1px solid #333; color: white; margin-bottom: 20px; box-sizing: border-box; }
+        .submit-btn { width: 100%; padding: 15px; font-weight: bold; border: none; cursor: pointer; text-transform: uppercase; }
+        
+        .success-view { display: none; text-align: center; }
+        .checkmark { font-size: 50px; display: block; margin-bottom: 10px; }
+
+    </style>
+</head>
+<body>
+
+    <div class="mobile-container">
+        <div class="nav-header">
+            <div class="back-btn" onclick="alert('Returning to Voting Grid...')">← BACK TO BATTLE</div>
+            <div class="profile-tag">ETHER CERTIFIED</div>
+        </div>
+
+        <div class="hero-section">
+            <div class="hero-overlay">
+                <h1 class="artist-name">MC KINETIC</h1>
+                <div class="artist-hood">WEST END // LYRICAL DIVISION</div>
+            </div>
+        </div>
+
+        <div class="stats-bar">
+            <div class="stat-box">
+                <span class="stat-num">482</span>
+                <span class="stat-label">Votes</span>
+            </div>
+            <div class="stat-box">
+                <span class="stat-num">#2</span>
+                <span class="stat-label">Rank</span>
+            </div>
+            <div class="stat-box">
+                <span class="stat-num">9.2</span>
+                <span class="stat-label">Style Score</span>
+            </div>
+        </div>
+
+        <div class="content-section">
+            <div class="section-title">ABOUT THE ARTIST</div>
+            <p class="bio-text">
+                Raised in the 613, Kinetic blends old-school boom bap with futuristic flows. Recorded his debut EP at The Ether Studio using the 0% financing program. Currently fighting for the 9LMNTS Crown.
+            </p>
+
+            <div class="section-title">LATEST TRACKS</div>
+            <div class="media-card">
+                <div class="track-row">
+                    <div class="play-btn">▶</div>
+                    <div class="track-info" style="flex:1; padding-left:15px;">
+                        <h4>Concrete Jungle</h4>
+                        <span>Prod. by Ether Audio</span>
+                    </div>
+                    <button class="buy-btn" onclick="openModal('buyModal', 'Concrete Jungle', '$1.99')">$1.99</button>
+                </div>
+                <div class="track-row">
+                    <div class="play-btn">▶</div>
+                    <div class="track-info" style="flex:1; padding-left:15px;">
+                        <h4>Night Vision (Freestyle)</h4>
+                        <span>Live at Culture Clash</span>
+                    </div>
+                    <button class="buy-btn" onclick="openModal('buyModal', 'Night Vision', '$0.99')">$0.99</button>
+                </div>
+            </div>
+
+            <div class="section-title">SUPPORT THE ARTIST</div>
+            <div class="tip-section">
+                <p style="margin:0 0 10px 0; color:#ccc; font-size:0.8rem;">Love the set? Send a tip directly to Kinetic.</p>
+                <button class="tip-btn-large" onclick="openModal('tipModal')">💸 SEND CASH TIP</button>
+            </div>
+
+            <div style="text-align:center; margin-top:40px; border:1px solid #333; padding:20px;">
+                <p style="color:#666; font-size:0.7rem; margin-bottom:10px;">ARTIST WEBSITE POWERED BY 9LMNTS</p>
+                <a href="#" style="color:var(--orange); font-size:0.8rem; font-weight:bold; text-decoration:none;">WANT A PAGE LIKE THIS? CLICK HERE</a>
+            </div>
+        </div>
+
+        <div class="action-bar">
+            <button class="action-btn share-action">🔗</button>
+            <button class="action-btn vote-action" onclick="alert('Vote Cast for MC KINETIC!')">VOTE FOR KINETIC</button>
+        </div>
+    </div>
+
+
+    <div id="tipModal" class="modal-overlay">
+        <div class="modal-box modal-tip">
+            <span style="position:absolute; top:15px; right:20px; cursor:pointer; font-size:24px; color:#555;" onclick="closeModal('tipModal')">&times;</span>
+            
+            <div id="tip-form">
+                <h3 style="margin-top:0; color:var(--green);">SEND A TIP</h3>
+                <p style="color:#888; font-size:0.8rem; margin-bottom:20px;">100% goes to MC Kinetic.</p>
+                
+                <div class="amount-grid">
+                    <div class="amount-option" onclick="selectAmount(this)">$5</div>
+                    <div class="amount-option" onclick="selectAmount(this)">$10</div>
+                    <div class="amount-option" onclick="selectAmount(this)">$20</div>
+                </div>
+
+                <label>Your Email (For Receipt)</label>
+                <input type="email" placeholder="fan@email.com">
+                
+                <button class="submit-btn" style="background:var(--green); color:black;" onclick="fakeSubmit('tip-form', 'tip-success')">PAY SECURELY</button>
+            </div>
+
+            <div id="tip-success" class="success-view">
+                <span class="checkmark" style="color:var(--green)">✓</span>
+                <h3>SENT.</h3>
+                <p style="color:#888">You just supported local talent.</p>
+                <button class="submit-btn" style="background:#333; color:white;" onclick="closeModal('tipModal')">CLOSE</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="buyModal" class="modal-overlay">
+        <div class="modal-box modal-buy">
+            <span style="position:absolute; top:15px; right:20px; cursor:pointer; font-size:24px; color:#555;" onclick="closeModal('buyModal')">&times;</span>
+            
+            <div id="buy-form">
+                <h3 style="margin-top:0; color:var(--orange);">CONFIRM PURCHASE</h3>
+                <p style="color:#fff; font-size:1rem; margin-bottom:5px;" id="itemName">Track Name</p>
+                <p style="color:var(--orange); font-size:1.2rem; font-weight:bold; margin-bottom:20px;" id="itemPrice">$0.00</p>
+                
+                <label>Email for Download Link</label>
+                <input type="email" required>
+                
+                <button class="submit-btn" style="background:var(--orange); color:white;" onclick="fakeSubmit('buy-form', 'buy-success')">BUY NOW</button>
+            </div>
+
+            <div id="buy-success" class="success-view">
+                <span class="checkmark" style="color:var(--orange)">✓</span>
+                <h3>PURCHASED.</h3>
+                <p style="color:#888">Check your email for the download link.</p>
+                <button class="submit-btn" style="background:#333; color:white;" onclick="closeModal('buyModal')">CLOSE</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openModal(id, item, price) {
+            const modal = document.getElementById(id);
+            if(item) document.getElementById('itemName').innerText = item;
+            if(price) document.getElementById('itemPrice').innerText = price;
+
+            modal.style.display = 'flex';
+            setTimeout(() => {
+                modal.style.opacity = '1';
+                modal.querySelector('.modal-box').style.transform = 'translateY(0)';
+            }, 10);
+        }
+
+        function closeModal(id) {
+            const modal = document.getElementById(id);
+            modal.style.opacity = '0';
+            modal.querySelector('.modal-box').style.transform = 'translateY(20px)';
+            setTimeout(() => {
+                modal.style.display = 'none';
+                modal.querySelector('[id$="-form"]').style.display = 'block';
+                modal.querySelector('[id$="-success"]').style.display = 'none';
+            }, 300);
+        }
+
+        function selectAmount(el) {
+            document.querySelectorAll('.amount-option').forEach(d => d.style.borderColor = '#333');
+            document.querySelectorAll('.amount-option').forEach(d => d.style.background = '#000');
+            el.style.borderColor = 'var(--green)';
+            el.style.background = 'rgba(0, 230, 118, 0.1)';
+        }
+
+        function fakeSubmit(formId, successId) {
+            const form = document.getElementById(formId);
+            const btn = form.querySelector('button');
+            const originalText = btn.innerText;
+            btn.innerText = "PROCESSING...";
+            
+            setTimeout(() => {
+                form.style.display = 'none';
+                document.getElementById(successId).style.display = 'block';
+                btn.innerText = originalText;
+            }, 1000);
+        }
+
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal-overlay')) {
+                closeModal(event.target.id);
+            }
+        }
+    </script>
+</body>
+</html>

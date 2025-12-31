@@ -1,7 +1,42 @@
 import { Link } from 'react-router-dom';
-import { Zap, QrCode, Brain, Gamepad2, ArrowRight, CheckCircle } from 'lucide-react';
+import { Zap, QrCode, Brain, Gamepad2, ArrowRight, CheckCircle, Calendar, Users, TrendingUp, Shield } from 'lucide-react';
 
 export function EventOSPage() {
+  const eventTypes = [
+    {
+      title: 'Culture Clash',
+      description: 'Street Tournament Live Event Platform',
+      icon: Users,
+      features: ['Live Battle Tracking', 'Real-time Scoring', 'Audience Voting', 'QR Check-in'],
+      route: '/event-os/culture-clash',
+      color: '#FF5E00'
+    },
+    {
+      title: 'Pitch Battle',
+      description: 'Corporate Pitch Competition Finals',
+      icon: TrendingUp,
+      features: ['Live Pitch Tracking', 'Investor Voting', 'Real-time Analytics', 'QR Networking'],
+      route: '/event-os/pitch-battle',
+      color: '#06D6A0'
+    },
+    {
+      title: 'Runway OS',
+      description: 'Fashion Week Live Management',
+      icon: Calendar,
+      features: ['Model Tracking', 'Show Scheduling', 'Designer Profiles', 'QR Access'],
+      route: '/event-os/runway',
+      color: '#CCFF00'
+    },
+    {
+      title: 'Sports Clash',
+      description: 'Live Sports Event Management',
+      icon: Shield,
+      features: ['Game Tracking', 'Player Stats', 'Fan Engagement', 'QR Tickets'],
+      route: '/event-os/sports-clash',
+      color: '#3B82F6'
+    }
+  ];
+
   return (
     <div className="min-h-screen bg-[#1A1A1A] pt-16">
       {/* Hero Section */}
@@ -14,7 +49,7 @@ export function EventOSPage() {
           </div>
           <h1 className="text-4xl sm:text-6xl text-white mb-6">
             <span className="font-futuristic">Event OS</span> - 
-            <span className="font-graffiti text-[#FF7A00">Live Logistics Engine</span>
+            <span className="font-graffiti text-[#FF7A00]">Live Experience Engine</span>
           </h1>
           <p className="text-xl text-gray-400 max-w-3xl mx-auto mb-8">
             QR-based real-time event management powered by the L.O.A. AI Agent. 
@@ -39,8 +74,76 @@ export function EventOSPage() {
         </div>
       </section>
 
-      {/* Features */}
+      {/* Event Types Grid */}
       <section className="py-20 px-4 sm:px-6 lg:px-8 bg-[#0D0D0D]">
+        <div className="max-w-6xl mx-auto">
+          <h2 className="text-3xl sm:text-4xl text-white text-center mb-16">
+            <span className="font-futuristic">Event</span> 
+            <span className="font-graffiti text-[#FF7A00]">Platforms</span>
+          </h2>
+          
+          <div className="grid md:grid-cols-2 lg:grid-cols-2 gap-8">
+            {eventTypes.map((event, index) => (
+              <div key={index} className="group cursor-pointer">
+                <div 
+                  className="bg-[#222222] rounded-lg overflow-hidden border border-[#FF7A00]/20 hover:border-[#FF7A00]/40 transition-all"
+                  style={{ borderTop: `4px solid ${event.color}` }}
+                >
+                  <div className="p-6">
+                    <div className="flex items-center mb-4">
+                      <event.icon 
+                        className="mr-3" 
+                        size={32} 
+                        style={{ color: event.color }}
+                      />
+                      <div>
+                        <h3 className="text-white text-xl font-bold">{event.title}</h3>
+                        <p className="text-gray-400 text-sm">{event.description}</p>
+                      </div>
+                    </div>
+                    
+                    <div className="mb-6">
+                      <h4 className="text-white font-medium mb-3">Key Features:</h4>
+                      <ul className="space-y-2">
+                        {event.features.map((feature, featureIndex) => (
+                          <li key={featureIndex} className="flex items-center text-gray-300 text-sm">
+                            <QrCode className="mr-2" size={16} style={{ color: event.color }} />
+                            {feature}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                    
+                    <Link
+                      to={event.route}
+                      className="inline-flex items-center gap-2 px-6 py-3 rounded-lg transition-all font-medium"
+                      style={{
+                        backgroundColor: `${event.color}20`,
+                        border: `1px solid ${event.color}`,
+                        color: event.color
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = event.color;
+                        e.currentTarget.style.color = '#1A1A1A';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = `${event.color}20`;
+                        e.currentTarget.style.color = event.color;
+                      }}
+                    >
+                      Launch Platform
+                      <ArrowRight size={16} />
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Features */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-3xl sm:text-4xl text-white text-center mb-16">
             <span className="font-futuristic">Powered</span> by <span className="font-graffiti text-[#FF7A00]">L.O.A.</span>

@@ -1,0 +1,2542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>9LMNTS Trinity | Ultimate Crypto Real Estate Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap');
+        * { 
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background-color: #050505;
+            color: #fff;
+            overflow-x: hidden;
+        }
+        .glass {
+            background: rgba(20, 20, 20, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+        }
+        .accent {
+            color: #FF5500;
+        }
+        .bg-accent {
+            background-color: #FF5500;
+        }
+        .success {
+            color: #10B981;
+        }
+        .warning {
+            color: #F59E0B;
+        }
+        .mono {
+            font-family: 'Courier New', monospace;
+        }
+        
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes pulse {
+            0% { opacity: 0.6; }
+            50% { opacity: 1; }
+            100% { opacity: 0.6; }
+        }
+        @keyframes ticker {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.3s ease-out;
+        }
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        .ticker-container {
+            overflow: hidden;
+            white-space: nowrap;
+        }
+        .ticker-content {
+            display: inline-block;
+            padding-left: 100%;
+            animation: ticker 30s linear infinite;
+        }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 85, 0, 0.5);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 85, 0, 0.7);
+        }
+        
+        /* Micro tier highlight */
+        .micro-tier {
+            background: linear-gradient(135deg, rgba(255,85,0,0.1) 0%, rgba(16,185,129,0.1) 100%);
+            border: 2px solid rgba(16, 185, 129, 0.3);
+        }
+        
+        /* Network surge effects */
+        .network-surge {
+            animation: surge 1.5s ease-in-out infinite;
+        }
+        @keyframes surge {
+            0%, 100% { box-shadow: 0 0 20px rgba(16, 185, 129, 0.3); }
+            50% { box-shadow: 0 0 40px rgba(16, 185, 129, 0.6); }
+        }
+        
+        /* ====== CRITICAL BUG FIXES ====== */
+        /* Mobile Modal Fix */
+        .property-detail-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 10000;
+            display: flex;
+            align-items: flex-start; /* Changed from center */
+            justify-content: center;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        
+        .property-detail-content {
+            max-width: 1200px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            background: rgba(20, 20, 20, 0.9);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 85, 0, 0.2);
+            margin-top: 20px;
+            margin-bottom: 50px; /* Added padding at bottom */
+        }
+        
+        @media (max-width: 768px) {
+            .property-detail-modal {
+                display: block !important;
+                overflow-y: auto !important;
+                padding: 10px !important;
+                align-items: unset !important;
+            }
+            
+            .property-detail-content {
+                margin: 20px auto 80px auto !important;
+                max-height: none !important;
+                height: auto !important;
+                overflow-y: visible !important;
+                min-height: 300px;
+            }
+        }
+        
+        /* Data Crash Prevention */
+        .financials-container, .specifications-container {
+            min-height: 100px;
+        }
+        
+        /* Scroll Locking */
+        body.modal-open {
+            overflow: hidden;
+        }
+        
+        /* Tab Navigation */
+        .tab-nav {
+            display: flex;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 24px;
+            overflow-x: auto;
+        }
+        
+        .tab-nav-item {
+            padding: 12px 24px;
+            cursor: pointer;
+            color: #A0AEC0;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+            white-space: nowrap;
+        }
+        
+        .tab-nav-item.active {
+            color: #FF5500;
+            border-bottom: 2px solid #FF5500;
+        }
+        
+        /* Status Badges */
+        .status-active {
+            background: rgba(16, 185, 129, 0.2);
+            color: #10B981;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .status-pending {
+            background: rgba(245, 158, 11, 0.2);
+            color: #F59E0B;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        /* CRM Table */
+        .crm-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .crm-table th {
+            background: rgba(255, 85, 0, 0.1);
+            padding: 12px;
+            text-align: left;
+            color: #FF5500;
+            font-weight: 600;
+            border-bottom: 2px solid rgba(255, 85, 0, 0.2);
+        }
+        
+        .crm-table td {
+            padding: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .crm-table tr:hover {
+            background: rgba(255, 85, 0, 0.05);
+        }
+        
+        /* Financial Card */
+        .financial-card {
+            background: linear-gradient(145deg, rgba(20, 20, 20, 0.7), rgba(5, 5, 5, 0.9));
+            border: 1px solid rgba(255, 85, 0, 0.2);
+            border-radius: 16px;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .financial-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #FF5500, #10B981, #8A2BE2);
+        }
+        
+        /* Badges */
+        .vip-badge {
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+            color: #000;
+            font-weight: 800;
+        }
+        
+        .micro-badge {
+            background: linear-gradient(135deg, #10B981 0%, #3B82F6 100%);
+            color: #000;
+            font-weight: 800;
+        }
+        
+        .daily-income-badge {
+            background: linear-gradient(135deg, #FFD700, #FF9E00);
+            color: #000;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            animation: pulse 2s infinite;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        // ====== UTILITY FUNCTIONS ======
+        const formatMoney = (amount) => {
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+            }).format(amount);
+        };
+
+        const formatCurrency = (amount) => {
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            }).format(amount);
+        };
+
+        const formatCompact = (amount) => {
+            if (!amount) return '$0';
+            if (amount >= 1000000000) {
+                return '$' + (amount / 1000000000).toFixed(1) + 'B';
+            } else if (amount >= 1000000) {
+                return '$' + (amount / 1000000).toFixed(1) + 'M';
+            } else if (amount >= 1000) {
+                return '$' + (amount / 1000).toFixed(1) + 'K';
+            }
+            return '$' + amount.toFixed(0);
+        };
+
+        const generateTokenAddress = () => {
+            return '0x' + Array.from({length: 40}, () => 
+                Math.floor(Math.random() * 16).toString(16)
+            ).join('');
+        };
+
+        // Image error handler
+        const handleImageError = (e) => {
+            e.target.src = 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80';
+            e.target.onerror = null;
+        };
+
+        // ====== ENHANCED PLATFORM DATA ======
+        const PLATFORM_DATA = {
+            assets: [
+                {
+                    id: 1,
+                    name: "THE ETHER TOWER",
+                    type: "Luxury Residential",
+                    status: "ACTIVE",
+                    target: 50000000,
+                    raised: 28500000,
+                    microRaised: 1250000,
+                    apy: 8.2,
+                    holders: 1240,
+                    microHolders: 650,
+                    listingDate: "2023-10-15",
+                    monthlyRevenue: 185000,
+                    feesCollected: 427500,
+                    performance: 94,
+                    description: "72-story architectural marvel in the financial district. LEED Platinum certified with private club and panoramic city views.",
+                    detailedDescription: `
+                        <h3 class="text-xl font-bold text-white mb-4">Property Overview</h3>
+                        <p class="text-gray-300 mb-4">The Ether Tower represents the pinnacle of luxury real estate tokenization. This 72-story marvel features:</p>
+                        <ul class="list-disc pl-5 text-gray-300 mb-4">
+                            <li>Daily rental income distribution (like Lofty)</li>
+                            <li>Tokenized ownership on Ethereum blockchain</li>
+                            <li>Rental yields distributed directly to crypto wallets (like RealT)</li>
+                            <li>Blockchain verification for transparent ownership (like Mogul)</li>
+                            <li>Professional external property management</li>
+                        </ul>
+                        <h3 class="text-xl font-bold text-white mb-4">Competitor Advantages</h3>
+                        <ul class="list-disc pl-5 text-gray-300 mb-4">
+                            <li><span class="success">✓ Better than Lofty:</span> Higher APY (8.2% vs 6-8%)</li>
+                            <li><span class="success">✓ Better than RealT:</span> More property types available</li>
+                            <li><span class="success">✓ Better than Mogul:</span> Lower minimum investment ($250)</li>
+                            <li><span class="success">✓ Better than Arrived:</span> Daily income distributions</li>
+                        </ul>
+                    `,
+                    propertyFeatures: [
+                        "Daily Rental Income Distribution",
+                        "Blockchain Verified Ownership",
+                        "Smart Contract Automated",
+                        "Professional External Management",
+                        "Premium Financial District Location"
+                    ],
+                    financials: {
+                        capRate: 7.8,
+                        occupancy: 94,
+                        monthlyExpenses: 120000,
+                        netOperatingIncome: 65000,
+                        propertyTaxes: 45000,
+                        insurance: 25000
+                    },
+                    specifications: {
+                        yearBuilt: 2023,
+                        floors: 72,
+                        units: 412,
+                        squareFootage: 850000,
+                        amenities: 25
+                    },
+                    location: {
+                        address: "500 Financial District Ave, New York, NY 10005",
+                        city: "New York",
+                        state: "NY"
+                    },
+                    tokenDetails: {
+                        contractAddress: generateTokenAddress(),
+                        tokenStandard: "ERC-721",
+                        totalTokens: 50000000,
+                        tokenValue: 1,
+                        distributionFrequency: "Daily",
+                        nextDistribution: "Today"
+                    },
+                    images: [
+                        "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+                        "https://images.unsplash.com/photo-1487956382158-bb926046304a?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+                    ],
+                    tags: ["VIP", "MICRO", "DAILY_INCOME", "BLOCKCHAIN_VERIFIED"],
+                    documents: [
+                        { name: "Property Prospectus", url: "#", date: "2023-10-01" },
+                        { name: "Financial Projections", url: "#", date: "2023-10-01" }
+                    ],
+                    rentalIncomeHistory: [
+                        { date: "Today", amount: 6166, distributed: true },
+                        { date: "Yesterday", amount: 6166, distributed: true },
+                        { date: "2 days ago", amount: 6166, distributed: true }
+                    ],
+                    suites: [
+                        { id: '12A', name: "City View Studio", price: 425000, size: "650 sqft", yield: 6.2 },
+                        { id: '12B', name: "Executive One-Bedroom", price: 850000, size: "1,200 sqft", yield: 7.5 },
+                        { id: '45C', name: "Corner Two-Bedroom", price: 1250000, size: "1,850 sqft", yield: 8.1 },
+                        { id: '68P', name: "Penthouse Sky Residence", price: 3850000, size: "4,200 sqft", yield: 9.8 }
+                    ]
+                },
+                {
+                    id: 2,
+                    name: "9LMNTS HQ",
+                    type: "Commercial",
+                    status: "ACTIVE",
+                    target: 20000000,
+                    raised: 18000000,
+                    microRaised: 950000,
+                    apy: 11.5,
+                    holders: 850,
+                    microHolders: 420,
+                    listingDate: "2023-08-22",
+                    monthlyRevenue: 165000,
+                    feesCollected: 270000,
+                    performance: 98,
+                    description: "Flagship creative studio and office complex for Web3 startups.",
+                    detailedDescription: `
+                        <h3 class="text-xl font-bold text-white mb-4">Commercial Property Specialization</h3>
+                        <p class="text-gray-300 mb-4">Premium commercial office complex with professional external management:</p>
+                        <ul class="list-disc pl-5 text-gray-300 mb-4">
+                            <li>Specialized tech office spaces (like WeWork but owned)</li>
+                            <li>High rental yields from premium tech companies</li>
+                            <li>Passive income without management hassle</li>
+                            <li>Long-term corporate leases</li>
+                            <li>Professional external property management</li>
+                        </ul>
+                        <h3 class="text-xl font-bold text-white mb-4">Key Features</h3>
+                        <ul class="list-disc pl-5 text-gray-300">
+                            <li>State-of-the-art tech infrastructure</li>
+                            <li>Collaborative workspaces and meeting rooms</li>
+                            <li>High-end commercial property management</li>
+                            <li>Premium rental rates for tech companies</li>
+                            <li>Daily income distribution to token holders</li>
+                        </ul>
+                    `,
+                    propertyFeatures: [
+                        "Tech Office Specialization",
+                        "Premium Commercial Location",
+                        "Professional External Management",
+                        "Long-term Corporate Leases",
+                        "High Occupancy Rates"
+                    ],
+                    financials: {
+                        capRate: 9.2,
+                        occupancy: 87,
+                        monthlyExpenses: 85000,
+                        netOperatingIncome: 80000,
+                        propertyTaxes: 35000
+                    },
+                    specifications: {
+                        yearBuilt: 2022,
+                        floors: 12,
+                        units: 85,
+                        squareFootage: 185000
+                    },
+                    location: {
+                        address: "100 Tech Valley, San Francisco, CA 94105",
+                        city: "San Francisco",
+                        state: "CA"
+                    },
+                    tokenDetails: {
+                        contractAddress: generateTokenAddress(),
+                        tokenStandard: "ERC-721",
+                        totalTokens: 20000000,
+                        tokenValue: 1,
+                        distributionFrequency: "Daily",
+                        nextDistribution: "Today"
+                    },
+                    images: [
+                        "https://images.unsplash.com/photo-1497366754035-f200968a6e72?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+                        "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+                    ],
+                    tags: ["VIP", "MICRO", "TECH", "DAILY_INCOME"],
+                    rentalIncomeHistory: [
+                        { date: "Today", amount: 5500, distributed: true },
+                        { date: "Yesterday", amount: 5500, distributed: true }
+                    ],
+                    suites: [
+                        { id: 'G01', name: "Ground Floor Retail", price: 1250000, size: "3,200 sqft", yield: 10.5 },
+                        { id: '5A', name: "Tech Suite", price: 750000, size: "2,100 sqft", yield: 9.8 }
+                    ]
+                },
+                {
+                    id: 3,
+                    name: "LOGISTICS HUB ALPHA",
+                    type: "Industrial",
+                    status: "FUNDING",
+                    target: 15000000,
+                    raised: 2500000,
+                    microRaised: 180000,
+                    apy: 7.8,
+                    holders: 120,
+                    microHolders: 85,
+                    listingDate: "2023-11-05",
+                    monthlyRevenue: 45000,
+                    feesCollected: 37500,
+                    performance: 65,
+                    description: "State-of-the-art logistics center with autonomous vehicle integration.",
+                    detailedDescription: `
+                        <h3 class="text-xl font-bold text-white mb-4">Vetted Industrial Property</h3>
+                        <p class="text-gray-300 mb-4">Carefully selected industrial property with blockchain-verified ownership:</p>
+                        <ul class="list-disc pl-5 text-gray-300 mb-4">
+                            <li>Vetted property with due diligence (like Mogul)</li>
+                            <li>Transparent ownership records on blockchain</li>
+                            <li>Industrial focus for stable returns</li>
+                            <li>Professional external property management</li>
+                            <li>Monthly income distributions</li>
+                        </ul>
+                        <h3 class="text-xl font-bold text-white mb-4">Investment Advantages</h3>
+                        <ul class="list-disc pl-5 text-gray-300">
+                            <li>Lower risk through thorough vetting</li>
+                            <li>Stable industrial market returns</li>
+                            <li>Transparent blockchain ownership</li>
+                            <li>Passive monthly income</li>
+                            <li>Fractional ownership from $250</li>
+                        </ul>
+                    `,
+                    propertyFeatures: [
+                        "Vetted Properties",
+                        "Transparent Ownership Records",
+                        "Industrial Focus",
+                        "Stable Returns",
+                        "Blockchain Verified"
+                    ],
+                    financials: {
+                        capRate: 8.5,
+                        occupancy: 100,
+                        monthlyExpenses: 25000,
+                        netOperatingIncome: 20000,
+                        propertyTaxes: 15000
+                    },
+                    specifications: {
+                        yearBuilt: 2021,
+                        floors: 3,
+                        units: 1,
+                        squareFootage: 250000
+                    },
+                    location: {
+                        address: "500 Logistics Drive, Chicago, IL 60609",
+                        city: "Chicago",
+                        state: "IL"
+                    },
+                    tokenDetails: {
+                        contractAddress: generateTokenAddress(),
+                        tokenStandard: "ERC-721",
+                        totalTokens: 15000000,
+                        tokenValue: 1,
+                        distributionFrequency: "Monthly",
+                        nextDistribution: "2024-02-01"
+                    },
+                    images: [
+                        "https://images.unsplash.com/photo-1635070041078-e363dbe005cb?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+                        "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+                    ],
+                    tags: ["MICRO", "INDUSTRIAL", "VETTED", "TRANSPARENT"],
+                    rentalIncomeHistory: [
+                        { date: "This Month", amount: 45000, distributed: true }
+                    ],
+                    suites: [
+                        { id: 'WH1', name: "Main Warehouse", price: 15000000, size: "250,000 sqft", yield: 7.8 }
+                    ]
+                }
+            ],
+            transactions: [],
+            tvl: 28500000 + 18000000 + 2500000,
+            fees: (28500000 + 18000000 + 2500000) * 0.015,
+            totalInvestors: 1240 + 850 + 120,
+            microInvestors: 650 + 420 + 85
+        };
+
+        // ====== LOADING SCREEN ======
+        const LoadingScreen = ({ onComplete }) => {
+            const [progress, setProgress] = useState(0);
+            const [status, setStatus] = useState("Initializing 9LMNTS Network...");
+            
+            useEffect(() => {
+                const statuses = [
+                    "Loading Smart Contracts...",
+                    "Syncing Blockchain Data...",
+                    "Initializing Liquidity Pools...",
+                    "Connecting to Polygon Network...",
+                    "Ready for Live Demo"
+                ];
+                
+                const interval = setInterval(() => {
+                    setProgress(prev => {
+                        const newProgress = prev + 20;
+                        if (newProgress <= 100) {
+                            setStatus(statuses[newProgress / 20 - 1]);
+                        }
+                        
+                        if (newProgress >= 100) {
+                            clearInterval(interval);
+                            setTimeout(onComplete, 800);
+                            return 100;
+                        }
+                        return newProgress;
+                    });
+                }, 600);
+                
+                return () => clearInterval(interval);
+            }, [onComplete]);
+            
+            return (
+                <div className="fixed inset-0 bg-black flex items-center justify-center z-50">
+                    <div className="text-center p-8 max-w-md">
+                        <div className="w-32 h-32 mx-auto mb-8 relative">
+                            <div className="absolute inset-0 border-4 border-transparent border-t-accent rounded-full animate-spin"></div>
+                            <div className="absolute inset-4 border-4 border-transparent border-b-success rounded-full animate-spin" style={{animationDirection: 'reverse'}}></div>
+                            <div className="absolute inset-8 bg-accent rounded-full flex items-center justify-center">
+                                <span className="text-4xl font-black text-white">9</span>
+                            </div>
+                        </div>
+                        
+                        <h1 className="text-5xl font-black text-white mb-2">9LMNTS</h1>
+                        <p className="text-gray-400 mb-6">DIGITAL REAL ESTATE NETWORK</p>
+                        
+                        <div className="mb-8">
+                            <div className="flex justify-between text-sm text-gray-400 mb-2">
+                                <span>{status}</span>
+                                <span>{progress}%</span>
+                            </div>
+                            <div className="w-full bg-gray-800 h-3 rounded-full overflow-hidden">
+                                <div 
+                                    className="h-full bg-gradient-to-r from-accent to-success transition-all duration-500"
+                                    style={{ width: `${progress}%` }}
+                                ></div>
+                            </div>
+                        </div>
+                        
+                        <div className="text-xs text-gray-600">
+                            <div className="flex justify-center space-x-6">
+                                <span><i className="fas fa-bolt mr-1 accent"></i> Polygon Network</span>
+                                <span><i className="fas fa-shield-alt mr-1 success"></i> Secure</span>
+                                <span><i className="fas fa-users mr-1 text-blue-400"></i> Multi-Tier</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // ====== PROPERTY DETAIL MODAL ======
+        const PropertyDetailModal = ({ property, onClose, onInvest, userType }) => {
+            const [selectedImage, setSelectedImage] = useState(property?.images?.[0] || '');
+            const [activeTab, setActiveTab] = useState('overview');
+            const [investmentAmount, setInvestmentAmount] = useState(userType === 'VIP' ? 50000 : 1000);
+            
+            // Lock body scroll when modal opens
+            useEffect(() => {
+                document.body.classList.add('modal-open');
+                return () => {
+                    document.body.classList.remove('modal-open');
+                };
+            }, []);
+            
+            if (!property) return null;
+            
+            // Defensive checks for all data fields
+            const safeProperty = {
+                ...property,
+                financials: property.financials || {},
+                specifications: property.specifications || {},
+                location: property.location || { city: '', state: '' },
+                tokenDetails: property.tokenDetails || {},
+                images: property.images || [],
+                tags: property.tags || [],
+                rentalIncomeHistory: property.rentalIncomeHistory || [],
+                suites: property.suites || []
+            };
+            
+            const quickAmounts = userType === 'VIP' 
+                ? [50000, 100000, 250000, 500000]
+                : [250, 500, 1000, 2000];
+            
+            const handleInvest = () => {
+                onInvest(safeProperty, investmentAmount);
+            };
+            
+            return (
+                <div className="property-detail-modal">
+                    <div className="modal-backdrop" onClick={onClose}></div>
+                    <div className="property-detail-content glass p-4 md:p-6 fade-in">
+                        {/* Header */}
+                        <div className="flex justify-between items-start mb-6">
+                            <div>
+                                <div className="flex items-center space-x-3 mb-2">
+                                    <h2 className="text-2xl md:text-3xl font-bold text-white">{safeProperty.name}</h2>
+                                    <div className="flex flex-wrap gap-2">
+                                        {safeProperty.tags.includes('VIP') && <span className="vip-badge px-3 py-1 rounded-full text-sm">VIP</span>}
+                                        {safeProperty.tags.includes('MICRO') && <span className="micro-badge px-3 py-1 rounded-full text-sm">MICRO</span>}
+                                        {safeProperty.tags.includes('DAILY_INCOME') && <span className="daily-income-badge text-sm">DAILY INCOME</span>}
+                                    </div>
+                                </div>
+                                <p className="text-gray-400">{safeProperty.type} • {safeProperty.location.city}, {safeProperty.location.state}</p>
+                            </div>
+                            <button onClick={onClose} className="text-gray-400 hover:text-white text-2xl">
+                                <i className="fas fa-times"></i>
+                            </button>
+                        </div>
+                        
+                        {/* Image Gallery */}
+                        <div className="mb-8">
+                            <div className="h-48 md:h-64 rounded-xl overflow-hidden mb-4">
+                                <img 
+                                    src={selectedImage} 
+                                    alt={safeProperty.name} 
+                                    className="w-full h-full object-cover" 
+                                    onError={handleImageError} 
+                                />
+                            </div>
+                            <div className="flex space-x-2 overflow-x-auto pb-2">
+                                {safeProperty.images.map((img, idx) => (
+                                    <div 
+                                        key={idx} 
+                                        className={`h-16 w-24 rounded-lg overflow-hidden cursor-pointer flex-shrink-0 ${selectedImage === img ? 'ring-2 ring-accent' : ''}`}
+                                        onClick={() => setSelectedImage(img)}
+                                    >
+                                        <img 
+                                            src={img} 
+                                            alt={`${safeProperty.name} ${idx + 1}`} 
+                                            className="w-full h-full object-cover" 
+                                            onError={handleImageError} 
+                                        />
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                        
+                        {/* Tabs */}
+                        <div className="tab-nav">
+                            <div 
+                                className={`tab-nav-item ${activeTab === 'overview' ? 'active' : ''}`} 
+                                onClick={() => setActiveTab('overview')}
+                            >
+                                <i className="fas fa-info-circle mr-2"></i>Overview
+                            </div>
+                            <div 
+                                className={`tab-nav-item ${activeTab === 'financials' ? 'active' : ''}`} 
+                                onClick={() => setActiveTab('financials')}
+                            >
+                                <i className="fas fa-chart-line mr-2"></i>Financials
+                            </div>
+                            <div 
+                                className={`tab-nav-item ${activeTab === 'income' ? 'active' : ''}`} 
+                                onClick={() => setActiveTab('income')}
+                            >
+                                <i className="fas fa-money-bill-wave mr-2"></i>Income
+                            </div>
+                            <div 
+                                className={`tab-nav-item ${activeTab === 'investment' ? 'active' : ''}`} 
+                                onClick={() => setActiveTab('investment')}
+                            >
+                                <i className="fas fa-coins mr-2"></i>Investment
+                            </div>
+                            <div 
+                                className={`tab-nav-item ${activeTab === 'units' ? 'active' : ''}`} 
+                                onClick={() => setActiveTab('units')}
+                            >
+                                <i className="fas fa-building mr-2"></i>Units
+                            </div>
+                        </div>
+                        
+                        {/* Tab Content */}
+                        <div className="mb-8">
+                            {activeTab === 'overview' && (
+                                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                                    <div className="lg:col-span-2">
+                                        <div dangerouslySetInnerHTML={{ __html: safeProperty.detailedDescription }} />
+                                        
+                                        <div className="mt-8">
+                                            <h3 className="text-xl font-bold text-white mb-4">Property Features</h3>
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                                {safeProperty.propertyFeatures.map((feature, idx) => (
+                                                    <div key={idx} className="flex items-center space-x-2 p-3 bg-gray-900/50 rounded-lg">
+                                                        <i className="fas fa-check success"></i>
+                                                        <span className="text-gray-300">{feature}</span>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div>
+                                        <div className="glass p-6 mb-6">
+                                            <h3 className="text-xl font-bold text-white mb-4">Quick Facts</h3>
+                                            <div className="space-y-3">
+                                                <div className="flex justify-between">
+                                                    <span className="text-gray-400">Property Type</span>
+                                                    <span className="text-white">{safeProperty.type}</span>
+                                                </div>
+                                                <div className="flex justify-between">
+                                                    <span className="text-gray-400">Location</span>
+                                                    <span className="text-white">{safeProperty.location.city}, {safeProperty.location.state}</span>
+                                                </div>
+                                                <div className="flex justify-between">
+                                                    <span className="text-gray-400">Year Built</span>
+                                                    <span className="text-white">{safeProperty.specifications?.yearBuilt || 'N/A'}</span>
+                                                </div>
+                                                <div className="flex justify-between">
+                                                    <span className="text-gray-400">Square Footage</span>
+                                                    <span className="text-white">{safeProperty.specifications?.squareFootage?.toLocaleString() || 'N/A'} sqft</span>
+                                                </div>
+                                                <div className="flex justify-between">
+                                                    <span className="text-gray-400">Occupancy Rate</span>
+                                                    <span className="success">{safeProperty.financials?.occupancy || 'N/A'}%</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                            
+                            {activeTab === 'financials' && (
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                    <div className="glass p-6 financials-container">
+                                        <h3 className="text-xl font-bold text-white mb-4">Financial Performance</h3>
+                                        <div className="space-y-4">
+                                            <div className="flex justify-between">
+                                                <span className="text-gray-400">Capitalization Rate</span>
+                                                <span className="success font-bold">{safeProperty.financials?.capRate || 'N/A'}%</span>
+                                            </div>
+                                            <div className="flex justify-between">
+                                                <span className="text-gray-400">Monthly Revenue</span>
+                                                <span className="text-white">{formatCurrency(safeProperty.monthlyRevenue)}</span>
+                                            </div>
+                                            <div className="flex justify-between">
+                                                <span className="text-gray-400">Monthly Expenses</span>
+                                                <span className="text-white">{formatCurrency(safeProperty.financials?.monthlyExpenses)}</span>
+                                            </div>
+                                            <div className="flex justify-between">
+                                                <span className="text-gray-400">Net Operating Income</span>
+                                                <span className="success">{formatCurrency(safeProperty.financials?.netOperatingIncome)}</span>
+                                            </div>
+                                            {safeProperty.financials?.propertyTaxes && (
+                                                <div className="flex justify-between">
+                                                    <span className="text-gray-400">Property Taxes</span>
+                                                    <span className="text-white">{formatCurrency(safeProperty.financials.propertyTaxes)}/year</span>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="glass p-6">
+                                        <h3 className="text-xl font-bold text-white mb-4">Token Details</h3>
+                                        <div className="space-y-4">
+                                            <div className="flex justify-between">
+                                                <span className="text-gray-400">Token Contract</span>
+                                                <span className="accent text-sm mono">
+                                                    {safeProperty.tokenDetails?.contractAddress?.slice(0, 8)}...{safeProperty.tokenDetails?.contractAddress?.slice(-6)}
+                                                </span>
+                                            </div>
+                                            <div className="flex justify-between">
+                                                <span className="text-gray-400">Token Standard</span>
+                                                <span className="text-white">{safeProperty.tokenDetails?.tokenStandard || 'N/A'}</span>
+                                            </div>
+                                            <div className="flex justify-between">
+                                                <span className="text-gray-400">Total Tokens</span>
+                                                <span className="text-white">{safeProperty.tokenDetails?.totalTokens?.toLocaleString() || 'N/A'}</span>
+                                            </div>
+                                            <div className="flex justify-between">
+                                                <span className="text-gray-400">Token Value</span>
+                                                <span className="text-white">{formatCurrency(safeProperty.tokenDetails?.tokenValue || 0)}</span>
+                                            </div>
+                                            <div className="flex justify-between">
+                                                <span className="text-gray-400">Distribution</span>
+                                                <span className="success">{safeProperty.tokenDetails?.distributionFrequency || 'N/A'}</span>
+                                            </div>
+                                            <div className="flex justify-between">
+                                                <span className="text-gray-400">Next Distribution</span>
+                                                <span className="text-white">{safeProperty.tokenDetails?.nextDistribution || 'N/A'}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                            
+                            {activeTab === 'income' && (
+                                <div className="glass p-6">
+                                    <h3 className="text-xl font-bold text-white mb-6">Income Distribution History</h3>
+                                    <div className="space-y-4">
+                                        {safeProperty.rentalIncomeHistory.length > 0 ? (
+                                            safeProperty.rentalIncomeHistory.map((income, idx) => (
+                                                <div key={idx} className="flex items-center justify-between p-4 border border-gray-800 rounded-lg">
+                                                    <div className="flex items-center space-x-4">
+                                                        <div className={`w-10 h-10 ${income.distributed ? 'bg-green-500/20' : 'bg-yellow-500/20'} rounded-lg flex items-center justify-center`}>
+                                                            <i className={`fas ${income.distributed ? 'fa-check-circle success' : 'fa-clock warning'}`}></i>
+                                                        </div>
+                                                        <div>
+                                                            <h4 className="text-white font-medium">Rental Income Distribution</h4>
+                                                            <p className="text-gray-400 text-sm">{income.date}</p>
+                                                        </div>
+                                                    </div>
+                                                    <div className="text-right">
+                                                        <div className="success font-bold">{formatCurrency(income.amount)}</div>
+                                                        <div className={`text-xs ${income.distributed ? 'success' : 'warning'}`}>
+                                                            {income.distributed ? 'Distributed' : 'Pending'}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            ))
+                                        ) : (
+                                            <div className="text-center py-8">
+                                                <i className="fas fa-chart-line text-4xl text-gray-600 mb-4"></i>
+                                                <p className="text-gray-400">No income distributions yet</p>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            )}
+                            
+                            {activeTab === 'investment' && (
+                                <div className="glass p-6">
+                                    <h3 className="text-2xl font-bold text-white mb-6">Investment Details</h3>
+                                    
+                                    <div className="mb-8">
+                                        <div className="flex justify-between mb-4">
+                                            <label className="text-lg font-medium text-white">Investment Amount</label>
+                                            <span className="accent font-bold text-2xl">{formatCurrency(investmentAmount)}</span>
+                                        </div>
+                                        <input
+                                            type="range"
+                                            min={userType === 'VIP' ? 50000 : 250}
+                                            max={userType === 'VIP' ? 1000000 : 5000}
+                                            step={userType === 'VIP' ? 10000 : 250}
+                                            value={investmentAmount}
+                                            onChange={(e) => setInvestmentAmount(parseInt(e.target.value))}
+                                            className="w-full h-3 bg-gray-800 rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-6 [&::-webkit-slider-thumb]:w-6 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-accent"
+                                        />
+                                        <div className="flex justify-between text-sm text-gray-400 mt-2">
+                                            <span>{formatCurrency(userType === 'VIP' ? 50000 : 250)}</span>
+                                            <span>{formatCurrency(userType === 'VIP' ? 500000 : 2500)}</span>
+                                            <span>{formatCurrency(userType === 'VIP' ? 1000000 : 5000)}</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+                                        {quickAmounts.map(amount => (
+                                            <button
+                                                key={amount}
+                                                onClick={() => setInvestmentAmount(amount)}
+                                                className={`py-3 glass rounded-xl text-center transition-all ${investmentAmount === amount ? 'border-accent border-2' : ''}`}
+                                            >
+                                                <div className="text-white font-bold">
+                                                    ${amount >= 1000000 ? '1M' : amount >= 1000 ? amount/1000 + 'K' : amount}
+                                                </div>
+                                                <div className="text-xs text-gray-400">{amount.toLocaleString()} tokens</div>
+                                            </button>
+                                        ))}
+                                    </div>
+                                    
+                                    <div className="glass p-6 mb-6">
+                                        <h4 className="text-lg font-bold text-white mb-4">Investment Summary</h4>
+                                        <div className="space-y-4">
+                                            <div className="flex justify-between">
+                                                <span className="text-gray-400">Investment Amount</span>
+                                                <span className="text-white font-bold">{formatCurrency(investmentAmount)}</span>
+                                            </div>
+                                            <div className="flex justify-between">
+                                                <span className="text-gray-400">Tokens Received</span>
+                                                <span className="accent font-bold mono">{investmentAmount.toLocaleString()} TOKENS</span>
+                                            </div>
+                                            <div className="flex justify-between">
+                                                <span className="text-gray-400">Daily Income</span>
+                                                <span className="success font-bold">
+                                                    {formatCurrency((investmentAmount * safeProperty.apy) / 100 / 365)}
+                                                </span>
+                                            </div>
+                                            <div className="flex justify-between">
+                                                <span className="text-gray-400">Monthly Income</span>
+                                                <span className="success font-bold">
+                                                    {formatCurrency((investmentAmount * safeProperty.apy) / 100 / 12)}
+                                                </span>
+                                            </div>
+                                            <div className="flex justify-between">
+                                                <span className="text-gray-400">Annual Income</span>
+                                                <span className="success font-bold">
+                                                    {formatCurrency((investmentAmount * safeProperty.apy) / 100)}
+                                                </span>
+                                            </div>
+                                            <div className="border-t border-gray-800 pt-4 mt-4">
+                                                <div className="flex justify-between text-lg font-bold">
+                                                    <span className="text-white">Total Cost</span>
+                                                    <span className="text-white">{formatCurrency(investmentAmount)}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <button
+                                            onClick={handleInvest}
+                                            className="py-4 bg-accent hover:bg-orange-600 rounded-xl font-bold text-black text-lg"
+                                        >
+                                            <i className="fas fa-check-circle mr-2"></i>
+                                            CONFIRM INVESTMENT
+                                        </button>
+                                        <button
+                                            onClick={onClose}
+                                            className="py-4 glass rounded-xl font-bold text-white text-lg"
+                                        >
+                                            Cancel
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+                            
+                            {activeTab === 'units' && safeProperty.suites.length > 0 && (
+                                <div className="glass p-6">
+                                    <h3 className="text-xl font-bold text-white mb-6">Available Units</h3>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        {safeProperty.suites.map((suite, idx) => (
+                                            <div key={idx} className="border border-gray-800 rounded-xl p-4 hover:border-accent transition-colors">
+                                                <div className="flex justify-between items-start mb-3">
+                                                    <div>
+                                                        <h4 className="text-lg font-bold text-white">{suite.name}</h4>
+                                                        <p className="text-sm text-gray-400">Unit {suite.id}</p>
+                                                    </div>
+                                                    <span className="px-3 py-1 bg-success/20 success rounded-full text-sm">
+                                                        {suite.yield}% Yield
+                                                    </span>
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <div className="flex justify-between">
+                                                        <span className="text-gray-400">Price</span>
+                                                        <span className="text-white font-bold">{formatCurrency(suite.price)}</span>
+                                                    </div>
+                                                    <div className="flex justify-between">
+                                                        <span className="text-gray-400">Size</span>
+                                                        <span className="text-white">{suite.size}</span>
+                                                    </div>
+                                                </div>
+                                                {userType === 'VIP' && (
+                                                    <button className="w-full mt-4 py-2 bg-accent hover:bg-orange-600 rounded-lg font-bold text-white">
+                                                        Purchase Unit
+                                                    </button>
+                                                )}
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // ====== VIP INVESTOR VIEW ======
+        const VIPInvestorView = ({ assets, onInvest, demoMode = true }) => {
+            const [balance, setBalance] = useState(demoMode ? 1000000 : 50000);
+            const [portfolio, setPortfolio] = useState([]);
+            const [selectedAsset, setSelectedAsset] = useState(null);
+            const [showModal, setShowModal] = useState(false);
+            
+            const handleInvestClick = (asset, amount) => {
+                // Confetti effect
+                confetti({
+                    particleCount: 200,
+                    spread: 100,
+                    origin: { y: 0.6 },
+                    colors: ['#FF5500', '#10B981', '#FFFFFF']
+                });
+                
+                setBalance(prev => prev - amount);
+                
+                // Update portfolio
+                const existing = portfolio.find(p => p.assetId === asset.id);
+                const tokens = amount / 1;
+                
+                if (existing) {
+                    setPortfolio(prev => prev.map(p => 
+                        p.assetId === asset.id 
+                            ? { ...p, amount: p.amount + amount, tokens: p.tokens + tokens }
+                            : p
+                    ));
+                } else {
+                    setPortfolio([...portfolio, {
+                        assetId: asset.id,
+                        name: asset.name,
+                        amount: amount,
+                        tokens: tokens,
+                        type: 'VIP'
+                    }]);
+                }
+                
+                // Call global investment handler
+                onInvest(asset.id, amount, 'VIP');
+                
+                // Close modal
+                setTimeout(() => {
+                    setShowModal(false);
+                    setSelectedAsset(null);
+                }, 1500);
+            };
+            
+            return (
+                <div className="p-4 md:p-6 max-w-7xl mx-auto">
+                    {/* VIP Banner */}
+                    <div className="glass p-6 mb-8 border-l-4 border-accent relative overflow-hidden">
+                        <div className="absolute top-4 right-4">
+                            <span className="px-3 py-1 bg-accent text-black text-xs font-bold rounded-full">VIP TIER</span>
+                        </div>
+                        <div className="flex flex-col md:flex-row items-center">
+                            <div className="md:w-2/3 pr-0 md:pr-8">
+                                <h2 className="text-2xl md:text-3xl font-bold text-white mb-2">VIP INVESTOR DASHBOARD</h2>
+                                <p className="text-gray-300 mb-4">Access to premium properties with $50K+ minimum investment. Institutional-grade opportunities.</p>
+                                <div className="flex flex-wrap gap-4 mb-4">
+                                    <div className="flex items-center">
+                                        <div className="w-2 h-2 bg-accent rounded-full mr-2"></div>
+                                        <span className="text-sm text-gray-300">Minimum: $50,000</span>
+                                    </div>
+                                    <div className="flex items-center">
+                                        <div className="w-2 h-2 bg-success rounded-full mr-2"></div>
+                                        <span className="text-sm text-gray-300">Priority Access</span>
+                                    </div>
+                                    <div className="flex items-center">
+                                        <div className="w-2 h-2 bg-blue-500 rounded-full mr-2"></div>
+                                        <span className="text-sm text-gray-300">Direct Deals</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="md:w-1/3 mt-4 md:mt-0">
+                                <div className="glass p-4 rounded-xl">
+                                    <div className="text-xs text-gray-400 uppercase font-bold mb-2">Available Liquidity</div>
+                                    <div className="text-3xl text-white font-bold mono mb-2">{formatCurrency(balance)}</div>
+                                    <div className="text-xs text-gray-500">USDC • VIP Account</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {/* Stats Dashboard */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+                        <div className="financial-card">
+                            <div className="text-xs text-gray-400 uppercase font-bold mb-2">
+                                <i className="fas fa-wallet mr-2"></i>
+                                Portfolio Value
+                            </div>
+                            <div className="text-3xl text-white font-bold mono">{formatCurrency(portfolio.reduce((sum, p) => sum + p.amount, 0))}</div>
+                            <div className="text-xs text-gray-500 mt-1">Across {portfolio.length} properties</div>
+                        </div>
+                        <div className="financial-card">
+                            <div className="text-xs text-gray-400 uppercase font-bold mb-2">
+                                <i className="fas fa-chart-line mr-2"></i>
+                                Projected Annual Yield
+                            </div>
+                            <div className="text-3xl success font-bold mono">
+                                +{formatCurrency(portfolio.reduce((sum, p) => sum + p.amount, 0) * 0.092)}
+                            </div>
+                            <div className="text-xs text-gray-500 mt-1">Based on 9.2% avg APY</div>
+                        </div>
+                        <div className="financial-card">
+                            <div className="text-xs text-gray-400 uppercase font-bold mb-2">
+                                <i className="fas fa-crown mr-2"></i>
+                                VIP Benefits
+                            </div>
+                            <div className="text-xl text-white font-bold">Priority Access</div>
+                            <div className="text-xs text-gray-500 mt-1">Early deal flow • Lower fees</div>
+                        </div>
+                    </div>
+                    
+                    {/* Property Grid */}
+                    <h2 className="text-2xl font-bold text-white mb-6">VIP Properties (Minimum $50K)</h2>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+                        {assets.filter(asset => asset.tags.includes('VIP')).map(asset => (
+                            <div key={asset.id} className="glass rounded-xl overflow-hidden hover:border-accent transition-colors border border-gray-800">
+                                <div className="h-48 relative overflow-hidden">
+                                    <img 
+                                        src={asset.images?.[0]} 
+                                        alt={asset.name} 
+                                        className="w-full h-full object-cover" 
+                                        onError={handleImageError}
+                                    />
+                                    <div className="absolute top-3 right-3">
+                                        <span className="vip-badge px-2 py-1 rounded text-xs font-bold">VIP ACCESS</span>
+                                    </div>
+                                    <div className="absolute bottom-3 left-3">
+                                        {asset.tags.includes('DAILY_INCOME') && <span className="daily-income-badge text-xs">DAILY INCOME</span>}
+                                    </div>
+                                </div>
+                                <div className="p-5">
+                                    <div className="flex justify-between items-start mb-2">
+                                        <h3 className="font-bold text-lg text-white">{asset.name}</h3>
+                                        <span className="text-xs px-2 py-1 bg-white/10 rounded text-gray-300">{asset.type}</span>
+                                    </div>
+                                    <p className="text-xs text-gray-400 mb-4 flex items-center">
+                                        <i className="fas fa-users mr-2"></i>
+                                        {asset.holders.toLocaleString()} VIP Investors
+                                    </p>
+                                    
+                                    <div className="w-full bg-gray-800 h-2 rounded-full mb-3">
+                                        <div 
+                                            className="bg-accent h-full rounded-full" 
+                                            style={{ width: `${((asset.raised + asset.microRaised) / asset.target) * 100}%` }}
+                                        ></div>
+                                    </div>
+                                    <div className="flex justify-between text-xs text-gray-500 mb-6">
+                                        <span>{formatCompact(asset.raised + asset.microRaised)} raised</span>
+                                        <span>Goal: {formatCompact(asset.target)}</span>
+                                    </div>
+                                    
+                                    <button 
+                                        onClick={() => {
+                                            setSelectedAsset(asset);
+                                            setShowModal(true);
+                                        }}
+                                        className="w-full py-3 bg-white/10 hover:bg-accent hover:text-white rounded-xl font-bold text-sm transition-colors"
+                                    >
+                                        <i className="fas fa-arrow-right mr-2"></i>
+                                        INVEST FROM $50K
+                                    </button>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                    
+                    {/* VIP Exclusive Features */}
+                    <div className="glass p-6 rounded-2xl mb-12">
+                        <h3 className="text-xl font-bold text-white mb-6">VIP Exclusive Features</h3>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div className="text-center p-6">
+                                <div className="w-16 h-16 bg-accent/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <i className="fas fa-gem text-2xl accent"></i>
+                                </div>
+                                <h4 className="font-bold text-white mb-2">Priority Access</h4>
+                                <p className="text-gray-400 text-sm">Get first dibs on new property listings before they go public.</p>
+                            </div>
+                            <div className="text-center p-6">
+                                <div className="w-16 h-16 bg-success/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <i className="fas fa-percentage text-2xl success"></i>
+                                </div>
+                                <h4 className="font-bold text-white mb-2">Lower Fees</h4>
+                                <p className="text-gray-400 text-sm">Enjoy reduced platform fees (1% vs standard 1.5%).</p>
+                            </div>
+                            <div className="text-center p-6">
+                                <div className="w-16 h-16 bg-purple-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <i className="fas fa-handshake text-2xl text-purple-400"></i>
+                                </div>
+                                <h4 className="font-bold text-white mb-2">Direct Deals</h4>
+                                <p className="text-gray-400 text-sm">Access off-market properties and direct investment opportunities.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {/* Property Detail Modal */}
+                    {showModal && selectedAsset && (
+                        <PropertyDetailModal 
+                            property={selectedAsset}
+                            onClose={() => {
+                                setShowModal(false);
+                                setSelectedAsset(null);
+                            }}
+                            onInvest={handleInvestClick}
+                            userType="VIP"
+                        />
+                    )}
+                </div>
+            );
+        };
+
+        // ====== MICRO INVESTOR VIEW ======
+        const MicroInvestorView = ({ assets, onInvest, demoMode = true }) => {
+            const [balance, setBalance] = useState(demoMode ? 2000 : 1000);
+            const [portfolio, setPortfolio] = useState([]);
+            const [selectedAsset, setSelectedAsset] = useState(null);
+            const [showModal, setShowModal] = useState(false);
+            
+            const handleInvestClick = (asset, amount) => {
+                // Confetti for micro-investors
+                confetti({
+                    particleCount: 100,
+                    spread: 70,
+                    origin: { y: 0.6 },
+                    colors: ['#10B981', '#FF5500', '#FFFFFF']
+                });
+                
+                setBalance(prev => prev - amount);
+                
+                // Update portfolio
+                const existing = portfolio.find(p => p.assetId === asset.id);
+                const tokens = amount / 1;
+                
+                if (existing) {
+                    setPortfolio(prev => prev.map(p => 
+                        p.assetId === asset.id 
+                            ? { ...p, amount: p.amount + amount, tokens: p.tokens + tokens }
+                            : p
+                    ));
+                } else {
+                    setPortfolio([...portfolio, {
+                        assetId: asset.id,
+                        name: asset.name,
+                        amount: amount,
+                        tokens: tokens,
+                        type: 'MICRO'
+                    }]);
+                }
+                
+                // Call global investment handler
+                onInvest(asset.id, amount, 'MICRO');
+                
+                // Close modal
+                setTimeout(() => {
+                    setShowModal(false);
+                    setSelectedAsset(null);
+                }, 1500);
+            };
+            
+            return (
+                <div className="p-4 md:p-6 max-w-7xl mx-auto">
+                    {/* Micro Tier Banner */}
+                    <div className="micro-tier p-6 mb-8 rounded-2xl relative overflow-hidden">
+                        <div className="absolute top-4 right-4">
+                            <span className="px-3 py-1 bg-success text-black text-xs font-bold rounded-full">MICRO TIER</span>
+                        </div>
+                        <div className="flex flex-col md:flex-row items-center">
+                            <div className="md:w-2/3 pr-0 md:pr-8">
+                                <h2 className="text-2xl md:text-3xl font-bold text-white mb-2">MICRO-INVESTOR PLATFORM</h2>
+                                <p className="text-gray-300 mb-4">Start with as little as $250. Own a piece of premium real estate alongside institutional investors.</p>
+                                <div className="flex flex-wrap gap-4 mb-4">
+                                    <div className="flex items-center">
+                                        <div className="w-2 h-2 bg-success rounded-full mr-2"></div>
+                                        <span className="text-sm text-gray-300">Minimum: $250</span>
+                                    </div>
+                                    <div className="flex items-center">
+                                        <div className="w-2 h-2 bg-accent rounded-full mr-2"></div>
+                                        <span className="text-sm text-gray-300">Same Properties as VIPs</span>
+                                    </div>
+                                    <div className="flex items-center">
+                                        <div className="w-2 h-2 bg-blue-500 rounded-full mr-2"></div>
+                                        <span className="text-sm text-gray-300">Automatic Diversification</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="md:w-1/3 mt-4 md:mt-0">
+                                <div className="glass p-4 rounded-xl">
+                                    <div className="text-xs text-gray-400 uppercase font-bold mb-2">Available Balance</div>
+                                    <div className="text-3xl text-white font-bold mono mb-2">{formatCurrency(balance)}</div>
+                                    <div className="text-xs text-gray-500">Start with $250 • Micro Account</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {/* Stats Dashboard */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+                        <div className="financial-card">
+                            <div className="text-xs text-gray-400 uppercase font-bold mb-2">
+                                <i className="fas fa-piggy-bank mr-2"></i>
+                                Micro Portfolio
+                            </div>
+                            <div className="text-3xl text-white font-bold mono">{formatCurrency(portfolio.reduce((sum, p) => sum + p.amount, 0))}</div>
+                            <div className="text-xs text-gray-500 mt-1">Start small, grow steadily</div>
+                        </div>
+                        <div className="financial-card">
+                            <div className="text-xs text-gray-400 uppercase font-bold mb-2">
+                                <i className="fas fa-chart-line mr-2"></i>
+                                Projected Annual Yield
+                            </div>
+                            <div className="text-3xl success font-bold mono">
+                                +{formatCurrency(portfolio.reduce((sum, p) => sum + p.amount, 0) * 0.092)}
+                            </div>
+                            <div className="text-xs text-gray-500 mt-1">Same APY as VIP investors</div>
+                        </div>
+                        <div className="financial-card">
+                            <div className="text-xs text-gray-400 uppercase font-bold mb-2">
+                                <i className="fas fa-users mr-2"></i>
+                                Community Power
+                            </div>
+                            <div className="text-xl text-white font-bold">6,500+ Micro-Investors</div>
+                            <div className="text-xs text-gray-500 mt-1">Join the community</div>
+                        </div>
+                    </div>
+                    
+                    {/* Property Grid for Micro */}
+                    <h2 className="text-2xl font-bold text-white mb-6">Available for Micro-Investing (From $250)</h2>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+                        {assets.filter(asset => asset.tags.includes('MICRO')).map(asset => (
+                            <div key={asset.id} className="glass rounded-xl overflow-hidden hover:border-success transition-colors border border-gray-800">
+                                <div className="h-48 relative overflow-hidden">
+                                    <img 
+                                        src={asset.images?.[0]} 
+                                        alt={asset.name} 
+                                        className="w-full h-full object-cover" 
+                                        onError={handleImageError}
+                                    />
+                                    <div className="absolute top-3 right-3">
+                                        <span className="px-2 py-1 bg-success/20 success rounded text-xs font-bold">MICRO ACCESS</span>
+                                    </div>
+                                    <div className="absolute bottom-3 left-3">
+                                        <div className="text-xs text-gray-400">
+                                            <i className="fas fa-user-friends mr-1"></i>
+                                            {asset.microHolders} micro-investors
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="p-5">
+                                    <div className="flex justify-between items-start mb-2">
+                                        <h3 className="font-bold text-lg text-white">{asset.name}</h3>
+                                        <span className="text-xs px-2 py-1 bg-white/10 rounded text-gray-300">{asset.type}</span>
+                                    </div>
+                                    <p className="text-xs text-gray-400 mb-4">
+                                        {formatCompact(asset.microRaised)} raised from micro-investors
+                                    </p>
+                                    
+                                    <div className="w-full bg-gray-800 h-2 rounded-full mb-3">
+                                        <div 
+                                            className="bg-success h-full rounded-full" 
+                                            style={{ width: `${(asset.microRaised / asset.target) * 100}%` }}
+                                        ></div>
+                                    </div>
+                                    
+                                    <button 
+                                        onClick={() => {
+                                            setSelectedAsset(asset);
+                                            setShowModal(true);
+                                        }}
+                                        className="w-full py-3 bg-success/20 hover:bg-success success hover:text-white rounded-xl font-bold text-sm transition-colors"
+                                    >
+                                        <i className="fas fa-coins mr-2"></i>
+                                        INVEST FROM $250
+                                    </button>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                    
+                    {/* How Micro-Investing Works */}
+                    <div className="glass p-6 rounded-2xl mb-12">
+                        <h3 className="text-xl font-bold text-white mb-6">How Micro-Investing Works</h3>
+                        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                            <div className="text-center">
+                                <div className="w-16 h-16 bg-accent/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <i className="fas fa-wallet text-2xl accent"></i>
+                                </div>
+                                <h4 className="font-bold text-white mb-2">Start Small</h4>
+                                <p className="text-gray-400 text-sm">Begin with just $250. No large capital required.</p>
+                            </div>
+                            <div className="text-center">
+                                <div className="w-16 h-16 bg-success/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <i className="fas fa-building text-2xl success"></i>
+                                </div>
+                                <h4 className="font-bold text-white mb-2">Same Properties</h4>
+                                <p className="text-gray-400 text-sm">Access the same premium properties as VIP investors.</p>
+                            </div>
+                            <div className="text-center">
+                                <div className="w-16 h-16 bg-blue-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <i className="fas fa-percentage text-2xl text-blue-400"></i>
+                                </div>
+                                <h4 className="font-bold text-white mb-2">Same Yields</h4>
+                                <p className="text-gray-400 text-sm">Earn the same APY percentages as large investors.</p>
+                            </div>
+                            <div className="text-center">
+                                <div className="w-16 h-16 bg-purple-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <i className="fas fa-chart-line text-2xl text-purple-400"></i>
+                                </div>
+                                <h4 className="font-bold text-white mb-2">Build Wealth</h4>
+                                <p className="text-gray-400 text-sm">Grow your portfolio one small investment at a time.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {/* Property Detail Modal */}
+                    {showModal && selectedAsset && (
+                        <PropertyDetailModal 
+                            property={selectedAsset}
+                            onClose={() => {
+                                setShowModal(false);
+                                setSelectedAsset(null);
+                            }}
+                            onInvest={handleInvestClick}
+                            userType="MICRO"
+                        />
+                    )}
+                    
+                    {/* Live News Ticker */}
+                    <div className="fixed bottom-0 left-0 right-0 bg-black/95 border-t border-gray-800 z-40 py-3">
+                        <div className="ticker-container">
+                            <div className="ticker-content">
+                                {[
+                                    "MICRO-INVESTING: Now open to everyone with just $250 minimum",
+                                    "LIVE DEMO: Try both VIP and Micro tiers with simulated funds",
+                                    "NEW: Over 6,500 micro-investors joined this month",
+                                    "ANNOUNCEMENT: Ether Tower micro-investing pool now open",
+                                    "TIP: Start with $250 and add $100 monthly to build wealth"
+                                ].map((news, index) => (
+                                    <span key={index} className="inline-block mx-8 text-sm">
+                                        <span className="success font-bold">◉ MICRO:</span> 
+                                        <span className="text-gray-300 ml-2">{news}</span>
+                                    </span>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // ====== DEVELOPER VIEW ======
+        const DeveloperView = ({ assets, onUpdateAsset }) => {
+            const [selectedProperty, setSelectedProperty] = useState(null);
+            const [showModal, setShowModal] = useState(false);
+            
+            const handleUpdateProperty = (updatedProperty) => {
+                // In a real app, this would update the backend
+                console.log("Updated property:", updatedProperty);
+                setShowModal(false);
+                setSelectedProperty(null);
+                if (onUpdateAsset) onUpdateAsset(updatedProperty);
+            };
+            
+            return (
+                <div className="p-6 max-w-7xl mx-auto">
+                    <div className="flex justify-between items-center mb-8">
+                        <div>
+                            <h2 className="text-3xl font-bold text-white">Developer Console</h2>
+                            <p className="text-gray-400">List and manage tokenized properties</p>
+                        </div>
+                        <button className="px-6 py-3 bg-accent hover:bg-orange-600 rounded-xl font-bold text-black">
+                            <i className="fas fa-plus mr-2"></i>
+                            NEW PROPERTY LISTING
+                        </button>
+                    </div>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                        <div className="glass p-6 rounded-2xl">
+                            <div className="text-xs text-gray-400 uppercase font-bold mb-2">Total Properties</div>
+                            <div className="text-3xl text-white font-bold">{assets.length}</div>
+                        </div>
+                        <div className="glass p-6 rounded-2xl">
+                            <div className="text-xs text-gray-400 uppercase font-bold mb-2">Capital Raised</div>
+                            <div className="text-3xl text-white font-bold mono">
+                                {formatCompact(assets.reduce((sum, a) => sum + a.raised + a.microRaised, 0))}
+                            </div>
+                        </div>
+                        <div className="glass p-6 rounded-2xl">
+                            <div className="text-xs text-gray-400 uppercase font-bold mb-2">Total Investors</div>
+                            <div className="text-3xl text-white font-bold">
+                                {(assets.reduce((sum, a) => sum + a.holders + a.microHolders, 0)).toLocaleString()}
+                            </div>
+                        </div>
+                        <div className="glass p-6 rounded-2xl">
+                            <div className="text-xs text-gray-400 uppercase font-bold mb-2">Fees Collected</div>
+                            <div className="text-3xl success font-bold mono">
+                                {formatCompact(assets.reduce((sum, a) => sum + a.feesCollected, 0))}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div className="glass rounded-2xl overflow-hidden mb-8">
+                        <table className="crm-table">
+                            <thead className="bg-gray-900">
+                                <tr>
+                                    <th className="p-4 text-left text-gray-400 text-sm font-bold">Property</th>
+                                    <th className="p-4 text-left text-gray-400 text-sm font-bold">Status</th>
+                                    <th className="p-4 text-left text-gray-400 text-sm font-bold">VIP Raised</th>
+                                    <th className="p-4 text-left text-gray-400 text-sm font-bold">Micro Raised</th>
+                                    <th className="p-4 text-left text-gray-400 text-sm font-bold">Total</th>
+                                    <th className="p-4 text-left text-gray-400 text-sm font-bold">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {assets.map(asset => (
+                                    <tr key={asset.id} className="border-t border-gray-800 hover:bg-white/5">
+                                        <td className="p-4">
+                                            <div className="font-bold text-white">{asset.name}</div>
+                                            <div className="text-xs text-gray-400">{asset.type}</div>
+                                        </td>
+                                        <td className="p-4">
+                                            <span className={`px-3 py-1 rounded-full text-xs font-bold ${
+                                                asset.status === 'ACTIVE' ? 'bg-success/20 text-success' :
+                                                'bg-warning/20 text-warning'
+                                            }`}>
+                                                {asset.status}
+                                            </span>
+                                        </td>
+                                        <td className="p-4">
+                                            <div className="text-white font-bold">{formatCompact(asset.raised)}</div>
+                                            <div className="text-xs text-gray-400">{asset.holders} investors</div>
+                                        </td>
+                                        <td className="p-4">
+                                            <div className="text-white font-bold">{formatCompact(asset.microRaised)}</div>
+                                            <div className="text-xs text-gray-400">{asset.microHolders} investors</div>
+                                        </td>
+                                        <td className="p-4">
+                                            <div className="flex items-center">
+                                                <div className="w-24 bg-gray-800 h-2 rounded-full mr-3">
+                                                    <div 
+                                                        className="bg-accent h-full rounded-full" 
+                                                        style={{ width: `${((asset.raised + asset.microRaised) / asset.target) * 100}%` }}
+                                                    ></div>
+                                                </div>
+                                                <span className="text-sm text-gray-300">
+                                                    {(((asset.raised + asset.microRaised) / asset.target) * 100).toFixed(1)}%
+                                                </span>
+                                            </div>
+                                        </td>
+                                        <td className="p-4">
+                                            <button 
+                                                onClick={() => {
+                                                    setSelectedProperty(asset);
+                                                    setShowModal(true);
+                                                }}
+                                                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-sm text-white"
+                                            >
+                                                <i className="fas fa-cog mr-1"></i>
+                                                Manage
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    {/* Management Modal */}
+                    {showModal && selectedProperty && (
+                        <div className="fixed inset-0 bg-black/95 backdrop-blur-lg z-50 flex items-center justify-center p-4">
+                            <div className="glass max-w-2xl w-full max-h-[90vh] overflow-y-auto rounded-2xl border border-gray-800">
+                                <div className="p-6">
+                                    <div className="flex justify-between items-center mb-6">
+                                        <h2 className="text-2xl font-bold text-white">Manage Property</h2>
+                                        <button onClick={() => setShowModal(false)} className="text-gray-400 hover:text-white text-2xl">
+                                            <i className="fas fa-times"></i>
+                                        </button>
+                                    </div>
+                                    
+                                    <div className="space-y-6">
+                                        <div>
+                                            <label className="block text-gray-400 text-sm mb-2">Property Name</label>
+                                            <input 
+                                                type="text" 
+                                                defaultValue={selectedProperty.name}
+                                                className="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-3 text-white"
+                                            />
+                                        </div>
+                                        
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <div>
+                                                <label className="block text-gray-400 text-sm mb-2">Target Capital</label>
+                                                <input 
+                                                    type="text" 
+                                                    defaultValue={selectedProperty.target}
+                                                    className="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-3 text-white"
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-gray-400 text-sm mb-2">Offered APY</label>
+                                                <input 
+                                                    type="text" 
+                                                    defaultValue={selectedProperty.apy}
+                                                    className="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-3 text-white"
+                                                />
+                                            </div>
+                                        </div>
+                                        
+                                        <div>
+                                            <label className="block text-gray-400 text-sm mb-2">Investment Tiers</label>
+                                            <div className="flex space-x-4">
+                                                <label className="flex items-center">
+                                                    <input type="checkbox" defaultChecked={selectedProperty.tags.includes('VIP')} className="mr-2" />
+                                                    <span className="text-gray-300">VIP Tier ($50K+)</span>
+                                                </label>
+                                                <label className="flex items-center">
+                                                    <input type="checkbox" defaultChecked={selectedProperty.tags.includes('MICRO')} className="mr-2" />
+                                                    <span className="text-gray-300">Micro Tier ($250+)</span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                        
+                                        <div className="flex space-x-4 pt-6 border-t border-gray-800">
+                                            <button
+                                                onClick={() => handleUpdateProperty(selectedProperty)}
+                                                className="flex-1 py-3 bg-accent hover:bg-orange-600 rounded-xl font-bold text-black"
+                                            >
+                                                Save Changes
+                                            </button>
+                                            <button
+                                                onClick={() => setShowModal(false)}
+                                                className="px-8 py-3 glass rounded-xl font-bold text-white"
+                                            >
+                                                Cancel
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
+        // ====== GOD MODE VIEW ======
+        const GodModeView = ({ assets, onSurge }) => {
+            const [isSurgeActive, setIsSurgeActive] = useState(false);
+            const [networkLoad, setNetworkLoad] = useState(42);
+            
+            useEffect(() => {
+                let interval;
+                if (isSurgeActive) {
+                    interval = setInterval(() => {
+                        setNetworkLoad(prev => {
+                            const newLoad = prev + Math.random() * 10;
+                            return newLoad > 95 ? 95 : newLoad;
+                        });
+                    }, 500);
+                } else {
+                    interval = setInterval(() => {
+                        setNetworkLoad(prev => {
+                            const newLoad = prev - 1;
+                            return newLoad < 42 ? 42 : newLoad;
+                        });
+                    }, 1000);
+                }
+                return () => clearInterval(interval);
+            }, [isSurgeActive]);
+            
+            const handleSurge = () => {
+                setIsSurgeActive(true);
+                onSurge();
+                
+                // Auto-stop after 10 seconds
+                setTimeout(() => {
+                    setIsSurgeActive(false);
+                }, 10000);
+            };
+            
+            const tvl = assets.reduce((sum, asset) => sum + asset.raised + asset.microRaised, 0);
+            const fees = tvl * 0.015;
+            const totalInvestors = assets.reduce((sum, asset) => sum + asset.holders + asset.microHolders, 0);
+            const microInvestors = assets.reduce((sum, asset) => sum + asset.microHolders, 0);
+            
+            return (
+                <div className="p-6 max-w-7xl mx-auto min-h-screen bg-black">
+                    {/* Header */}
+                    <div className="flex items-center justify-between mb-8">
+                        <div className="flex items-center">
+                            <div className={`p-3 rounded-lg mr-4 ${isSurgeActive ? 'network-surge bg-success' : 'bg-purple-600'}`}>
+                                <i className="fas fa-crown text-white text-2xl"></i>
+                            </div>
+                            <div>
+                                <h1 className="text-4xl font-black text-white">GOD MODE</h1>
+                                <p className="text-gray-400">Network Administration Dashboard</p>
+                            </div>
+                        </div>
+                        <div className="text-right">
+                            <div className="text-xs text-gray-400 mb-1">DEMO CONTROLS</div>
+                            <div className="flex space-x-2">
+                                <button
+                                    onClick={handleSurge}
+                                    className={`px-4 py-2 rounded-lg font-bold ${isSurgeActive ? 'bg-warning text-black' : 'bg-success text-white'}`}
+                                >
+                                    {isSurgeActive ? 'SURGE ACTIVE' : 'SIMULATE SURGE'}
+                                </button>
+                                <button
+                                    onClick={() => setIsSurgeActive(false)}
+                                    className="px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg font-bold text-white"
+                                >
+                                    STOP
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {/* Surge Banner */}
+                    {isSurgeActive && (
+                        <div className="mb-8 p-4 glass border border-warning/50">
+                            <div className="flex items-center">
+                                <div className="w-3 h-3 bg-warning rounded-full animate-pulse mr-3"></div>
+                                <span className="warning font-bold text-xl">⚡ NETWORK SURGE DETECTED</span>
+                            </div>
+                            <p className="text-gray-300 text-sm mt-2">
+                                Simulating massive liquidity inflow from both VIP and Micro investors
+                            </p>
+                        </div>
+                    )}
+                    
+                    {/* Stats Grid */}
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
+                        <div className={`glass p-6 rounded-xl border ${isSurgeActive ? 'border-success' : 'border-purple-500'}`}>
+                            <div className="text-xs text-gray-400 font-bold mb-2">TOTAL VALUE LOCKED</div>
+                            <div className="text-4xl text-white font-bold mono">{formatCompact(tvl)}</div>
+                            <div className="text-xs text-gray-500 mt-2">
+                                {isSurgeActive ? (
+                                    <span className="success">
+                                        <i className="fas fa-arrow-up mr-1"></i>
+                                        Simulating surge
+                                    </span>
+                                ) : 'Combined VIP + Micro'}
+                            </div>
+                        </div>
+                        
+                        <div className={`glass p-6 rounded-xl border ${isSurgeActive ? 'border-success' : 'border-purple-500'}`}>
+                            <div className="text-xs text-gray-400 font-bold mb-2">NETWORK FEES (1.5%)</div>
+                            <div className="text-4xl success font-bold mono">{formatCompact(fees)}</div>
+                            <div className="text-xs text-gray-500 mt-2">
+                                80% to treasury • 10% staking • 10% buyback
+                            </div>
+                        </div>
+                        
+                        <div className="glass p-6 rounded-xl border border-blue-500">
+                            <div className="text-xs text-gray-400 font-bold mb-2">TOTAL INVESTORS</div>
+                            <div className="text-4xl text-white font-bold">{totalInvestors.toLocaleString()}</div>
+                            <div className="text-xs text-gray-500 mt-2">
+                                {microInvestors.toLocaleString()} micro-investors
+                            </div>
+                        </div>
+                        
+                        <div className="glass p-6 rounded-xl border border-blue-500">
+                            <div className="text-xs text-gray-400 font-bold mb-2">NETWORK STATUS</div>
+                            <div className="flex items-center text-xl font-bold mb-4">
+                                <div className={`w-3 h-3 rounded-full mr-3 ${isSurgeActive ? 'bg-warning animate-pulse' : 'bg-success'}`}></div>
+                                <span className={isSurgeActive ? 'warning' : 'success'}>
+                                    {isSurgeActive ? 'HIGH TRAFFIC' : 'OPERATIONAL'}
+                                </span>
+                            </div>
+                            <div className="text-xs text-gray-400 mb-2">Network Load: {networkLoad.toFixed(0)}%</div>
+                            <div className="w-full bg-gray-800 h-2 rounded-full">
+                                <div 
+                                    className={`h-full rounded-full ${
+                                        networkLoad > 80 ? 'bg-red-500' :
+                                        networkLoad > 60 ? 'bg-warning' : 'bg-success'
+                                    }`}
+                                    style={{ width: `${networkLoad}%` }}
+                                ></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {/* Dual Tier Analytics */}
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+                        <div className="glass p-6 rounded-xl">
+                            <h3 className="text-xl font-bold text-white mb-6">
+                                <i className="fas fa-chart-pie mr-2"></i>
+                                Investment Tier Distribution
+                            </h3>
+                            <div className="space-y-6">
+                                {assets.map(asset => {
+                                    const totalRaised = asset.raised + asset.microRaised;
+                                    const vipPercent = totalRaised > 0 ? (asset.raised / totalRaised) * 100 : 0;
+                                    const microPercent = totalRaised > 0 ? (asset.microRaised / totalRaised) * 100 : 0;
+                                    
+                                    return (
+                                        <div key={asset.id} className="space-y-2">
+                                            <div className="flex justify-between text-sm">
+                                                <span className="text-gray-300">{asset.name}</span>
+                                                <span className="text-gray-400">{formatCompact(totalRaised)}</span>
+                                            </div>
+                                            <div className="w-full h-4 bg-gray-800 rounded-full overflow-hidden flex">
+                                                <div 
+                                                    className="bg-accent h-full"
+                                                    style={{ width: `${vipPercent}%` }}
+                                                    title={`VIP: ${vipPercent.toFixed(1)}%`}
+                                                ></div>
+                                                <div 
+                                                    className="bg-success h-full"
+                                                    style={{ width: `${microPercent}%` }}
+                                                    title={`Micro: ${microPercent.toFixed(1)}%`}
+                                                ></div>
+                                            </div>
+                                            <div className="flex justify-between text-xs text-gray-500">
+                                                <span>VIP: {formatCompact(asset.raised)}</span>
+                                                <span>Micro: {formatCompact(asset.microRaised)}</span>
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                        
+                        <div className="glass p-6 rounded-xl">
+                            <h3 className="text-xl font-bold text-white mb-6">
+                                <i className="fas fa-bolt mr-2"></i>
+                                Live Network Activity
+                            </h3>
+                            <div className="space-y-4 h-96 overflow-y-auto">
+                                {[
+                                    { type: 'VIP', user: 'VIP_Investor_482', amount: 50000, asset: 'ETHER TOWER', time: 'Just now' },
+                                    { type: 'MICRO', user: 'Micro_Investor_156', amount: 1000, asset: '9LMNTS HQ', time: '1 min ago' },
+                                    { type: 'VIP', user: 'VIP_Investor_129', amount: 250000, asset: 'ETHER TOWER', time: '2 min ago' },
+                                    { type: 'MICRO', user: 'Micro_Investor_893', amount: 500, asset: 'LOGISTICS HUB', time: '3 min ago' },
+                                    { type: 'MICRO', user: 'Micro_Investor_452', amount: 2000, asset: '9LMNTS HQ', time: '4 min ago' },
+                                    { type: 'VIP', user: 'VIP_Investor_754', amount: 100000, asset: 'ETHER TOWER', time: '5 min ago' }
+                                ].map((tx, index) => (
+                                    <div key={index} className="flex items-center justify-between p-3 glass rounded-lg">
+                                        <div className="flex items-center">
+                                            <div className={`w-3 h-3 rounded-full mr-3 ${tx.type === 'VIP' ? 'bg-accent' : 'bg-success'}`}></div>
+                                            <div>
+                                                <div className="text-gray-300 text-sm">{tx.user}</div>
+                                                <div className="text-xs text-gray-500">{tx.asset}</div>
+                                            </div>
+                                        </div>
+                                        <div className="text-right">
+                                            <div className={`font-bold ${tx.type === 'VIP' ? 'accent' : 'success'}`}>
+                                                +{formatCurrency(tx.amount)}
+                                            </div>
+                                            <div className="text-xs text-gray-500">{tx.time}</div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {/* Platform Summary */}
+                    <div className="glass p-6 rounded-xl">
+                        <h3 className="text-xl font-bold text-white mb-6">Platform Summary</h3>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div className="text-center p-6">
+                                <div className="text-5xl font-bold text-white mb-2">{assets.length}</div>
+                                <div className="text-gray-400">Tokenized Properties</div>
+                            </div>
+                            <div className="text-center p-6 border-l border-r border-gray-800">
+                                <div className="text-5xl font-bold text-white mb-2">
+                                    {((microInvestors / totalInvestors) * 100).toFixed(0)}%
+                                </div>
+                                <div className="text-gray-400">Of Investors are Micro Tier</div>
+                            </div>
+                            <div className="text-center p-6">
+                                <div className="text-5xl success font-bold mb-2">1.5%</div>
+                                <div className="text-gray-400">Platform Fee on All Trades</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // ====== CLIENT PORTAL ======
+        const ClientPortal = ({ portfolio, onViewProperty }) => {
+            const [activeTab, setActiveTab] = useState('portfolio');
+            const [clientData] = useState({
+                name: "John CryptoInvestor",
+                email: "john@crypto.com",
+                wallet: "0x742d35Cc6634C0532925a3b8...",
+                totalInvested: portfolio.reduce((sum, p) => sum + p.amount, 0),
+                totalIncome: portfolio.reduce((sum, p) => sum + p.incomeReceived, 0),
+                kycStatus: "Verified",
+                joinDate: "2023-06-15"
+            });
+            
+            return (
+                <div className="p-4 md:p-6 max-w-7xl mx-auto">
+                    {/* Header */}
+                    <div className="glass p-6 md:p-8 mb-8">
+                        <div className="flex flex-col md:flex-row items-center justify-between">
+                            <div className="mb-6 md:mb-0">
+                                <h2 className="text-3xl font-bold text-white mb-2">CLIENT PORTAL</h2>
+                                <p className="text-gray-400">Manage your investments and track performance</p>
+                            </div>
+                            <div className="flex items-center space-x-4">
+                                <div className="text-right hidden md:block">
+                                    <p className="text-sm text-gray-400">Wallet</p>
+                                    <p className="accent mono text-sm">{clientData.wallet}</p>
+                                </div>
+                                <div className="w-12 h-12 bg-gradient-to-br from-accent to-purple-600 rounded-full flex items-center justify-center">
+                                    <span className="text-white font-bold">JC</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div className="flex flex-col lg:flex-row gap-8">
+                        {/* Sidebar */}
+                        <div className="lg:w-1/4">
+                            <div className="glass p-6 mb-8">
+                                <h3 className="text-lg font-bold text-white mb-4">Client Information</h3>
+                                <div className="space-y-3">
+                                    <div>
+                                        <p className="text-sm text-gray-400">Name</p>
+                                        <p className="text-white">{clientData.name}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-sm text-gray-400">Email</p>
+                                        <p className="text-white">{clientData.email}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-sm text-gray-400">KYC Status</p>
+                                        <span className="status-active">Verified</span>
+                                    </div>
+                                    <div>
+                                        <p className="text-sm text-gray-400">Member Since</p>
+                                        <p className="text-white">{clientData.joinDate}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div className="glass p-4">
+                                <div 
+                                    className={`p-3 rounded-lg mb-2 cursor-pointer ${activeTab === 'portfolio' ? 'bg-accent/20 text-accent' : 'text-gray-300 hover:text-white'}`} 
+                                    onClick={() => setActiveTab('portfolio')}
+                                >
+                                    <i className="fas fa-chart-pie mr-3"></i>
+                                    Portfolio
+                                </div>
+                                <div 
+                                    className={`p-3 rounded-lg mb-2 cursor-pointer ${activeTab === 'income' ? 'bg-accent/20 text-accent' : 'text-gray-300 hover:text-white'}`} 
+                                    onClick={() => setActiveTab('income')}
+                                >
+                                    <i className="fas fa-money-bill-wave mr-3"></i>
+                                    Income History
+                                </div>
+                                <div 
+                                    className={`p-3 rounded-lg mb-2 cursor-pointer ${activeTab === 'transactions' ? 'bg-accent/20 text-accent' : 'text-gray-300 hover:text-white'}`} 
+                                    onClick={() => setActiveTab('transactions')}
+                                >
+                                    <i className="fas fa-exchange-alt mr-3"></i>
+                                    Transactions
+                                </div>
+                                <div 
+                                    className={`p-3 rounded-lg cursor-pointer ${activeTab === 'documents' ? 'bg-accent/20 text-accent' : 'text-gray-300 hover:text-white'}`} 
+                                    onClick={() => setActiveTab('documents')}
+                                >
+                                    <i className="fas fa-file-contract mr-3"></i>
+                                    Documents
+                                </div>
+                            </div>
+                        </div>
+                        
+                        {/* Main Content */}
+                        <div className="lg:w-3/4">
+                            {/* Stats Overview */}
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+                                <div className="financial-card">
+                                    <div className="text-xs text-gray-400 uppercase font-bold mb-2">Total Invested</div>
+                                    <div className="text-3xl text-white font-bold mono">{formatCurrency(clientData.totalInvested)}</div>
+                                    <div className="text-xs text-gray-500 mt-1">Across {portfolio.length} properties</div>
+                                </div>
+                                <div className="financial-card">
+                                    <div className="text-xs text-gray-400 uppercase font-bold mb-2">Total Income Received</div>
+                                    <div className="text-3xl success font-bold mono">{formatCurrency(clientData.totalIncome)}</div>
+                                    <div className="text-xs text-gray-500 mt-1">Lifetime earnings</div>
+                                </div>
+                                <div className="financial-card">
+                                    <div className="text-xs text-gray-400 uppercase font-bold mb-2">Estimated Annual Yield</div>
+                                    <div className="text-3xl accent font-bold mono">
+                                        {formatCurrency(clientData.totalInvested * 0.125)}
+                                    </div>
+                                    <div className="text-xs text-gray-500 mt-1">Based on 12.5% avg APY</div>
+                                </div>
+                            </div>
+                            
+                            {/* Portfolio Content */}
+                            {activeTab === 'portfolio' && (
+                                <div className="glass p-6">
+                                    <h3 className="text-2xl font-bold text-white mb-6">Investment Portfolio</h3>
+                                    <div className="space-y-6">
+                                        {portfolio.length > 0 ? portfolio.map((item, idx) => (
+                                            <div key={idx} className="border border-gray-800 rounded-lg p-6 hover:border-accent transition-colors">
+                                                <div className="flex flex-col md:flex-row md:items-center justify-between mb-4">
+                                                    <div>
+                                                        <h4 className="text-xl font-bold text-white mb-2">{item.name}</h4>
+                                                        <div className="flex items-center space-x-4">
+                                                            <span className="success font-bold">{item.apy}% APY</span>
+                                                            <span className="text-gray-400">•</span>
+                                                            <span className="text-gray-400">Invested: {formatCurrency(item.amount)}</span>
+                                                        </div>
+                                                    </div>
+                                                    <button 
+                                                        onClick={() => onViewProperty(item)}
+                                                        className="px-6 py-3 bg-accent hover:bg-orange-600 rounded-xl font-bold text-black mt-4 md:mt-0"
+                                                    >
+                                                        View Property
+                                                    </button>
+                                                </div>
+                                                
+                                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                                    <div className="p-4 bg-gray-900/50 rounded-lg">
+                                                        <p className="text-sm text-gray-400 mb-1">Monthly Income</p>
+                                                        <p className="success font-bold">{formatCurrency((item.amount * item.apy) / 100 / 12)}</p>
+                                                    </div>
+                                                    <div className="p-4 bg-gray-900/50 rounded-lg">
+                                                        <p className="text-sm text-gray-400 mb-1">Total Income Received</p>
+                                                        <p className="success font-bold">{formatCurrency(item.incomeReceived)}</p>
+                                                    </div>
+                                                    <div className="p-4 bg-gray-900/50 rounded-lg">
+                                                        <p className="text-sm text-gray-400 mb-1">Ownership</p>
+                                                        <p className="text-white font-bold">{((item.amount / item.target) * 100).toFixed(4)}%</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        )) : (
+                                            <div className="text-center py-12">
+                                                <i className="fas fa-chart-pie text-4xl text-gray-600 mb-4"></i>
+                                                <h4 className="text-xl font-bold text-white mb-2">No Investments Yet</h4>
+                                                <p className="text-gray-400">Start investing in properties to build your portfolio</p>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // ====== ADMIN CRM ======
+        const AdminCRM = ({ assets, investors, transactions }) => {
+            const [activeTab, setActiveTab] = useState('overview');
+            
+            const tvl = assets.reduce((sum, asset) => sum + asset.raised + asset.microRaised, 0);
+            const fees = tvl * 0.015;
+            const totalInvestors = assets.reduce((sum, asset) => sum + asset.holders + asset.microHolders, 0);
+            const microInvestors = assets.reduce((sum, asset) => sum + asset.microHolders, 0);
+            
+            return (
+                <div className="p-4 md:p-6 max-w-7xl mx-auto">
+                    {/* Header */}
+                    <div className="glass p-6 md:p-8 mb-8">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <h2 className="text-3xl font-bold text-white mb-2">ADMIN CRM</h2>
+                                <p className="text-gray-400">Platform Management Dashboard</p>
+                            </div>
+                            <div className="flex space-x-4">
+                                <button className="px-6 py-3 bg-accent hover:bg-orange-600 rounded-xl font-bold text-black hidden md:block">
+                                    <i className="fas fa-plus mr-2"></i>
+                                    New Property
+                                </button>
+                                <button className="glass px-4 md:px-6 py-3 rounded-lg font-bold text-white">
+                                    <i className="fas fa-download mr-2"></i>
+                                    Export
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {/* Stats Overview */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                        <div className="financial-card">
+                            <div className="text-xs text-gray-400 uppercase font-bold mb-2">Total Value Locked</div>
+                            <div className="text-3xl text-white font-bold mono">{formatCompact(tvl)}</div>
+                            <div className="text-xs text-gray-500 mt-1">Combined VIP + Micro</div>
+                        </div>
+                        <div className="financial-card">
+                            <div className="text-xs text-gray-400 uppercase font-bold mb-2">Platform Fees</div>
+                            <div className="text-3xl success font-bold mono">{formatCompact(fees)}</div>
+                            <div className="text-xs text-gray-500 mt-1">1.5% on all trades</div>
+                        </div>
+                        <div className="financial-card">
+                            <div className="text-xs text-gray-400 uppercase font-bold mb-2">Total Investors</div>
+                            <div className="text-3xl text-white font-bold mono">{totalInvestors.toLocaleString()}</div>
+                            <div className="text-xs text-gray-500 mt-1">{microInvestors.toLocaleString()} micro</div>
+                        </div>
+                        <div className="financial-card">
+                            <div className="text-xs text-gray-400 uppercase font-bold mb-2">Active Properties</div>
+                            <div className="text-3xl accent font-bold mono">{assets.length}</div>
+                            <div className="text-xs text-gray-500 mt-1">{assets.filter(a => a.status === 'ACTIVE').length} live</div>
+                        </div>
+                    </div>
+                    
+                    {/* Tabs */}
+                    <div className="tab-nav">
+                        <div className={`tab-nav-item ${activeTab === 'overview' ? 'active' : ''}`} onClick={() => setActiveTab('overview')}>
+                            Platform Overview
+                        </div>
+                        <div className={`tab-nav-item ${activeTab === 'properties' ? 'active' : ''}`} onClick={() => setActiveTab('properties')}>
+                            Properties
+                        </div>
+                        <div className={`tab-nav-item ${activeTab === 'investors' ? 'active' : ''}`} onClick={() => setActiveTab('investors')}>
+                            Investors
+                        </div>
+                        <div className={`tab-nav-item ${activeTab === 'transactions' ? 'active' : ''}`} onClick={() => setActiveTab('transactions')}>
+                            Transactions
+                        </div>
+                    </div>
+                    
+                    {/* Tab Content */}
+                    <div className="glass p-4 md:p-6">
+                        {activeTab === 'overview' && (
+                            <div>
+                                <h3 className="text-2xl font-bold text-white mb-6">Platform Performance</h3>
+                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                                    <div>
+                                        <h4 className="text-lg font-bold text-white mb-4">Recent Activity</h4>
+                                        <div className="space-y-4">
+                                            {[
+                                                { time: "Just now", action: "New VIP investment", amount: 50000, user: "VIP_Investor_482" },
+                                                { time: "5 min ago", action: "Micro investment", amount: 1000, user: "Micro_Investor_156" },
+                                                { time: "15 min ago", action: "Income distribution", amount: 185000, user: "Ether Tower" }
+                                            ].map((activity, idx) => (
+                                                <div key={idx} className="flex items-center justify-between p-4 border border-gray-800 rounded-lg">
+                                                    <div>
+                                                        <p className="text-white">{activity.action}</p>
+                                                        <p className="text-gray-400 text-sm">{activity.user} • {activity.time}</p>
+                                                    </div>
+                                                    {activity.amount && (
+                                                        <div className="success font-bold">
+                                                            {formatCurrency(activity.amount)}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    
+                                    <div>
+                                        <h4 className="text-lg font-bold text-white mb-4">Property Performance</h4>
+                                        <div className="space-y-4">
+                                            {assets.map(asset => (
+                                                <div key={asset.id} className="p-4 border border-gray-800 rounded-lg">
+                                                    <div className="flex justify-between items-center mb-2">
+                                                        <h5 className="text-white font-bold">{asset.name}</h5>
+                                                        <span className={`px-2 py-1 rounded text-xs ${asset.status === 'ACTIVE' ? 'bg-success/20 text-success' : 'bg-warning/20 text-warning'}`}>
+                                                            {asset.status}
+                                                        </span>
+                                                    </div>
+                                                    <div className="flex justify-between text-sm mb-2">
+                                                        <span className="text-gray-400">Raised: {formatCompact(asset.raised + asset.microRaised)}</span>
+                                                        <span className="success">APY: {asset.apy}%</span>
+                                                    </div>
+                                                    <div className="w-full bg-gray-800 h-2 rounded-full">
+                                                        <div 
+                                                            className="bg-accent h-full rounded-full"
+                                                            style={{ width: `${((asset.raised + asset.microRaised) / asset.target) * 100}%` }}
+                                                        ></div>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                        
+                        {activeTab === 'properties' && (
+                            <div>
+                                <h3 className="text-2xl font-bold text-white mb-6">Property Management</h3>
+                                <div className="overflow-x-auto">
+                                    <table className="crm-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Property</th>
+                                                <th>Type</th>
+                                                <th>Status</th>
+                                                <th>Target</th>
+                                                <th>Raised</th>
+                                                <th>APY</th>
+                                                <th>Investors</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {assets.map(asset => (
+                                                <tr key={asset.id}>
+                                                    <td>
+                                                        <div>
+                                                            <p className="text-white font-medium">{asset.name}</p>
+                                                            <p className="text-gray-400 text-sm">{asset.location?.city || 'N/A'}</p>
+                                                        </div>
+                                                    </td>
+                                                    <td>{asset.type}</td>
+                                                    <td>
+                                                        <span className={`px-2 py-1 rounded text-xs ${asset.status === 'ACTIVE' ? 'bg-success/20 text-success' : 'bg-warning/20 text-warning'}`}>
+                                                            {asset.status}
+                                                        </span>
+                                                    </td>
+                                                    <td>{formatCompact(asset.target)}</td>
+                                                    <td>
+                                                        <div>
+                                                            <p className="text-white">{formatCompact(asset.raised + asset.microRaised)}</p>
+                                                            <p className="text-gray-400 text-sm">
+                                                                {(((asset.raised + asset.microRaised) / asset.target) * 100).toFixed(1)}%
+                                                            </p>
+                                                        </div>
+                                                    </td>
+                                                    <td className="success font-bold">{asset.apy}%</td>
+                                                    <td>{(asset.holders + asset.microHolders).toLocaleString()}</td>
+                                                    <td>
+                                                        <button className="px-3 py-1 bg-blue-600 hover:bg-blue-700 rounded text-sm text-white">
+                                                            Manage
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
+        };
+
+        // ====== MAIN APP ======
+        const App = () => {
+            const [view, setView] = useState('micro');
+            const [loading, setLoading] = useState(true);
+            const [assets, setAssets] = useState(PLATFORM_DATA.assets);
+            const [transactions, setTransactions] = useState(PLATFORM_DATA.transactions);
+            const [tvl, setTvl] = useState(PLATFORM_DATA.tvl);
+            const [fees, setFees] = useState(PLATFORM_DATA.fees);
+            const [totalInvestors, setTotalInvestors] = useState(PLATFORM_DATA.totalInvestors);
+            const [microInvestors, setMicroInvestors] = useState(PLATFORM_DATA.microInvestors);
+            const [portfolio, setPortfolio] = useState([
+                {
+                    id: 1,
+                    name: "THE ETHER TOWER",
+                    amount: 50000,
+                    tokens: 50000,
+                    apy: 8.2,
+                    target: 50000000,
+                    incomeReceived: 2500,
+                    investmentDate: "2023-11-15"
+                }
+            ]);
+            const [selectedProperty, setSelectedProperty] = useState(null);
+            
+            const handleInvest = (assetId, amount, investorType) => {
+                // Update asset state with defensive checks
+                setAssets(prev => prev.map(asset => {
+                    if (asset.id === assetId) {
+                        if (investorType === 'VIP') {
+                            return {
+                                ...asset,
+                                raised: (asset.raised || 0) + amount,
+                                holders: (asset.holders || 0) + 1
+                            };
+                        } else {
+                            return {
+                                ...asset,
+                                microRaised: (asset.microRaised || 0) + amount,
+                                microHolders: (asset.microHolders || 0) + 1
+                            };
+                        }
+                    }
+                    return asset;
+                }));
+                
+                // Add transaction
+                const newTransaction = {
+                    id: Date.now(),
+                    assetId,
+                    amount,
+                    investorType,
+                    time: new Date().toLocaleTimeString()
+                };
+                setTransactions(prev => [newTransaction, ...prev]);
+                
+                // Update TVL and fees
+                setTvl(prev => prev + amount);
+                setFees(prev => prev + (amount * 0.015));
+                
+                // Update investor counts
+                if (investorType === 'VIP') {
+                    setTotalInvestors(prev => prev + 1);
+                } else {
+                    setTotalInvestors(prev => prev + 1);
+                    setMicroInvestors(prev => prev + 1);
+                }
+            };
+            
+            const handleNetworkSurge = () => {
+                // Simulate a network surge with random investments
+                const surgeInterval = setInterval(() => {
+                    const randomAsset = assets[Math.floor(Math.random() * assets.length)];
+                    const isVIP = Math.random() > 0.7;
+                    const amount = isVIP 
+                        ? Math.floor(Math.random() * 100000) + 50000
+                        : Math.floor(Math.random() * 1750) + 250;
+                    
+                    handleInvest(randomAsset.id, amount, isVIP ? 'VIP' : 'MICRO');
+                    
+                    // Random confetti during surge
+                    if (Math.random() > 0.8) {
+                        confetti({
+                            particleCount: Math.floor(Math.random() * 30) + 10,
+                            spread: 70,
+                            origin: { x: Math.random(), y: 0 },
+                            colors: ['#FF5500', '#10B981', '#FFFFFF']
+                        });
+                    }
+                }, 300);
+                
+                // Stop after 10 seconds
+                setTimeout(() => {
+                    clearInterval(surgeInterval);
+                }, 10000);
+            };
+            
+            const handleViewProperty = (property) => {
+                setSelectedProperty(property);
+            };
+            
+            useEffect(() => {
+                const timer = setTimeout(() => {
+                    setLoading(false);
+                }, 2500);
+                return () => clearTimeout(timer);
+            }, []);
+            
+            if (loading) {
+                return <LoadingScreen onComplete={() => setLoading(false)} />;
+            }
+            
+            return (
+                <div className="min-h-screen bg-black">
+                    {/* Navigation */}
+                    <div className="sticky top-0 z-50 bg-gray-900 border-b border-gray-800 px-6 py-3 flex justify-between items-center">
+                        <div className="flex items-center space-x-3">
+                            <div className="w-10 h-10 bg-accent rounded-xl flex items-center justify-center font-black text-2xl text-black">9</div>
+                            <span className="font-bold text-white text-xl">9LMNTS TRINITY</span>
+                            <span className="text-xs px-2 py-1 bg-success/20 success rounded-full">ULTIMATE</span>
+                        </div>
+                        
+                        {/* View Switcher */}
+                        <div className="flex bg-gray-800 rounded-xl p-1">
+                            <button 
+                                onClick={() => setView('micro')}
+                                className={`px-4 py-2 rounded-lg text-sm font-bold ${view === 'micro' ? 'bg-success text-black' : 'text-gray-300 hover:text-white'}`}
+                            >
+                                <i className="fas fa-users mr-2"></i>
+                                Micro Tier
+                            </button>
+                            <button 
+                                onClick={() => setView('vip')}
+                                className={`px-4 py-2 rounded-lg text-sm font-bold ${view === 'vip' ? 'bg-accent text-black' : 'text-gray-300 hover:text-white'}`}
+                            >
+                                <i className="fas fa-crown mr-2"></i>
+                                VIP Tier
+                            </button>
+                            <button 
+                                onClick={() => setView('clientPortal')}
+                                className={`px-4 py-2 rounded-lg text-sm font-bold ${view === 'clientPortal' ? 'bg-accent text-black' : 'text-gray-300 hover:text-white'}`}
+                            >
+                                <i className="fas fa-user-circle mr-2"></i>
+                                Client Portal
+                            </button>
+                            <button 
+                                onClick={() => setView('adminCRM')}
+                                className={`px-4 py-2 rounded-lg text-sm font-bold ${view === 'adminCRM' ? 'bg-accent text-black' : 'text-gray-300 hover:text-white'}`}
+                            >
+                                <i className="fas fa-chart-bar mr-2"></i>
+                                Admin CRM
+                            </button>
+                            <button 
+                                onClick={() => setView('developer')}
+                                className={`px-4 py-2 rounded-lg text-sm font-bold ${view === 'developer' ? 'bg-blue-600 text-white' : 'text-gray-300 hover:text-white'}`}
+                            >
+                                <i className="fas fa-code mr-2"></i>
+                                Developer
+                            </button>
+                            <button 
+                                onClick={() => setView('god')}
+                                className={`px-4 py-2 rounded-lg text-sm font-bold ${view === 'god' ? 'bg-purple-600 text-white' : 'text-gray-300 hover:text-white'}`}
+                            >
+                                <i className="fas fa-eye mr-2"></i>
+                                God Mode
+                            </button>
+                        </div>
+                    </div>
+                    
+                    {/* Current View */}
+                    {view === 'micro' && <MicroInvestorView assets={assets} onInvest={handleInvest} demoMode={true} />}
+                    {view === 'vip' && <VIPInvestorView assets={assets} onInvest={handleInvest} demoMode={true} />}
+                    {view === 'clientPortal' && <ClientPortal portfolio={portfolio} onViewProperty={handleViewProperty} />}
+                    {view === 'adminCRM' && <AdminCRM assets={assets} investors={[]} transactions={transactions} />}
+                    {view === 'developer' && <DeveloperView assets={assets} />}
+                    {view === 'god' && (
+                        <GodModeView 
+                            assets={assets}
+                            transactions={transactions}
+                            tvl={tvl}
+                            fees={fees}
+                            totalInvestors={totalInvestors}
+                            microInvestors={microInvestors}
+                            onSurge={handleNetworkSurge}
+                        />
+                    )}
+                    
+                    {/* Property Detail Modal */}
+                    {selectedProperty && (
+                        <PropertyDetailModal 
+                            property={selectedProperty}
+                            onClose={() => setSelectedProperty(null)}
+                            onInvest={(property, amount) => {
+                                const investorType = view === 'vip' ? 'VIP' : 'MICRO';
+                                handleInvest(property.id, amount, investorType);
+                                setSelectedProperty(null);
+                                confetti({
+                                    particleCount: 100,
+                                    spread: 70,
+                                    origin: { y: 0.6 }
+                                });
+                            }}
+                            userType={view === 'vip' ? 'VIP' : 'MICRO'}
+                        />
+                    )}
+                    
+                    {/* Demo Instructions Footer */}
+                    <div className="fixed bottom-20 right-4 glass p-4 rounded-xl max-w-xs">
+                        <div className="text-xs text-gray-400 mb-2">DEMO INSTRUCTIONS</div>
+                        <div className="text-sm text-gray-300">
+                            <div className="flex items-center mb-1">
+                                <div className="w-2 h-2 bg-success rounded-full mr-2"></div>
+                                <span>Micro Tier: Start with $250-$2,000</span>
+                            </div>
+                            <div className="flex items-center mb-1">
+                                <div className="w-2 h-2 bg-accent rounded-full mr-2"></div>
+                                <span>VIP Tier: $50,000 minimum</span>
+                            </div>
+                            <div className="flex items-center mb-1">
+                                <div className="w-2 h-2 bg-blue-500 rounded-full mr-2"></div>
+                                <span>Client Portal: Track investments</span>
+                            </div>
+                            <div className="flex items-center">
+                                <div className="w-2 h-2 bg-purple-500 rounded-full mr-2"></div>
+                                <span>God Mode: Click "Simulate Surge"</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // Render the app
+        ReactDOM.render(<App />, document.getElementById('root'));
+    </script>
+</body>
+</html>

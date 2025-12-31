@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>9LMNTS Event OS | Revenue Rack Demo</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Teko:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        /* --- CORE VARIABLES --- */
+        :root {
+            --bg-dark: #050b14;
+            --card-bg: #111827;
+            --text-main: #ffffff;
+            --text-muted: #9ca3af;
+            
+            /* BATTLE MODE COLORS (High Energy/Urgency) */
+            --battle-primary: #ef4444; /* Red */
+            --battle-accent: #f59e0b;  /* Orange/Gold */
+            
+            /* CONFERENCE MODE COLORS (Professional/Trust) */
+            --conf-primary: #3b82f6;   /* Blue */
+            --conf-accent: #06d6a0;    /* Teal */
+            
+            /* Default to Battle initially */
+            --active-primary: var(--battle-primary);
+            --active-accent: var(--battle-accent);
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* --- SIMULATOR CONTROLS --- */
+        .simulator-controls {
+            background: #1f2937;
+            padding: 10px;
+            border-radius: 50px;
+            display: flex;
+            gap: 10px;
+            margin-bottom: 40px;
+            border: 1px solid #374151;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .sim-btn {
+            padding: 10px 24px;
+            border-radius: 40px;
+            border: none;
+            cursor: pointer;
+            font-weight: 800;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+            color: #9ca3af;
+            background: transparent;
+        }
+
+        .sim-btn.active {
+            color: white;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        .sim-btn.active.battle { background: linear-gradient(135deg, #ef4444, #b91c1c); }
+        .sim-btn.active.conf { background: linear-gradient(135deg, #3b82f6, #2563eb); }
+
+        /* --- THE REVENUE RACK CONTAINER --- */
+        .rack-container {
+            width: 100%;
+            max-width: 420px;
+            perspective: 1000px;
+        }
+
+        .rack-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 0 5px;
+        }
+
+        .rack-title {
+            font-family: 'Teko', sans-serif;
+            font-size: 1.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin: 0;
+            line-height: 1;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .rack-title i { color: var(--active-accent); }
+
+        .balance-pill {
+            background: rgba(255,255,255,0.05);
+            padding: 5px 12px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            color: var(--active-accent);
+            border: 1px solid rgba(255,255,255,0.1);
+            font-weight: 600;
+        }
+
+        /* --- PRODUCT GRID --- */
+        .product-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr; /* 2 Column Layout */
+            gap: 12px;
+        }
+
+        .product-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 20px 15px;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid #374151;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        /* Hover Effect */
+        .product-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--active-primary);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 
+                        0 0 15px -5px var(--active-primary);
+        }
+
+        /* Featured/Best Seller Highlight */
+        .product-card.featured {
+            border: 1px solid var(--active-accent);
+            background: linear-gradient(180deg, rgba(255,255,255,0.03) 0%, var(--card-bg) 100%);
+        }
+
+        .badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 0.6rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            padding: 2px 8px;
+            border-radius: 4px;
+            background: var(--active-accent);
+            color: #000;
+        }
+
+        .p-icon {
+            font-size: 2rem;
+            margin-bottom: 12px;
+            color: var(--active-primary);
+            filter: drop-shadow(0 0 8px rgba(255,255,255,0.1));
+            transition: 0.3s;
+        }
+        
+        .product-card:hover .p-icon { transform: scale(1.1); }
+
+        .p-name {
+            font-size: 0.95rem;
+            font-weight: 700;
+            margin-bottom: 4px;
+            line-height: 1.2;
+            color: white;
+        }
+
+        .p-desc {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+            min-height: 2.4em; /* aligned height */
+        }
+
+        .p-price {
+            background: rgba(0,0,0,0.3);
+            width: 100%;
+            padding: 8px;
+            border-radius: 8px;
+            font-weight: 800;
+            color: white;
+            border: 1px solid transparent;
+            transition: 0.3s;
+        }
+        
+        .product-card:hover .p-price {
+            background: var(--active-primary);
+            box-shadow: 0 0 15px var(--active-primary);
+        }
+
+        /* Full Width Item (e.g. Sponsors or Big Upgrades) */
+        .product-card.full-width {
+            grid-column: span 2;
+            flex-direction: row;
+            text-align: left;
+            padding: 15px 20px;
+            align-items: center;
+            gap: 15px;
+        }
+        .full-width .p-icon { margin-bottom: 0; font-size: 1.5rem; }
+        .full-width .p-desc { min-height: 0; margin-bottom: 0; }
+        .full-width .p-price { width: auto; padding: 6px 15px; margin-left: auto; }
+
+        /* Animation for Mode Switch */
+        .fade-in { animation: fadeIn 0.4s ease forwards; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="simulator-controls">
+        <button class="sim-btn active battle" onclick="setMode('battle')">
+            <i class="fas fa-fire"></i> Battle Mode
+        </button>
+        <button class="sim-btn" onclick="setMode('conference')">
+            <i class="fas fa-briefcase"></i> Conference Mode
+        </button>
+    </div>
+
+    <div class="rack-container">
+        
+        <div class="rack-header">
+            <h2 class="rack-title" id="rackTitle">
+                <i class="fas fa-shopping-basket"></i> THE ARMORY
+            </h2>
+            <div class="balance-pill">
+                <i class="fas fa-wallet"></i> BAL: $0.00
+            </div>
+        </div>
+
+        <div class="product-grid" id="rackGrid">
+            </div>
+
+    </div>
+
+    <script>
+        // --- DATA OBJECTS ---
+
+        // 1. BATTLE MODE (High Volume, Low Cost, Emotional Impulse)
+        const battleItems = [
+            {
+                name: "10 Power Votes",
+                desc: "Basic boost for your favorite team.",
+                price: "$5.00",
+                icon: "fa-bolt",
+                featured: false
+            },
+            {
+                name: "Mega Pack (50)",
+                desc: "Best Value! Dominate the leaderboard.",
+                price: "$20.00",
+                icon: "fa-bomb",
+                badge: "MOST POPULAR",
+                featured: true
+            },
+            {
+                name: "Team Nuke",
+                desc: "500 Votes instantly applied.",
+                price: "$50.00",
+                icon: "fa-radiation",
+                featured: false
+            },
+            {
+                name: "Winner Prediction",
+                desc: "Enter the raffle for $5k cash prize.",
+                price: "$10.00",
+                icon: "fa-ticket-alt",
+                featured: false
+            },
+            // Full Width Sponsor Slot
+            {
+                name: "Sponsored Shoutout",
+                desc: "Put your message on the main screen.",
+                price: "$100",
+                icon: "fa-bullhorn",
+                fullWidth: true
+            }
+        ];
+
+        // 2. CONFERENCE MODE (High Value, Networking, Access)
+        const conferenceItems = [
+            {
+                name: "Priority Q&A",
+                desc: "Pin your question to the top of the list.",
+                price: "$5.00",
+                icon: "fa-star",
+                featured: false
+            },
+            {
+                name: "Unlock Networking",
+                desc: "See full attendee list & enable DMing.",
+                price: "$15.00",
+                icon: "fa-unlock-alt",
+                badge: "REQUIRED",
+                featured: true
+            },
+            {
+                name: "Gala Dinner Seat",
+                desc: "Reserve a seat at tonight's charity gala.",
+                price: "$75.00",
+                icon: "fa-wine-glass-alt",
+                featured: false
+            },
+            {
+                name: "Speaker Slides",
+                desc: "Download all 12 decks immediately.",
+                price: "$20.00",
+                icon: "fa-file-powerpoint",
+                featured: false
+            },
+            {
+                name: "VIP Lounge Pass",
+                desc: "Access the private lounge (Open Bar).",
+                price: "$45.00",
+                icon: "fa-crown",
+                fullWidth: true
+            }
+        ];
+
+        // --- LOGIC ---
+
+        const root = document.documentElement;
+        const grid = document.getElementById('rackGrid');
+        const title = document.getElementById('rackTitle');
+        const buttons = document.querySelectorAll('.sim-btn');
+
+        function setMode(mode) {
+            // 1. Update Buttons
+            buttons.forEach(btn => {
+                btn.classList.remove('active', 'battle', 'conf');
+            });
+            
+            const activeBtn = event ? event.currentTarget : buttons[0];
+            
+            // 2. Update CSS Variables & Data
+            let items = [];
+            
+            if (mode === 'battle') {
+                activeBtn.classList.add('active', 'battle');
+                root.style.setProperty('--active-primary', 'var(--battle-primary)');
+                root.style.setProperty('--active-accent', 'var(--battle-accent)');
+                title.innerHTML = '<i class="fas fa-fire"></i> THE ARMORY';
+                items = battleItems;
+            } else {
+                activeBtn.classList.add('active', 'conf');
+                root.style.setProperty('--active-primary', 'var(--conf-primary)');
+                root.style.setProperty('--active-accent', 'var(--conf-accent)');
+                title.innerHTML = '<i class="fas fa-store"></i> UPGRADE STORE';
+                items = conferenceItems;
+            }
+
+            // 3. Render Items
+            renderItems(items);
+        }
+
+        function renderItems(items) {
+            grid.innerHTML = ''; // Clear existing
+
+            items.forEach(item => {
+                const card = document.createElement('div');
+                card.className = `product-card fade-in ${item.featured ? 'featured' : ''} ${item.fullWidth ? 'full-width' : ''}`;
+                
+                let badgeHTML = item.badge ? `<div class="badge">${item.badge}</div>` : '';
+
+                card.innerHTML = `
+                    ${badgeHTML}
+                    <i class="fas ${item.icon} p-icon"></i>
+                    <div style="${item.fullWidth ? 'flex:1' : ''}">
+                        <div class="p-name">${item.name}</div>
+                        <div class="p-desc">${item.desc}</div>
+                    </div>
+                    <div class="p-price">${item.price}</div>
+                `;
+
+                grid.appendChild(card);
+            });
+        }
+
+        // Initialize
+        setMode('battle');
+
+    </script>
+</body>
+</html>

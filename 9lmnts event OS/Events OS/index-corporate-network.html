@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Global Innovation Summit 2025</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* --- CORPORATE THEME VARIABLES --- */
+        :root { 
+            --bg-color: #f4f6f8;
+            --card-bg: #ffffff;
+            --primary: #003366; /* Navy */
+            --accent: #00d2d3;  /* Teal */
+            --gold: #D4AF37;    /* VIP Gold */
+            --text-main: #2c3e50;
+            --text-sub: #7f8c8d;
+            --border: #e1e4e8;
+            --input-bg: #ffffff;
+            --font-main: 'Roboto', sans-serif; 
+        }
+
+        /* DARK MODE */
+        [data-theme="dark"] {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --primary: #38bdf8;
+            --text-main: #f1f5f9;
+            --text-sub: #94a3b8;
+            --border: #334155;
+            --input-bg: #0f172a;
+        }
+
+        body { 
+            background-color: var(--bg-color);
+            color: var(--text-main); 
+            font-family: var(--font-main); 
+            margin: 0; padding-bottom: 90px;
+            transition: background 0.3s, color 0.3s;
+        }
+        
+        .app-container { 
+            max-width: 480px; margin: 0 auto; min-height: 100vh; 
+            background: var(--bg-color); border-left: 1px solid var(--border); border-right: 1px solid var(--border); 
+            position: relative; overflow-x: hidden;
+        }
+        
+        /* HEADER */
+        header { 
+            background: var(--card-bg); padding: 15px 20px; 
+            position: sticky; top: 0; z-index: 90; 
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid var(--border);
+        }
+        .logo { font-size: 1.1rem; font-weight: 900; letter-spacing: 1px; text-transform: uppercase; color: var(--primary); }
+        .user-pill { display: flex; align-items: center; gap: 8px; background: var(--bg-color); padding: 5px 12px; border-radius: 20px; border: 1px solid var(--border); font-size: 0.8rem; cursor: pointer; }
+        .user-avatar-sm { width: 24px; height: 24px; background: #ddd; border-radius: 50%; }
+
+        /* HERO STATS */
+        .hero-dashboard {
+            background: var(--card-bg); padding: 30px 20px; text-align: center; border-bottom: 1px solid var(--border);
+        }
+        .hero-dashboard h1 { margin: 0; font-size: 1.6rem; color: var(--primary); }
+        .hero-dashboard p { font-size: 0.9rem; color: var(--text-sub); margin: 5px 0 20px; }
+        
+        .kpi-row { display: flex; gap: 10px; justify-content: center; }
+        .kpi-card { background: var(--bg-color); border: 1px solid var(--border); padding: 10px; border-radius: 8px; flex: 1; }
+        .kpi-num { font-size: 1.2rem; font-weight: 900; color: var(--primary); display: block; }
+        .kpi-label { font-size: 0.6rem; text-transform: uppercase; color: var(--text-sub); font-weight: bold; }
+
+        /* REVENUE RACK (Contribution Module) */
+        .contribution-section {
+            padding: 20px 0 20px 20px; margin: 15px; background: var(--card-bg); border-radius: 12px;
+            border: 1px solid var(--gold); box-shadow: 0 4px 15px rgba(212, 175, 55, 0.1);
+        }
+        .ticket-row {
+            display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; padding-right: 20px;
+            scrollbar-width: none;
+        }
+        .ticket-card {
+            min-width: 130px; padding: 15px; border-radius: 8px; border: 1px solid var(--border);
+            background: var(--bg-color); cursor: pointer; position: relative; text-align: center;
+            transition: 0.2s;
+        }
+        .ticket-card:hover { transform: translateY(-3px); border-color: var(--primary); }
+        .ticket-card.vip { border: 1px solid var(--gold); background: linear-gradient(135deg, rgba(212,175,55,0.1), transparent); }
+        .t-price { font-size: 1.2rem; font-weight: bold; color: var(--text-main); }
+        .t-label { font-size: 0.7rem; color: var(--text-sub); margin-bottom: 10px; height: 20px; }
+        .t-btn { 
+            font-size: 0.7rem; font-weight: bold; padding: 6px 12px; border-radius: 20px; 
+            border: none; background: var(--primary); color: white; cursor: pointer; width: 100%;
+        }
+        .vip .t-btn { background: var(--gold); color: black; }
+
+        /* TABS */
+        .nav-tabs { display: flex; background: var(--card-bg); padding: 0 10px 10px; border-bottom: 1px solid var(--border); overflow-x: auto; }
+        .tab { 
+            padding: 15px 20px; color: var(--text-sub); font-weight: bold; font-size: 0.8rem; cursor: pointer; white-space: nowrap; border-bottom: 3px solid transparent; 
+        }
+        .tab.active { color: var(--primary); border-bottom: 3px solid var(--primary); }
+
+        /* SECTIONS */
+        .view-section { display: none; padding: 20px; animation: fadeIn 0.4s ease; }
+        .view-section.active { display: block; }
+
+        /* PITCH CARDS */
+        .pitch-card {
+            background: var(--card-bg); border-radius: 8px; overflow: hidden; margin-bottom: 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05); border: 1px solid var(--border);
+        }
+        .pitch-header { padding: 15px; display: flex; align-items: center; gap: 15px; border-bottom: 1px solid var(--border); }
+        .team-avatar { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.1rem; }
+        .pitch-body { padding: 15px; }
+        .progress-bar { background: var(--border); height: 6px; border-radius: 3px; overflow: hidden; margin: 10px 0 5px; }
+        .fill { height: 100%; background: var(--accent); width: 0%; transition: width 1s ease; }
+        .vote-btn { width: 100%; background: var(--primary); color: white; border: none; padding: 12px; font-weight: bold; border-radius: 4px; cursor: pointer; }
+
+        /* NETWORKING STYLES */
+        .search-bar { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 20px; background: var(--input-bg); color: var(--text-main); }
+        
+        .profile-card {
+            background: var(--card-bg); border-radius: 8px; padding: 15px; margin-bottom: 15px;
+            border: 1px solid var(--border); display: flex; align-items: center; gap: 15px; cursor: pointer;
+        }
+        .p-avatar { width: 50px; height: 50px; border-radius: 50%; background-size: cover; position: relative; border: 1px solid var(--border); }
+        .online-dot { width: 12px; height: 12px; background: #2ecc71; border-radius: 50%; position: absolute; bottom: 0; right: 0; border: 2px solid var(--card-bg); }
+        .p-info { flex: 1; }
+        .p-badges { display: flex; gap: 5px; margin-top: 5px; }
+        .badge { font-size: 0.6rem; padding: 2px 6px; border-radius: 4px; background: var(--bg-color); color: var(--text-sub); border: 1px solid var(--border); display:flex; align-items:center; gap:3px; }
+        .badge.gold { background: rgba(212, 175, 55, 0.1); color: #b8860b; border-color: rgba(212, 175, 55, 0.3); }
+        .badge.blue { background: rgba(0, 51, 102, 0.1); color: var(--primary); border-color: rgba(0, 51, 102, 0.2); }
+        
+        .btn-connect { padding: 6px 15px; border-radius: 20px; font-size: 0.7rem; border: 1px solid var(--primary); color: var(--primary); background: transparent; cursor: pointer; }
+        .btn-connect.connected { background: var(--primary); color: white; }
+
+        /* QA SECTION */
+        .qa-card { background: var(--card-bg); padding: 15px; border-radius: 8px; margin-bottom: 10px; border: 1px solid var(--border); display: flex; gap: 10px; }
+        .upvote-box { display: flex; flex-direction: column; align-items: center; min-width: 40px; }
+        .arrow { font-size: 1.2rem; color: var(--text-sub); cursor: pointer; }
+        .arrow.active { color: var(--accent); }
+
+        /* FOOTER NAV */
+        .bottom-nav { position: fixed; bottom: 0; width: 100%; max-width: 480px; background: var(--card-bg); border-top: 1px solid var(--border); display: flex; justify-content: space-around; padding: 10px 0; z-index: 100; }
+        .nav-item { text-align: center; color: var(--text-sub); font-size: 0.7rem; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+        .nav-item.active { color: var(--primary); }
+        .nav-item i { font-size: 1.2rem; }
+
+        /* MODALS */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 200; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
+        .modal-box { width: 85%; max-width: 380px; background: var(--card-bg); padding: 30px; border-radius: 8px; text-align: center; position: relative; border-top: 4px solid var(--accent); animation: slideUp 0.3s; }
+        .close { position: absolute; top: 15px; right: 20px; font-size: 24px; cursor: pointer; color: var(--text-sub); }
+        
+        /* CHAT UI */
+        .chat-history { height: 200px; background: var(--bg-color); border: 1px solid var(--border); border-radius: 4px; margin: 15px 0; padding: 10px; text-align: left; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+        .chat-msg { max-width: 80%; padding: 8px 12px; border-radius: 12px; font-size: 0.85rem; }
+        .msg-them { background: #e3f2fd; color: #333; align-self: flex-start; border-bottom-left-radius: 2px; }
+        .msg-me { background: var(--primary); color: white; align-self: flex-end; border-bottom-right-radius: 2px; }
+
+        .submit-action { background: var(--primary); color: white; border: none; padding: 12px; width: 100%; font-weight: bold; border-radius: 4px; cursor: pointer; transition: 0.3s; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <header>
+        <div class="logo">ACME <span style="font-weight:300">SUMMIT</span></div>
+        <div class="user-pill" onclick="toggleTheme()">
+            <div class="user-avatar-sm"></div>
+            <span>Toggle Mode</span>
+        </div>
+    </header>
+
+    <div class="hero-dashboard">
+        <h1>Innovation Challenge</h1>
+        <p>Q1 Town Hall & Pitch Competition</p>
+        <div class="kpi-row">
+            <div class="kpi-card">
+                <span class="kpi-num">$12k</span>
+                <span class="kpi-label">Raised</span>
+            </div>
+            <div class="kpi-card">
+                <span class="kpi-num">320</span>
+                <span class="kpi-label">Voters</span>
+            </div>
+            <div class="kpi-card">
+                <span class="kpi-num">4</span>
+                <span class="kpi-label">Teams</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="contribution-section">
+        <h3 style="margin:0 0 15px 0; color:var(--text-main); font-size:0.9rem; text-align:left; padding-left:5px;">🎟️ Tickets & Upgrades</h3>
+        <div class="ticket-row">
+            <div class="ticket-card" onclick="openPay('Standard Ticket', 25)">
+                <div class="t-price">$25</div>
+                <div class="t-label">Entry Pass</div>
+                <button class="t-btn">BUY</button>
+            </div>
+            <div class="ticket-card" onclick="openPay('Vote Pack', 50)">
+                <div class="t-price">$50</div>
+                <div class="t-label">10x Power Votes</div>
+                <button class="t-btn">BOOST</button>
+            </div>
+            <div class="ticket-card vip" onclick="openPay('VIP Access', 150)">
+                <div style="position:absolute; top:-10px; right:10px; background:var(--gold); color:black; font-size:0.6rem; padding:2px 6px; border-radius:4px; font-weight:bold;">POPULAR</div>
+                <div class="t-price">$150</div>
+                <div class="t-label">VIP Experience</div>
+                <button class="t-btn">UPGRADE</button>
+            </div>
+            <div class="ticket-card" onclick="openPay('Raffle Bundle', 20)">
+                <div class="t-price">$20</div>
+                <div class="t-label">5 Raffle Tickets</div>
+                <button class="t-btn">ENTER</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="nav-tabs">
+        <div class="tab active" onclick="switchTab('pitch', this)">Pitch Battle</div>
+        <div class="tab" onclick="switchTab('qa', this)">Live Q&A</div>
+        <div class="tab" onclick="switchTab('network', this)">Networking</div>
+        <div class="tab" onclick="switchTab('csr', this)">Charity</div>
+    </div>
+
+    <div id="pitch" class="view-section active">
+        <div class="pitch-card">
+            <div class="pitch-header">
+                <div class="team-avatar" style="background:rgba(25, 118, 210, 0.1); color:#1976d2;">A</div>
+                <div>
+                    <div style="font-weight:bold; font-size:0.95rem;">Team Alpha</div>
+                    <div style="font-size:0.75rem; color:var(--text-sub);">Sales Dept</div>
+                </div>
+            </div>
+            <div class="pitch-body">
+                <div style="font-weight:bold; margin-bottom:5px;">Project: AI Client Onboarding</div>
+                <div style="font-size:0.85rem; color:var(--text-sub);">Using generative AI to reduce setup time.</div>
+                <div class="progress-bar"><div class="fill" style="width: 65%;"></div></div>
+                <div style="display:flex; justify-content:space-between; margin-bottom:10px; font-size:0.75rem; color:var(--text-sub);">
+                    <span>Approval Rating</span>
+                    <span>65%</span>
+                </div>
+                <button class="vote-btn" onclick="openModal('voteModal', 'Team Alpha')">VOTE FOR ALPHA</button>
+            </div>
+        </div>
+        <div class="pitch-card">
+            <div class="pitch-header">
+                <div class="team-avatar" style="background:rgba(0, 105, 92, 0.1); color:#00695c;">B</div>
+                <div>
+                    <div style="font-weight:bold; font-size:0.95rem;">Team Beta</div>
+                    <div style="font-size:0.75rem; color:var(--text-sub);">Engineering</div>
+                </div>
+            </div>
+            <div class="pitch-body">
+                <div style="font-weight:bold; margin-bottom:5px;">Project: Green Server Initiative</div>
+                <div style="font-size:0.85rem; color:var(--text-sub);">Reducing data center carbon footprint.</div>
+                <div class="progress-bar"><div class="fill" style="width: 42%;"></div></div>
+                <div style="display:flex; justify-content:space-between; margin-bottom:10px; font-size:0.75rem; color:var(--text-sub);">
+                    <span>Approval Rating</span>
+                    <span>42%</span>
+                </div>
+                <button class="vote-btn" onclick="openModal('voteModal', 'Team Beta')">VOTE FOR BETA</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="qa" class="view-section">
+        <button class="vote-btn" style="background:var(--accent); margin-bottom:20px;" onclick="openModal('askModal')">+ ASK A QUESTION</button>
+        <div class="qa-card">
+            <div class="upvote-box" onclick="toggleVote(this)">
+                <i class="fas fa-chevron-up arrow"></i>
+                <span class="count">42</span>
+            </div>
+            <div>
+                <div style="font-weight:bold; font-size:0.9rem;">Will we be expanding the remote work policy?</div>
+                <div style="font-size:0.7rem; color:var(--text-sub); margin-top:5px;">Anonymous • 2m ago</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="network" class="view-section">
+        <input type="text" class="search-bar" placeholder="Search attendees...">
+        <div style="font-size:0.75rem; color:var(--text-sub); text-transform:uppercase; margin-bottom:10px; font-weight:bold;">Recommended</div>
+        
+        <div class="profile-card" onclick="openProfile('Sarah Jenkins', 'VP Marketing', '70%', true)">
+            <div class="p-avatar" style="background-image: url('https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=100');">
+                <div class="online-dot"></div>
+            </div>
+            <div class="p-info">
+                <div style="font-weight:bold; font-size:0.95rem;">Sarah Jenkins</div>
+                <div style="font-size:0.75rem; color:var(--text-sub);">VP Marketing</div>
+                <div class="p-badges">
+                    <span class="badge gold"><i class="fas fa-star"></i> VIP</span>
+                </div>
+            </div>
+            <button class="btn-connect" onclick="toggleConnect(this, event)">Connect</button>
+        </div>
+
+        <div class="profile-card" onclick="openProfile('David Chen', 'Lead Engineer', '45%', false)">
+            <div class="p-avatar" style="background-image: url('https://images.unsplash.com/photo-1560250097-0b93528c311a?w=100');"></div>
+            <div class="p-info">
+                <div style="font-weight:bold; font-size:0.95rem;">David Chen</div>
+                <div style="font-size:0.75rem; color:var(--text-sub);">Lead Engineer</div>
+                <div class="p-badges">
+                    <span class="badge blue"><i class="fas fa-hand-holding-heart"></i> Donor</span>
+                </div>
+            </div>
+            <button class="btn-connect" onclick="toggleConnect(this, event)">Connect</button>
+        </div>
+    </div>
+
+    <div id="csr" class="view-section">
+        <div style="background:var(--card-bg); padding:30px; text-align:center; border-radius:8px; border:1px solid var(--border); border-top:4px solid var(--accent);">
+            <i class="fas fa-hand-holding-heart" style="font-size:3rem; color:var(--accent); margin-bottom:20px;"></i>
+            <h2 style="margin:0; color:var(--primary);">Q1 Charity Goal</h2>
+            <p style="color:var(--text-sub);">Donate to earn the "Philanthropist" Badge.</p>
+            <div class="progress-bar" style="height:15px; margin:20px 0;"><div class="fill" style="width: 75%;"></div></div>
+            <div style="display:flex; justify-content:space-between; margin-bottom:20px; font-size:0.8rem;">
+                <strong>$12,000 Raised</strong>
+                <span>Goal: $16,000</span>
+            </div>
+            <button class="vote-btn" style="background:var(--accent);" onclick="openPay('Charity Donation', 50)">DONATE $50</button>
+        </div>
+    </div>
+
+    <div class="bottom-nav">
+        <div class="nav-item active" onclick="switchTab('pitch', this)"><i class="fas fa-rocket"></i> Pitch</div>
+        <div class="nav-item" onclick="openModal('agendaModal')"><i class="far fa-calendar-alt"></i> Agenda</div>
+        <div class="nav-item" onclick="switchTab('network', this)"><i class="fas fa-users"></i> Network</div>
+    </div>
+</div>
+
+<div id="payModal" class="modal">
+    <div class="modal-box">
+        <span class="close" onclick="closeModal('payModal')">&times;</span>
+        <h3 id="payTitle" style="margin-top:0; color:var(--primary);">Confirm</h3>
+        <div style="font-size:2.5rem; font-weight:bold; margin:10px 0;">$<span id="payAmount">0</span></div>
+        <p style="font-size:0.8rem; color:var(--text-sub);">Secure Checkout</p>
+        <button class="submit-action" onclick="processPay()">CONFIRM & PAY</button>
+    </div>
+</div>
+
+<div id="voteModal" class="modal">
+    <div class="modal-box">
+        <span class="close" onclick="closeModal('voteModal')">&times;</span>
+        <h3 style="margin-top:0; color:var(--primary);">Cast Vote</h3>
+        <p style="color:var(--text-sub);">Voting for: <strong id="voteTarget">Team</strong></p>
+        <button class="submit-action" onclick="processAction('voteModal', 'Vote Submitted!')">SUBMIT VOTE</button>
+    </div>
+</div>
+
+<div id="agendaModal" class="modal">
+    <div class="modal-box" style="text-align:left;">
+        <span class="close" onclick="closeModal('agendaModal')">&times;</span>
+        <h3 style="text-align:center; color:var(--primary); margin-top:0;">Today's Agenda</h3>
+        <div style="padding:10px 0; border-bottom:1px solid var(--border);"><strong>09:00 AM</strong> - Keynote</div>
+        <div style="padding:10px 0; border-bottom:1px solid var(--border);"><strong>10:30 AM</strong> - Innovation Pitches</div>
+        <div style="padding:10px 0; border-bottom:1px solid var(--border);"><strong>12:00 PM</strong> - Networking Lunch</div>
+        <div style="padding:10px 0;"><strong>01:30 PM</strong> - Awards Ceremony</div>
+        <button class="submit-action" style="margin-top:15px;" onclick="closeModal('agendaModal')">CLOSE</button>
+    </div>
+</div>
+
+<div id="askModal" class="modal">
+    <div class="modal-box">
+        <span class="close" onclick="closeModal('askModal')">&times;</span>
+        <h3 style="margin-top:0; color:var(--primary);">Ask Question</h3>
+        <textarea rows="3" placeholder="Type here..."></textarea>
+        <button class="submit-action" onclick="processAction('askModal', 'Question Submitted')">SUBMIT</button>
+    </div>
+</div>
+
+<div id="profileModal" class="modal">
+    <div class="modal-box">
+        <span class="close" onclick="closeModal('profileModal')">&times;</span>
+        <div style="display:flex; flex-direction:column; align-items:center;">
+            <div style="width:80px; height:80px; background:#ddd; border-radius:50%; margin-bottom:10px; display:flex; align-items:center; justify-content:center; font-size:2rem; color:#888;"><i class="fas fa-user"></i></div>
+            <h2 id="pName" style="margin:0;">Name</h2>
+            <p id="pRole" style="color:var(--text-sub); margin:5px 0 15px;">Role</p>
+        </div>
+        
+        <div style="text-align:left; margin-bottom:20px;">
+            <div style="display:flex; justify-content:space-between; font-size:0.8rem; font-weight:bold; color:var(--primary); margin-bottom:5px;">
+                <span>Charity Match Goal</span>
+                <span style="background:var(--accent); color:white; padding:2px 8px; border-radius:10px; font-size:0.6rem; cursor:pointer;" onclick="openPay('Match Donation', 50)">CONTRIBUTE</span>
+            </div>
+            <div style="background:var(--border); height:10px; border-radius:5px; overflow:hidden;">
+                <div id="pGoal" style="height:100%; background:var(--primary); width:0%; transition:width 1s;"></div>
+            </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+            <button class="vote-btn" onclick="alert('Connected!')">+ CONNECT</button>
+            <button class="vote-btn" style="background:transparent; border:1px solid var(--primary); color:var(--primary);" onclick="openChat()">MESSAGE</button>
+        </div>
+    </div>
+</div>
+
+<div id="chatModal" class="modal">
+    <div class="modal-box" style="text-align:left; padding:20px;">
+        <span class="close" onclick="closeModal('chatModal')">&times;</span>
+        <h3 style="margin-top:0; color:var(--primary);">Chat</h3>
+        <div class="chat-history" id="chatHistory">
+            <div class="chat-msg msg-them">Hi! enjoying the summit?</div>
+            <div class="chat-msg msg-me">Yes, great pitches!</div>
+        </div>
+        <div style="display:flex; gap:10px;">
+            <input type="text" id="chatInput" placeholder="Type..." style="margin:0;">
+            <button style="background:var(--primary); color:white; border:none; border-radius:4px; padding:0 15px;" onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Theme Logic
+    function toggleTheme() {
+        const body = document.body;
+        if (body.getAttribute('data-theme') === 'dark') body.removeAttribute('data-theme');
+        else body.setAttribute('data-theme', 'dark');
+    }
+
+    // Navigation
+    function switchTab(id, el) {
+        document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.nav-item').forEach(t => t.classList.remove('active'));
+        
+        document.getElementById(id).classList.add('active');
+        if(el) el.classList.add('active');
+        
+        // Bottom Nav Sync
+        if(id === 'pitch') document.querySelector('.bottom-nav .nav-item:nth-child(1)').classList.add('active');
+        if(id === 'network') document.querySelector('.bottom-nav .nav-item:nth-child(3)').classList.add('active');
+    }
+
+    // Modal System
+    function openModal(id, data) {
+        if(data && id === 'voteModal') document.getElementById('voteTarget').innerText = data;
+        document.getElementById(id).style.display = 'flex';
+    }
+    
+    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+    // Payment Logic
+    function openPay(title, amount) {
+        document.getElementById('payTitle').innerText = title;
+        document.getElementById('payAmount').innerText = amount;
+        closeModal('profileModal'); // If open
+        document.getElementById('payModal').style.display = 'flex';
+    }
+    
+    function processPay() {
+        let btn = document.querySelector('#payModal .submit-action');
+        btn.innerText = "PROCESSING...";
+        setTimeout(() => { alert("Payment Successful!"); closeModal('payModal'); btn.innerText = "CONFIRM & PAY"; }, 1000);
+    }
+
+    function processAction(modalId, msg) {
+        let btn = document.querySelector(`#${modalId} .submit-action`);
+        btn.innerText = "...";
+        setTimeout(() => { alert(msg); closeModal(modalId); btn.innerText = "SUBMIT"; }, 800);
+    }
+
+    // Profile Logic
+    function openProfile(name, role, goal, isVIP) {
+        document.getElementById('pName').innerText = name;
+        document.getElementById('pRole').innerText = role;
+        document.getElementById('profileModal').style.display = 'flex';
+        setTimeout(() => { document.getElementById('pGoal').style.width = goal; }, 200);
+    }
+    
+    function toggleConnect(btn, e) {
+        e.stopPropagation();
+        if(btn.innerText.includes("Connect")) {
+            btn.innerText = "Pending";
+            btn.classList.add('connected');
+        } else {
+            btn.innerText = "Connect";
+            btn.classList.remove('connected');
+        }
+    }
+
+    // Chat Logic
+    function openChat() {
+        closeModal('profileModal');
+        document.getElementById('chatModal').style.display = 'flex';
+    }
+    function sendMessage() {
+        let input = document.getElementById('chatInput');
+        let val = input.value;
+        if(!val) return;
+        let div = document.createElement('div');
+        div.className = 'chat-msg msg-me';
+        div.innerText = val;
+        document.getElementById('chatHistory').appendChild(div);
+        input.value = "";
+    }
+
+    // Upvote Logic
+    function toggleVote(el) {
+        let arrow = el.querySelector('.arrow');
+        let count = el.querySelector('.count');
+        if(arrow.classList.contains('active')) {
+            arrow.classList.remove('active');
+            count.innerText = parseInt(count.innerText) - 1;
+        } else {
+            arrow.classList.add('active');
+            count.innerText = parseInt(count.innerText) + 1;
+        }
+    }
+</script>
+
+</body>
+</html>
