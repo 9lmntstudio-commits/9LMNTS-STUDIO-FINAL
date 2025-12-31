@@ -13,6 +13,9 @@ import { WagerOSPage } from '@/pages/event-os/WagerOSPage';
 import { LoveMatchPage } from '@/pages/event-os/LoveMatchPage';
 import { WeddingOSPage } from '@/pages/event-os/WeddingOSPage';
 import { FundTheGamePage } from '@/pages/FundTheGamePage';
+import { StartProjectPage } from '@/pages/StartProjectPage';
+import { AdminDashboardPage } from '@/pages/AdminDashboardPage';
+import { PaymentPage } from '@/pages/PaymentPage';
 
 export default function App() {
   return (
@@ -32,6 +35,13 @@ export default function App() {
           <Route path="/event-os/sound-clash" element={<SoundClashPage />} />
           <Route path="/event-os/wager" element={<WagerOSPage />} />
           <Route path="/event-os/love-match" element={<LoveMatchPage />} />
+
+          <Route path="/start-project" element={<StartProjectPage />} />
+          <Route path="/admin-dashboard" element={<AdminDashboardPage />} />
+          <Route path="/payment" element={<PaymentPage />} />
+          <Route path="/loa-funds" element={<FundTheGamePage />} />
+          <Route path="/loa-admin" element={<AdminDashboardPage />} />
+          <Route path="/create-loa" element={<AdminDashboardPage />} />
 
           <Route path="/loa-game" element={<FundTheGamePage />} />
 
