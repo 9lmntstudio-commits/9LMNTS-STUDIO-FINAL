@@ -5,24 +5,30 @@ import { ArrowRight, Play, Star, Users, Zap, Palette, Code, TrendingUp, Shield, 
 export function HomePage() {
   const [activeAgentTab, setActiveAgentTab] = useState('overview');
 
+  // Force redeploy for Vercel settings update
+  console.log('9LMNTS Studio v2.0 - Updated');
+
   const featuredProjects = [
     {
       title: "Sound Clash OS",
       category: "Nightlife & Entertainment",
       image: "/assets/featured/index-SOUND-CLASH-OS.jpg",
-      link: "/event-os/sound-clash"
+      link: "/event-os/sound-clash",
+      features: ["Live Voting", "Power Tips", "Battle Mode", "Real-time Chat"]
     },
     {
       title: "The Union: Wedding OS",
       category: "Lifestyle & Events", 
       image: "/assets/featured/index-Juliette's- Wedding.jpg",
-      link: "/event-os/wedding"
+      link: "/event-os/wedding",
+      features: ["Guest Management", "Live Streaming", "Digital Invitations", "Photo Gallery"]
     },
     {
       title: "Corporate Clash",
       category: "Business & Tech",
       image: "/assets/featured/index-Corporate-V2-MAIN.jpg",
-      link: "/event-os/pitch-battle"
+      link: "/event-os/pitch-battle",
+      features: ["Pitch Battles", "Investor Voting", "Live Analytics", "Networking Hub"]
     }
   ];
 
@@ -107,6 +113,16 @@ export function HomePage() {
                   <div className="p-6">
                     <div className="text-orange-500 text-sm mb-2">{project.category}</div>
                     <h3 className="text-xl font-bold mb-2 group-hover:text-orange-500 transition-colors">{project.title}</h3>
+                    
+                    {/* Features */}
+                    <div className="flex flex-wrap gap-2 mb-4">
+                      {project.features.map((feature, idx) => (
+                        <span key={idx} className="bg-orange-500/20 text-orange-500 px-2 py-1 rounded text-xs font-medium">
+                          {feature}
+                        </span>
+                      ))}
+                    </div>
+                    
                     <div className="flex items-center text-orange-500 group-hover:text-orange-400">
                       <span className="mr-2">View Platform</span>
                       <ArrowRight className="w-4 h-4" />
@@ -400,6 +416,34 @@ export function HomePage() {
           <p className="text-xl text-gray-300 mb-8">
             Live Event Operating System - Powered by AI Agents
           </p>
+          
+          {/* Video Game Trailer Placeholder */}
+          <div className="bg-gray-900 rounded-2xl p-8 mb-8 border border-gray-800">
+            <div className="aspect-video bg-gray-800 rounded-lg flex items-center justify-center mb-6">
+              <div className="text-center">
+                <div className="w-16 h-16 bg-orange-500/20 rounded-full flex items-center justify-center mb-4 mx-auto">
+                  <Play className="w-8 h-8 text-orange-500" />
+                </div>
+                <h3 className="text-xl font-bold text-white mb-2">Video Game Trailer</h3>
+                <p className="text-gray-400">Coming Soon - Experience the future of live events</p>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4 text-sm text-gray-300">
+              <div className="text-left">
+                <span className="text-orange-500">🎮</span> Interactive Gameplay
+              </div>
+              <div className="text-left">
+                <span className="text-orange-500">🤖</span> AI-Powered Events
+              </div>
+              <div className="text-left">
+                <span className="text-orange-500">🌐</span> Multi-Platform Support
+              </div>
+              <div className="text-left">
+                <span className="text-orange-500">⚡</span> Real-Time Processing
+              </div>
+            </div>
+          </div>
+          
           <div className="grid md:grid-cols-2 gap-6 mb-8">
             <Link 
               to="/loa-funds" 

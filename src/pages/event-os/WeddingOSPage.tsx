@@ -9,7 +9,14 @@ import {
   MapPin,
   MessageSquare,
   QrCode,
-  Users
+  Users,
+  Vote,
+  Zap,
+  Share2,
+  Settings,
+  Clock,
+  Star,
+  TrendingUp
 } from 'lucide-react';
 
 type TabKey = 'overview' | 'schedule' | 'guests' | 'gifts' | 'gallery';
@@ -50,6 +57,43 @@ export function WeddingOSPage() {
     ],
     []
   );
+
+  const tabs = [
+    {
+      key: 'overview',
+      label: 'Overview',
+      icon: Heart
+    },
+    {
+      key: 'schedule',
+      label: 'Schedule',
+      icon: Calendar
+    },
+    {
+      key: 'guests',
+      label: 'Guests',
+      icon: Users
+    },
+    {
+      key: 'gifts',
+      label: 'Gifts',
+      icon: Gift
+    },
+    {
+      key: 'gallery',
+      label: 'Gallery',
+      icon: Camera
+    }
+  ];
+
+  const features = [
+    { icon: Vote, title: 'Live Voting', description: 'Guests can vote on wedding decisions' },
+    { icon: MessageSquare, title: 'Live Chat', description: 'Real-time messaging with attendees' },
+    { icon: QrCode, title: 'QR Check-in', description: 'Digital invitations and check-in' },
+    { icon: Share2, title: 'Social Sharing', description: 'Share moments across platforms' },
+    { icon: Clock, title: 'Timeline Updates', description: 'Live schedule and notifications' },
+    { icon: Star, title: 'Wish Registry', description: 'Digital gift and wish management' }
+  ];
 
   const gold = '#D4AF37';
 
@@ -112,17 +156,11 @@ export function WeddingOSPage() {
       <section className="px-4 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-6xl border-b border-[#D4AF37]/20">
           <div className="flex gap-2 overflow-x-auto py-3">
-            {([
-              { key: 'overview', label: 'Overview' },
-              { key: 'schedule', label: 'Schedule' },
-              { key: 'guests', label: 'Guests' },
-              { key: 'gifts', label: 'Gifts' },
-              { key: 'gallery', label: 'Gallery' }
-            ] as const).map((t) => (
+            {tabs.map((t) => (
               <button
                 key={t.key}
                 type="button"
-                onClick={() => setActiveTab(t.key)}
+                onClick={() => setActiveTab(t.key as TabKey)}
                 className={`whitespace-nowrap rounded-full border px-4 py-2 text-sm font-medium transition-all ${
                   activeTab === t.key
                     ? 'border-[#D4AF37] bg-[#D4AF37] text-black'
@@ -143,15 +181,26 @@ export function WeddingOSPage() {
               <div className="rounded-2xl border border-[#D4AF37]/15 bg-brand-panel p-6 lg:col-span-2">
                 <div className="text-white text-lg font-semibold">Welcome Message</div>
                 <div className="mt-3 text-gray-300">
-                  Welcome to Wedding OS — the interactive experience layer for guests. Check in via QR, follow the live schedule, send messages,
-                  upload moments to the mosaic feed, and track gifting.
+                  Welcome to Wedding OS — interactive experience layer with live voting, real-time chat, QR check-in, social sharing, timeline updates, and digital wish registry.
+                </div>
+
+                <div className="mt-6 grid gap-3 sm:grid-cols-2">
+                  {features.map((feature, idx) => (
+                    <div key={idx} className="flex items-start gap-3 p-3 rounded-lg border border-[#D4AF37]/20 bg-brand-bg/60">
+                      <feature.icon className="w-5 h-5 text-[#D4AF37] flex-shrink-0 mt-0.5" />
+                      <div>
+                        <div className="text-white font-medium">{feature.title}</div>
+                        <div className="text-sm text-gray-400">{feature.description}</div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
 
                 <div className="mt-6 grid gap-3 sm:grid-cols-2">
                   <button type="button" className="rounded-xl border border-[#D4AF37]/25 bg-brand-bg/60 p-4 text-left hover:bg-[#D4AF37]/10">
                     <Users className="text-[#D4AF37]" />
                     <div className="mt-2 text-white font-medium">Guest Network</div>
-                    <div className="text-sm text-gray-400">See who’s here, connect, and coordinate.</div>
+                    <div className="text-sm text-gray-400">See who's here, connect, and coordinate.</div>
                   </button>
                   <button type="button" className="rounded-xl border border-[#D4AF37]/25 bg-brand-bg/60 p-4 text-left hover:bg-[#D4AF37]/10">
                     <MessageSquare className="text-[#D4AF37]" />
